@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 """
-7m体育网 球员数据爬虫 v4
-- 自动解密字段名（解析 getinfofun.php JS代码）
-- 自动转换 position 数字→中文
-- 抓取基本信息、比赛统计（解析为结构化数据）、实时数据
+7m体育网 球员数据爬虫 + Excel导出
 用法:
   python scrape_7m_player.py 97901
   python scrape_7m_player.py 97901 -o 97901.json
-  python scrape_7m_player.py 97901 45 100 -o players.json
+  python scrape_7m_player.py 97901 45 -x -o players.xlsx
+  python scrape_7m_player.py -i ids.txt -x -o players.xlsx
 """
 
 import json
 import re
 import sys
 import time
+import argparse
 from urllib.request import Request, urlopen
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
 }
 
-# 全局缓存：从 const/gb.js 获取的常量
 _LINEUP_ARR = None
 _PLAYER_DATA_TITLE = None
 
@@ -40,11 +38,9 @@ def load_constants(lang='gb'):
         return
     try:
         js = http_get(f'https://static.7m.com.cn/js/player/const/{lang}.js')
-        # 提取 LINEUP_ARR = ["前锋",...]  （匹配方括号内容）
         m = re.search(r'LINEUP_ARR\s*=\s*(\[.*?\])\s*;', js, re.DOTALL)
         if m:
             _LINEUP_ARR = json.loads(m.group(1))
-        # 提取 PLAYER_DATA_TITLE = ["国籍：",...]
         m2 = re.search(r'PLAYER_DATA_TITLE\s*=\s*(\[.*?\])\s*;', js, re.DOTALL)
         if m2:
             _PLAYER_DATA_TITLE = json.loads(m2.group(1))
@@ -57,7 +53,6 @@ def load_constants(lang='gb'):
 
 
 def extract_json_var(js_text, var_name):
-    """用括号计数法从JS中提取 var xxx = {...} 的JSON对象"""
     prefix = f'var {var_name} ='
     idx = js_text.find(prefix)
     if idx < 0:
@@ -93,23 +88,13 @@ def extract_json_var(js_text, var_name):
 
 
 def parse_info_fun_js(js):
-    """
-    解析 getinfofun.php 返回的JS，建立 加密key → 字段名 的映射。
-    通过分析 playerName 赋值和 PLAYER_DATA_TITLE 下标来推断。
-    """
     mapping = {}
-
-    # 1) 中文名：var playerName = playerInfo["..."]
     m = re.search(r'var playerName = playerInfo\["(.*?)"\]', js)
     if m:
         mapping[m.group(1)] = 'name_cn'
-
-    # 2) 英文名：playerName += "(" + playerInfo["..."] + ")"
     m2 = re.search(r'playerName \+=.*?playerInfo\["(.*?)"\]', js)
     if m2:
         mapping[m2.group(1)] = 'name_en'
-
-    # 3) 通过 PLAYER_DATA_TITLE 下标建立映射
     title_field = {
         0: 'nationality',
         1: 'birthday',
@@ -127,10 +112,8 @@ def parse_info_fun_js(js):
     positions = [(m.start(), int(m.group(1)))
                  for m in re.finditer(r'PLAYER_DATA_TITLE\[(\d+)\]', js)]
     positions.sort()
-
     key_occs = [(m.start(), m.group(1))
                   for m in re.finditer(r'playerInfo\["(.*?)"\]', js)]
-
     for pos, tidx in positions:
         if tidx not in title_field:
             continue
@@ -142,8 +125,6 @@ def parse_info_fun_js(js):
                 best_pos = kpos
         if best:
             mapping[best] = title_field[tidx]
-
-    # 4) profile / honours
     for km in re.finditer(r'playerInfo\["(.*?)"\]', js):
         k = km.group(1)
         if k in mapping:
@@ -153,12 +134,10 @@ def parse_info_fun_js(js):
             mapping[k] = 'profile'
         elif 'golry_td' in rest:
             mapping[k] = 'honours'
-
     return mapping
 
 
 def fetch_player_info(pid, lang='gb'):
-    """抓取并解密球员基本信息"""
     load_constants(lang)
     nc = str(int(time.time() * 1000))
     url = f'https://player.7m.com.cn/v2/encrypt/fun/getinfo.php?id={pid}&lang={lang}&nc={nc}'
@@ -177,7 +156,6 @@ def fetch_player_info(pid, lang='gb'):
             field_map = parse_info_fun_js(js_fun)
         except Exception as e:
             print(f'  [警告] 获取字段映射失败: {e}', file=sys.stderr)
-
     result = {}
     for k, v in info_enc.items():
         if k in ('e_index', 'link'):
@@ -190,8 +168,6 @@ def fetch_player_info(pid, lang='gb'):
                 result[guessed] = v
             else:
                 result[f'_raw_{k}'] = v
-
-    # 转换 position 数字 → 中文
     if 'position' in result and _LINEUP_ARR:
         try:
             idx = int(result['position'])
@@ -199,16 +175,12 @@ def fetch_player_info(pid, lang='gb'):
                 result['position'] = _LINEUP_ARR[idx]
         except (ValueError, TypeError):
             pass
-
-    # 转换 birthday 格式
     if 'birthday' in result:
         result['birthday'] = result['birthday'].replace(',', '-').strip()
-
     return result, None
 
 
 def _guess_field(k, v, result_so_far):
-    """按值特征猜测字段名"""
     if not isinstance(v, str):
         return None
     s = v.strip()
@@ -222,7 +194,6 @@ def _guess_field(k, v, result_so_far):
 
 
 def _parse_vs(vs_str):
-    """解析 vs 字段：赛事ID, 主队ID, 客队ID, 球员所在队ID, 主客场?, 主队进球, 客队进球"""
     parts = vs_str.split(',')
     return {
         'competition_id': parts[1] if len(parts) > 1 else '',
@@ -236,7 +207,6 @@ def _parse_vs(vs_str):
 
 
 def _parse_s(s_str):
-    """解析 s 字段：进球,点球,乌龙,黄牌,红牌,上场时间"""
     parts = s_str.split(',')
     return {
         'goals': parts[0] if len(parts) > 0 else '',
@@ -249,7 +219,6 @@ def _parse_s(s_str):
 
 
 def decrypt_stats(stats_enc, lang='gb'):
-    """解析比赛统计数据为结构化格式"""
     if not stats_enc:
         return None
     result = {}
@@ -257,7 +226,6 @@ def decrypt_stats(stats_enc, lang='gb'):
         if k in ('e_index', 'link'):
             result[k] = v
         elif isinstance(v, dict):
-            # 判断是赛事映射还是球队映射
             first_val = next(iter(v.values()), '')
             if isinstance(first_val, dict) and 'n' in first_val:
                 result['competitions'] = v
@@ -280,7 +248,6 @@ def decrypt_stats(stats_enc, lang='gb'):
 
 
 def fetch_player_stats(pid, lang='gb'):
-    """抓取比赛统计"""
     nc = str(int(time.time() * 1000))
     url = f'https://player.7m.com.cn/v2/encrypt/fun/getstats.php?id={pid}&lang={lang}&nc={nc}'
     referer = f'https://player.7m.com.cn/{pid}/index_{lang}.shtml'
@@ -294,7 +261,6 @@ def fetch_player_stats(pid, lang='gb'):
 
 
 def fetch_intime(pid):
-    """抓取球员实时数据（明文）"""
     url = f'https://player.7m.com.cn/{pid}/data/intime.js'
     try:
         js = http_get(url, timeout=10)
@@ -304,7 +270,6 @@ def fetch_intime(pid):
 
 
 def scrape_player(pid, lang='gb'):
-    """抓取一个球员的全部数据"""
     result = {'player_id': pid}
     info, err = fetch_player_info(pid, lang)
     if err:
@@ -320,41 +285,216 @@ def scrape_player(pid, lang='gb'):
     return result
 
 
-def main():
-    if len(sys.argv) < 2:
-        print(__doc__)
+# ─── Excel 导出 ───────────────────────────────────────────────────────────────
+
+INFO_COLUMNS = [
+    ('球员ID', 'player_id'),
+    ('中文名', 'name_cn'),
+    ('英文名', 'name_en'),
+    ('国籍', 'nationality'),
+    ('生日', 'birthday'),
+    ('身高', 'height'),
+    ('体重', 'weight'),
+    ('俱乐部', 'club'),
+    ('位置', 'position'),
+    ('球衣号码', 'shirt_no'),
+    ('加盟日期', 'join_date'),
+    ('转会费', 'transfer_fee'),
+    ('前度效力球队', 'former_club'),
+    ('曾经效力球队', 'once_club'),
+    ('球员身价', 'market_value'),
+]
+
+MATCH_COLUMNS = [
+    ('球员ID', 'player_id'),
+    ('中文名', '_name_cn'),
+    ('日期', 'date'),
+    ('赛事ID', 'competition_id'),
+    ('主队ID', 'team1_id'),
+    ('客队ID', 'team2_id'),
+    ('主队进球', 'score1'),
+    ('客队进球', 'score2'),
+    ('进球', 'goals'),
+    ('点球', 'penalties'),
+    ('乌龙球', 'own_goals'),
+    ('黄牌', 'yellow_cards'),
+    ('红牌', 'red_cards'),
+    ('上场时间(分钟)', 'minutes'),
+]
+
+
+def _get_info(data, key):
+    return data.get('info', {}).get(key, '')
+
+
+def export_to_xlsx(all_results, xlsx_path):
+    """
+    将抓取结果导出为 Excel（.xlsx），兼容 WPS。
+    三个 Sheet：
+      1. 基本信息  - 每个球员一行
+      2. 比赛统计  - 每个球员每场比赛一行
+      3. 荣誉简介  - 球员荣誉和简介
+    """
+    try:
+        import openpyxl
+        from openpyxl.styles import Font, Alignment, PatternFill
+        from openpyxl.utils import get_column_letter
+    except ImportError:
+        print('[错误] 需要 openpyxl 库，请运行: pip install openpyxl', file=sys.stderr)
         sys.exit(1)
-    pids = []
-    out_file = None
-    args = sys.argv[1:]
-    i = 0
-    while i < len(args):
-        if args[i] == '-o' and i + 1 < len(args):
-            out_file = args[i + 1]
-            i += 2
+
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(start_color='4472C4', end_color='4472C4', fill_type='solid')
+    wrap_align = Alignment(wrap_text=True, vertical='top', horizontal='left')
+    center_align = Alignment(horizontal='center', vertical='center')
+
+    # ── Sheet 1: 基本信息 ──
+    ws = wb.create_sheet('基本信息')
+    for col, (title, _) in enumerate(INFO_COLUMNS, 1):
+        cell = ws.cell(row=1, column=col, value=title)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_align
+    ws.row_dimensions[1].height = 20
+
+    for row_idx, data in enumerate(all_results, 2):
+        info = data.get('info', {})
+        for col, (_, key) in enumerate(INFO_COLUMNS, 1):
+            val = info.get(key, '')
+            cell = ws.cell(row=row_idx, column=col, value=str(val) if val else '')
+            cell.alignment = wrap_align
+        ws.row_dimensions[row_idx].height = 16
+
+    for col_idx in range(1, len(INFO_COLUMNS) + 1):
+        title = INFO_COLUMNS[col_idx - 1][0]
+        max_len = len(title) * 2
+        for row_idx in range(2, len(all_results) + 2):
+            val = ws.cell(row=row_idx, column=col_idx).value or ''
+            char_len = 0
+            for c in str(val):
+                char_len += 2 if '\u4e00' <= c <= '\u9fff' else 1
+            max_len = max(max_len, char_len)
+        ws.column_dimensions[get_column_letter(col_idx)].width = min(max_len + 2, 40)
+
+    # ── Sheet 2: 比赛统计 ──
+    ws2 = wb.create_sheet('比赛统计')
+    for col, (title, _) in enumerate(MATCH_COLUMNS, 1):
+        cell = ws2.cell(row=1, column=col, value=title)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_align
+    ws2.row_dimensions[1].height = 20
+
+    match_row = 2
+    for data in all_results:
+        pid = data.get('player_id', '')
+        name_cn = _get_info(data, 'name_cn')
+        matches = data.get('stats', {}).get('matches', [])
+        if not matches:
+            ws2.cell(row=match_row, column=1, value=pid)
+            ws2.cell(row=match_row, column=2, value=name_cn)
+            match_row += 1
         else:
-            pids.append(args[i])
-            i += 1
+            for m in matches:
+                for col, (_, key) in enumerate(MATCH_COLUMNS, 1):
+                    if key == 'player_id':
+                        val = pid
+                    elif key == '_name_cn':
+                        val = name_cn
+                    else:
+                        val = m.get(key, '')
+                    ws2.cell(row=match_row, column=col, value=str(val) if val else '')
+                match_row += 1
+
+    for row_idx in range(2, match_row):
+        ws2.row_dimensions[row_idx].height = 16
+    for col_idx in range(1, len(MATCH_COLUMNS) + 1):
+        title = MATCH_COLUMNS[col_idx - 1][0]
+        max_len = len(title) * 2
+        for row_idx in range(2, match_row):
+            val = ws2.cell(row=row_idx, column=col_idx).value or ''
+            char_len = 0
+            for c in str(val):
+                char_len += 2 if '\u4e00' <= c <= '\u9fff' else 1
+            max_len = max(max_len, char_len)
+        ws2.column_dimensions[get_column_letter(col_idx)].width = min(max_len + 2, 30)
+
+    # ── Sheet 3: 荣誉简介 ──
+    ws3 = wb.create_sheet('荣誉简介')
+    for col, title in enumerate(['球员ID', '中文名', '个人简介', '荣誉'], 1):
+        cell = ws3.cell(row=1, column=col, value=title)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_align
+    ws3.row_dimensions[1].height = 20
+
+    for row_idx, data in enumerate(all_results, 2):
+        info = data.get('info', {})
+        ws3.cell(row=row_idx, column=1, value=data.get('player_id', ''))
+        ws3.cell(row=row_idx, column=2, value=info.get('name_cn', ''))
+        profile_cell = ws3.cell(row=row_idx, column=3, value=info.get('profile', ''))
+        profile_cell.alignment = wrap_align
+        honours_cell = ws3.cell(row=row_idx, column=4, value=info.get('honours', ''))
+        honours_cell.alignment = wrap_align
+        ws3.row_dimensions[row_idx].height = 60
+
+    ws3.column_dimensions['A'].width = 10
+    ws3.column_dimensions['B'].width = 15
+    ws3.column_dimensions['C'].width = 40
+    ws3.column_dimensions['D'].width = 50
+
+    wb.save(xlsx_path)
+    print(f'[完成] Excel已保存到 {xlsx_path}', file=sys.stderr)
+
+
+# ─── main ─────────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(description='7m体育网 球员数据爬虫')
+    parser.add_argument('pids', nargs='*', help='球员ID列表')
+    parser.add_argument('-i', '--input', help='从文件读取球员ID（每行一个）')
+    parser.add_argument('-o', '--output', default='-', help='输出文件（.json 或 .xlsx）')
+    parser.add_argument('-x', '--xlsx', action='store_true', help='导出为Excel格式')
+    parser.add_argument('-l', '--lang', default='gb', help='语言（gb=简体中文）')
+    args = parser.parse_args()
+
+    pids = list(args.pids)
+    if args.input:
+        with open(args.input, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    pids.append(line)
+
     if not pids:
-        print('请提供至少一个球员ID', file=sys.stderr)
+        parser.print_help()
         sys.exit(1)
 
     all_results = []
     for pid in pids:
         print(f'[抓取中] 球员ID: {pid}', file=sys.stderr)
-        data = scrape_player(pid)
+        data = scrape_player(pid, args.lang)
         all_results.append(data)
         if len(pids) > 1:
             time.sleep(0.5)
 
-    output = all_results[0] if len(all_results) == 1 else all_results
-    json_str = json.dumps(output, ensure_ascii=False, indent=2)
-    if out_file:
-        with open(out_file, 'w', encoding='utf-8') as f:
-            f.write(json_str)
-        print(f'[完成] 已保存到 {out_file}', file=sys.stderr)
+    is_xlsx = args.xlsx or (args.output != '-' and args.output.endswith('.xlsx'))
+
+    if is_xlsx:
+        xlsx_path = args.output if args.output != '-' else 'players.xlsx'
+        export_to_xlsx(all_results, xlsx_path)
     else:
-        print(json_str)
+        output = all_results[0] if len(all_results) == 1 else all_results
+        json_str = json.dumps(output, ensure_ascii=False, indent=2)
+        if args.output != '-':
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(json_str)
+            print(f'[完成] 已保存到 {args.output}', file=sys.stderr)
+        else:
+            print(json_str)
 
 
 if __name__ == '__main__':
