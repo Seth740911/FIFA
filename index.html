@@ -142,10 +142,12 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .pd-honor-name{flex-shrink:0}
 .pd-honor-years{color:var(--gold);text-align:right;margin-left:8px}
 @media(max-width:500px){
+  .pd-overlay{align-items:flex-start;padding-top:0;overscroll-behavior:none}
+  .pd-modal{width:100%;max-width:none;height:100vh;max-height:none;border-radius:0;box-shadow:none;touch-action:pan-y}
   .pd-top{flex-direction:column;max-height:none}
-  .pd-photo-wrap{width:100%;height:auto;aspect-ratio:2/3;max-height:240px}
+  .pd-photo-wrap{width:100%;height:auto;aspect-ratio:2/3;max-height:50vh}
   .pd-photo-wrap img{height:100%}
-  .pd-info{padding:16px;max-height:none}
+  .pd-info{padding:16px;max-height:none;font-size:1.05em}
   .pd-attrs{grid-template-columns:repeat(4,1fr);gap:6px}
   .pd-attr{padding:6px 4px}
   .pd-attr-val{font-size:1em}
