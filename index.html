@@ -11,16 +11,24 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0a0f;--card:#12121a;--card2:#1a1a25;--border:#2a2a3a;--text:#e0e0e8;--text2:#8888a0;--gold:#d4a853;--accent:#5b8af5}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.6;overflow-x:hidden}
+html{overscroll-behavior-x:none}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.6;touch-action:pan-y}
 .container{max-width:1400px;margin:0 auto;padding:20px}
 header{text-align:center;padding:40px 20px 30px;border-bottom:1px solid var(--border)}
 header h1{font-size:2.5em;background:linear-gradient(135deg,var(--gold),#f0c878,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
 header p{color:var(--text2);margin-top:8px;font-size:1.1em}
 
 /* 顶部锚点导航 */
-nav{display:flex;gap:6px;padding:16px 0;overflow-x:auto;flex-wrap:wrap;justify-content:center;position:sticky;top:0;background:var(--bg);z-index:100;border-bottom:1px solid var(--border)}
-nav a{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.9em;transition:all .2s;white-space:nowrap;text-decoration:none}
-nav a:hover{border-color:var(--gold);color:var(--text)}
+nav{display:flex;gap:4px;padding:6px 2px;overflow-x:auto;flex-wrap:nowrap;justify-content:center;position:sticky;top:0;background:var(--bg);z-index:100;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{border:1px solid transparent;color:#fff;padding:4px 9px;border-radius:16px;cursor:pointer;font-size:.76em;transition:all .2s;white-space:nowrap;text-decoration:none;font-weight:600;letter-spacing:.3px;line-height:1.4}
+nav a:nth-child(1){background:#e67e22;border-color:#d35400}
+nav a:nth-child(2){background:#2ecc71;border-color:#27ae60}
+nav a:nth-child(3){background:#e74c3c;border-color:#c0392b}
+nav a:nth-child(4){background:#9b59b6;border-color:#8e44ad}
+nav a:nth-child(5){background:#3498db;border-color:#2980b9}
+nav a:nth-child(6){background:#1abc9c;border-color:#16a085}
+nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 
 /* 区块通用 */
 .section{padding:30px 0}
@@ -33,35 +41,20 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .overview-item .value{color:var(--gold);font-weight:600;font-size:1.05em;text-align:right;max-width:60%}
 
 /* 分组与赛程 */
-.group-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0}
-.group-card h3{color:var(--gold);margin-bottom:14px;font-size:1.2em}
-.group-teams{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.group-team{background:var(--card2);border-radius:10px;padding:16px 12px;text-align:center;transition:transform .2s}
-.group-team:hover{transform:translateY(-2px)}
-.group-team img{width:64px;height:43px;border-radius:5px;margin-bottom:8px;object-fit:contain}
-.group-team .name{font-weight:700;font-size:1.05em}
-.group-team .sub{color:var(--text2);font-size:.82em}
-.group-match-table{width:100%;border-collapse:collapse;margin:10px 0 0;font-size:.85em}
-.group-match-table th{background:var(--card2);color:var(--gold);padding:6px 8px;text-align:left;font-weight:600;white-space:nowrap;border-bottom:2px solid var(--gold);font-size:.85em}
-.group-match-table td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
-.group-match-table tr:hover td{background:rgba(212,168,83,.05)}
-.group-match-table .match-highlight{font-weight:600}
-.group-schedule{margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
-.group-schedule h4{color:var(--text2);font-size:.9em;margin-bottom:6px;font-weight:500}
 
 /* 焦点球星 */
 .star-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .star-card2{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s;position:relative}
 .star-card2:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .star-card2::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-color)}
-.sc2-photo-area{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:#111}
-.sc2-photo{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;opacity:0;transition:opacity .3s}
+.sc2-photo-area{position:relative;width:100%;aspect-ratio:2/3;overflow:hidden;background:#111}
+.sc2-photo{width:100%;height:100%;object-fit:cover;object-position:top;display:block;opacity:0;transition:opacity .3s}
 .sc2-photo.loaded{opacity:1}
 .sc2-photo-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#2a2a4e)}
 .sc2-flag-badge{position:absolute;top:8px;right:8px;width:32px;height:22px;border-radius:4px;border:2px solid rgba(0,0,0,.4);z-index:2;object-fit:contain}
 .sc2-photo-overlay{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);z-index:1}
 .sc2-name-on-photo{position:absolute;bottom:8px;left:10px;right:10px;font-size:1.3em;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);z-index:2;letter-spacing:.5px}
-.sc2-no-photo-area{position:relative;width:100%;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#111 0%,#1a1a2e 50%,#0d0d1a 100%);overflow:hidden}
+.sc2-no-photo-area{position:relative;width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#111 0%,#1a1a2e 50%,#0d0d1a 100%);overflow:hidden}
 .sc2-no-photo-area::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(212,168,83,.08),transparent 60%)}
 .sc2-flag-big{width:72px;height:48px;border-radius:6px;border:2px solid rgba(212,168,83,.2);position:relative;z-index:1;object-fit:contain}
 .sc2-name-on-flag{font-size:1.3em;font-weight:800;color:var(--gold);margin-top:10px;position:relative;z-index:1;letter-spacing:.5px}
@@ -75,31 +68,88 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .venue-card:hover{border-color:var(--gold)}
 
 /* 各队阵容 */
-.roster-team{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:10px 0;overflow:hidden}
-.roster-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.roster-header:hover{background:var(--card2)}
-.roster-header .team-color{width:4px;height:32px;border-radius:2px}
-.roster-header .flag-img{height:20px;width:auto;border-radius:3px;vertical-align:middle;margin-right:6px;object-fit:contain}
-.roster-body{display:none;padding:0 16px 16px}
-.roster-body.open{display:block}
+/* 阵容照片墙 */
+.rw-team{margin:12px 0}
+.rw-team-head{display:flex;align-items:center;gap:8px;padding:8px 4px;cursor:pointer;border-radius:6px;transition:background .15s}
+.rw-team-head:hover{background:var(--card2)}
+.rw-team-bar{width:4px;height:24px;border-radius:2px;flex-shrink:0}
+.rw-team-flag{height:18px;width:auto;border-radius:2px;object-fit:contain;flex-shrink:0}
+.rw-team-head strong{font-size:.95em;white-space:nowrap;cursor:pointer}
+.rw-team-head::after{content:"▸";color:var(--text2);font-size:.9em;margin-left:auto;padding-left:8px;transition:transform .2s}
+.rw-team-head:hover::after{color:var(--gold)}
+.rw-team-head.open::after{transform:rotate(90deg);color:var(--gold)}
+.rw-tag{color:var(--gold);font-size:.7em;background:rgba(212,168,83,.12);padding:1px 6px;border-radius:3px}
+.rw-team-sub{color:var(--text2);font-size:.78em;margin-left:8px}
+.rw-scroll{display:none;gap:10px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.rw-scroll.open{display:flex}
+.rw-scroll::-webkit-scrollbar{height:5px}
+.rw-scroll::-webkit-scrollbar-track{background:transparent}
+.rw-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.rw-card{flex-shrink:0;width:90px;background:#fff;border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.rw-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.rw-photo-area{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:#f5f5f5}
+.rw-photo{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;opacity:0;transition:opacity .3s}
+.rw-photo.loaded{opacity:1}
+.rw-no-photo{position:relative;width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
+.rw-jersey{font-size:2em;font-weight:900;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.4);opacity:.85}
+.rw-flag{position:absolute;top:4px;left:4px;height:12px;max-width:20px;width:auto;border-radius:2px;border:1px solid rgba(255,255,255,.7);z-index:2;object-fit:contain}
+.rw-pos{position:absolute;top:4px;right:4px;padding:1px 5px;border-radius:2px;font-size:.6em;font-weight:700;color:#fff;z-index:2;letter-spacing:.5px}
+.rw-name{padding:5px 6px 2px;background:#fff;font-size:.68em;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-num{padding:0 6px 5px;background:#fff;font-size:.6em;color:#999}
 .roster-filter{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.85em;transition:all .2s}
 .roster-filter:hover{border-color:var(--gold);color:var(--text)}
 .roster-filter.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
 
-/* 球员卡片 v3 */
-.player-grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:12px 0}
-.pc2{background:#fff;border-radius:12px;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.pc2:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.pc2-photo-area{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:#fff}
-.pc2-photo{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;opacity:0;transition:opacity .3s}
-.pc2-photo.loaded{opacity:1}
-.pc2-no-photo{position:relative;width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
-.pc2-jersey-big{font-size:3.2em;font-weight:900;color:#fff;text-shadow:0 3px 8px rgba(0,0,0,.4);opacity:.9}
-.pc2-flag-badge{position:absolute;top:8px;left:8px;height:16px;max-width:28px;width:auto;border-radius:2px;border:1.5px solid rgba(255,255,255,.8);z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.4);object-fit:contain;background:rgba(0,0,0,.15)}
-.pc2-pos-badge{position:absolute;top:8px;right:8px;padding:2px 7px;border-radius:3px;font-size:.68em;font-weight:700;color:#fff;z-index:2;letter-spacing:.5px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.pc2-info{padding:10px 10px 12px;background:#fff}
-.pc2-cn-name{font-size:.95em;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
-.pc2-en-name{font-size:.78em;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+/* 球员详情弹层 */
+.pd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pd-overlay.open{display:flex}
+.pd-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:480px;width:92%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.pd-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:1.6em;cursor:pointer;z-index:2;line-height:1;transition:color .15s}
+.pd-close:hover{color:var(--gold)}
+.pd-top{display:flex;gap:0;overflow:hidden;border-radius:16px 16px 0 0;max-height:300px}
+.pd-photo-wrap{flex-shrink:0;width:200px;height:300px;overflow:hidden;background:#1a1a25}
+.pd-photo-wrap img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.pd-no-photo{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4em;font-weight:900;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,.5);opacity:.8}
+.pd-info{flex:1;padding:16px 16px 16px 20px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;max-height:300px}
+.pd-name{font-size:1.5em;font-weight:800;color:var(--gold);line-height:1.2}
+.pd-en-name{font-size:.85em;color:var(--text2);margin-bottom:4px;word-break:break-word}
+.pd-team-line{display:flex;align-items:center;gap:8px;padding:6px 0}
+.pd-team-line img{height:20px;border-radius:2px;object-fit:contain}
+.pd-team-line .pd-team-cn{font-weight:700;font-size:1em}
+.pd-team-line .pd-team-en{color:var(--text2);font-size:.8em}
+.pd-attrs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:6px}
+.pd-attr{background:var(--card2);border-radius:8px;padding:10px 12px;text-align:center}
+.pd-attr-val{font-size:1.3em;font-weight:800;color:var(--gold)}
+.pd-attr-label{font-size:.7em;color:var(--text2);margin-top:2px}
+.pd-extra{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
+.pd-extra-row{display:flex;justify-content:space-between;padding:3px 0;font-size:.82em}
+.pd-extra-label{color:var(--text2)}
+.pd-extra-val{color:var(--text);font-weight:600;text-align:right;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-stats{padding:6px 0 0;font-size:.85em}
+.pd-bio{color:var(--text2);word-break:break-all;display:none}
+.pd-bio-text{padding:4px 20px 12px;text-indent:2em;font-size:.8em;line-height:1.7}
+.pd-section-title{font-size:.9em;font-weight:700;color:var(--gold);padding:10px 20px 4px;letter-spacing:.5px;border-top:1px solid var(--border)}
+.pd-match-table{width:100%;border-collapse:collapse;font-size:.78em;margin:4px 20px 0;table-layout:fixed}
+.pd-match-table th{color:var(--text2);font-weight:400;padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-match-table td{padding:4px 6px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-match-table tr:hover{background:var(--card2)}
+.pd-match-vs{max-width:none}
+.pd-honors-text{padding:4px 20px 12px;font-size:.8em;line-height:1.7;color:var(--text2)}
+.pd-honor-cat{font-weight:700;color:var(--text);margin-top:6px;padding-bottom:2px}
+.pd-honor-club{font-size:.9em;color:var(--text2);font-weight:600;padding:2px 0 0}
+.pd-honor-row{display:flex;justify-content:space-between;padding:1px 0}
+.pd-honor-name{flex-shrink:0}
+.pd-honor-years{color:var(--gold);text-align:right;margin-left:8px}
+@media(max-width:500px){
+  .pd-top{flex-direction:column;max-height:none}
+  .pd-photo-wrap{width:100%;height:auto;aspect-ratio:2/3;max-height:240px}
+  .pd-photo-wrap img{height:100%}
+  .pd-info{padding:16px;max-height:none}
+  .pd-attrs{grid-template-columns:repeat(4,1fr);gap:6px}
+  .pd-attr{padding:6px 4px}
+  .pd-attr-val{font-size:1em}
+  .pd-attr-label{font-size:.6em}
+}
 
 /* 回到顶部 */
 .back-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;background:var(--gold);color:#000;border:none;border-radius:50%;cursor:pointer;font-size:1.3em;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:200;transition:transform .2s}
@@ -107,7 +157,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .back-top.show{display:flex}
 
 /* 小组积分 */
-.gs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.gs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .gs-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;overflow:hidden}
 .gs-card h3{color:var(--gold);margin-bottom:10px;font-size:1.1em;display:flex;align-items:center;gap:8px}
 .gs-card h3 .gs-rank-hint{font-size:.7em;color:var(--text2);font-weight:400}
@@ -117,7 +167,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .gs-table td{padding:4px 5px;text-align:center;border-bottom:1px solid var(--border)}
 .gs-table td:first-child{text-align:center;width:20px;font-weight:700;color:var(--text2)}
 .gs-table td:nth-child(2){text-align:left;white-space:nowrap}
-.gs-table .gs-team{display:flex;align-items:center;gap:5px}
+.gs-table .gs-team{display:flex;align-items:center;gap:5px;cursor:pointer}
 .gs-table .gs-flag{width:18px;height:12px;border-radius:2px;object-fit:contain;flex-shrink:0}
 .gs-table .gs-tn{font-weight:600}
 .gs-table tr.gs-adv{background:rgba(212,168,83,.06)}
@@ -133,14 +183,28 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .gs-match .gs-ms:hover{background:rgba(212,168,83,.15)}
 .gs-match .gs-ms-input{width:24px;text-align:center;background:var(--bg);border:1px solid var(--gold);color:#fff;font-weight:700;font-size:.85em;border-radius:3px;padding:1px 2px;outline:none}
 .gs-match .gs-vs{color:var(--text2);font-size:.75em;min-width:12px;text-align:center}
+.gs-schedule{border-top:1px solid var(--border);padding-top:8px}
+.gs-sch-table{width:100%;border-collapse:collapse;font-size:.72em}
+.gs-sch-date{padding:3px 4px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.gs-sch-time{padding:3px 4px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.gs-sch-t1{text-align:right;padding:3px 4px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.gs-sch-sc{text-align:center;padding:3px 4px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;min-width:36px}
+.gs-sch-sc b{color:var(--gold);font-weight:700}
+.gs-sch-t2{text-align:left;padding:3px 4px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.gs-sch-pending{color:var(--text2)}
+.gs-sch-vs{color:var(--text2)}
+.gs-sch-t1:hover,.gs-sch-sc:hover,.gs-sch-t2:hover{background:rgba(212,168,83,.08)}
 .gs-ctrl{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 
 @media(max-width:900px){
+  .gs-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:500px){
   .gs-grid{grid-template-columns:1fr}
 }
 
 /* 淘汰赛签表 */
-.bracket-wrap{position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 0 20px}
+.bracket-wrap{position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 0 20px;max-width:100%;contain:layout}
 .bracket-grid{display:flex;align-items:stretch;position:relative;min-width:max-content;padding:0 10px}
 .bracket-svg{position:absolute;top:0;left:0;pointer-events:none;z-index:1}
 .bracket-col{display:flex;flex-direction:column;z-index:2}
@@ -153,8 +217,8 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .b-team+.b-team{border-top:1px solid var(--border)}
 .b-team.winner{background:rgba(212,168,83,.1)}
 .b-team.loser{opacity:.4}
-.b-flag{width:18px;height:12px;border-radius:2px;object-fit:contain;flex-shrink:0}
-.b-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default}
+.b-flag{width:18px;height:12px;border-radius:2px;object-fit:contain;flex-shrink:0;cursor:pointer}
+.b-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .b-score{min-width:20px;text-align:center;font-weight:700;color:var(--gold);cursor:pointer;padding:1px 3px;border-left:1px solid var(--border);font-size:.85em}
 .b-score:hover{background:rgba(212,168,83,.15)}
 .b-score-input{width:26px;text-align:center;background:var(--bg);border:1px solid var(--gold);color:#fff;font-weight:700;font-size:.85em;border-radius:3px;padding:1px 2px;outline:none}
@@ -164,11 +228,14 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 .bc-note{color:var(--text2);font-size:.75em;margin-left:4px}
 
 @media(max-width:900px){
-  .group-teams{grid-template-columns:repeat(2,1fr)}
   .overview-grid{grid-template-columns:1fr}
+  .overview-stats{grid-template-columns:repeat(2,1fr)}
+  .overview-item{white-space:nowrap;padding:10px 12px}
+  .overview-item .label{font-size:.75em;flex-shrink:0}
+  .overview-item .value{font-size:.82em;max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .star-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  nav a{padding:6px 12px;font-size:.8em}
-  header h1{font-size:1.8em}
+  nav a{padding:3px 8px;font-size:.7em}
+  header h1{font-size:1.1em;letter-spacing:1px}
 }
 .fade-in{animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -176,29 +243,27 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 </head>
 <body>
 <div class="container">
-<header>
-  <h1>2026 美加墨世界杯观赛指南</h1>
-  <p>FIFA World Cup 2026™ &mdash; 48队 12组 104场 首次三国联办</p>
-</header>
-
 <nav>
-  <a href="#overview">赛事概况</a>
-  <a href="#groups">分组赛程</a>
-  <a href="#groupstand">小组积分</a>
+  <a href="#overview">概况</a>
+  <a href="#groupstand">积分</a>
   <a href="#knockout">淘汰赛</a>
   <a href="#stars">球星</a>
   <a href="#venues">场馆</a>
   <a href="#roster">阵容</a>
 </nav>
+<header>
+  <h1>2026 美加墨世界杯观赛指南</h1>
+  <p>FIFA World Cup 2026™ &mdash; 48队 12组 104场 首次三国联办</p>
+</header>
 
 <!-- 赛事概况 -->
 <section id="overview" class="section fade-in">
   <h2>赛事概况</h2>
-  <div class="overview-grid" style="grid-template-columns:repeat(4,1fr)">
-    <div class="overview-item" style="flex-direction:column;align-items:center;justify-content:center;text-align:center"><span class="value" style="font-size:1.8em;max-width:100%">48</span><span class="label">参赛球队</span></div>
-    <div class="overview-item" style="flex-direction:column;align-items:center;justify-content:center;text-align:center"><span class="value" style="font-size:1.8em;max-width:100%">12</span><span class="label">小组</span></div>
-    <div class="overview-item" style="flex-direction:column;align-items:center;justify-content:center;text-align:center"><span class="value" style="font-size:1.8em;max-width:100%">104</span><span class="label">比赛场次</span></div>
-    <div class="overview-item" style="flex-direction:column;align-items:center;justify-content:center;text-align:center"><span class="value" style="font-size:1.8em;max-width:100%">39</span><span class="label">赛事天数</span></div>
+  <div class="overview-grid overview-stats" style="grid-template-columns:repeat(4,1fr)">
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">48</span><span class="label">参赛球队</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">12</span><span class="label">小组</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">104</span><span class="label">比赛场次</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">39</span><span class="label">赛事天数</span></div>
   </div>
   <div class="overview-grid">
     <div class="overview-item"><span class="label">举办国</span><span class="value">美国 · 加拿大 · 墨西哥</span></div>
@@ -212,19 +277,15 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
 </section>
 
-<!-- 分组与赛程 -->
-<section id="groups" class="section fade-in">
-  <h2>分组与赛程</h2>
-  <div id="groups-container"></div>
-</section>
-
 <!-- 小组积分 -->
 <section id="groupstand" class="section fade-in">
-  <h2>小组积分榜</h2>
-  <div class="gs-ctrl">
-    <button onclick="syncScores()" class="bc-btn">同步比分</button>
-    <button onclick="GSTAND.reset()" class="bc-btn">重置</button>
-    <span class="bc-note" id="sync-status">点击比分输入，或"同步比分"从FIFA获取</span>
+  <div id="gsSticky" style="position:sticky;top:0;background:var(--bg);z-index:90;padding-bottom:4px;border-bottom:1px solid var(--border)">
+    <h2 id="gsTitle" style="padding:12px 0;border-bottom:none;margin-bottom:0">小组积分榜</h2>
+    <div class="gs-ctrl">
+      <button onclick="syncScores()" class="bc-btn">同步比分</button>
+      <button onclick="GSTAND.reset()" class="bc-btn">重置</button>
+      <span class="bc-note" id="sync-status">点击比分输入，或"同步比分"从FIFA获取</span>
+    </div>
   </div>
   <div class="gs-grid" id="gs-container"></div>
 </section>
@@ -278,9 +339,12 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
     </div>
   </div>
   <div class="star-card2" style="--team-color:#C70000">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/NOR.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">哈兰德</div>
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/NOR/09_Erling%20HAALAND_FW.png" class="sc2-photo" alt="哈兰德" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/NOR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/NOR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-photo-overlay"></div>
+      <div class="sc2-name-on-photo">哈兰德</div>
     </div>
     <div class="sc2-info">
       <div class="sc2-meta">挪威 &middot; 前锋 &middot; 25岁</div>
@@ -290,7 +354,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FF0000">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/YAMAL-Lamine_484320.jpg" class="sc2-photo" alt="亚马尔" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/ESP/19_Lamine%20YAMAL_FW.png" class="sc2-photo" alt="亚马尔" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -304,7 +368,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FFCF25">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/VINICIUS-JUNIOR_405742.jpg" class="sc2-photo" alt="维尼修斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/BRA/07_VINICIUS%20JUNIOR_FW.png" class="sc2-photo" alt="维尼修斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/BRA.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/BRA.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -318,7 +382,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#CE1124">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/BELLINGHAM-Jude_448202.jpg" class="sc2-photo" alt="贝林厄姆" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/ENG/10_Jude%20BELLINGHAM_MF.png" class="sc2-photo" alt="贝林厄姆" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ENG.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -332,7 +396,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#880029">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/BRUYNE-Kevin_358120.jpg" class="sc2-photo" alt="德布劳内" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/BEL/07_Kevin%20DE%20BRUYNE_MF.png" class="sc2-photo" alt="德布劳内" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/BEL.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/BEL.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -346,7 +410,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FF0000">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/PEDRI_423646.jpg" class="sc2-photo" alt="佩德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/ESP/20_PEDRI_MF.png" class="sc2-photo" alt="佩德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -382,7 +446,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FF253A">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/SON-Heungmin_307849.jpg" class="sc2-photo" alt="孙兴慜" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/KOR/07_SON%20Heungmin_FW.png" class="sc2-photo" alt="孙兴慜" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/KOR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/KOR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -418,7 +482,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#CE1124">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/KANE-Harry_369419.jpg" class="sc2-photo" alt="凯恩" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/ENG/09_Harry%20KANE_FW.png" class="sc2-photo" alt="凯恩" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ENG.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -432,7 +496,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FF7A00">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/DIJK-Virgil_397786.jpg" class="sc2-photo" alt="范迪克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/NED/04_Virgil%20VAN%20DIJK_DF.png" class="sc2-photo" alt="范迪克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/NED.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/NED.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -446,7 +510,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#E40000">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/HAKIMI-Achraf_400721.jpg" class="sc2-photo" alt="阿什拉夫" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/MAR/02_Achraf%20HAKIMI_DF.png" class="sc2-photo" alt="阿什拉夫" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/MAR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/MAR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -460,7 +524,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#D52B1E">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/ALPHONSO-DAVIES_412144.jpg" class="sc2-photo" alt="阿方索·戴维斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/CAN/19_Alphonso%20DAVIES_DF.png" class="sc2-photo" alt="阿方索·戴维斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/CAN.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/CAN.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -474,7 +538,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   </div>
   <div class="star-card2" style="--team-color:#FF0000">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/RODRI_411375.jpg" class="sc2-photo" alt="罗德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img data-src="/wc-photos/ESP/16_RODRI_MF.png" class="sc2-photo" alt="罗德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
       <div class="sc2-photo-overlay"></div>
@@ -542,15 +606,208 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 <!-- 回到顶部按钮 -->
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
 
+<!-- 球员详情弹层 -->
+<div class="pd-overlay" id="pdOverlay" onclick="if(event.target===this)closePlayerDetail()">
+  <div class="pd-modal">
+    <button class="pd-close" onclick="closePlayerDetail()">&times;</button>
+    <div class="pd-top">
+      <div class="pd-photo-wrap" id="pdPhotoWrap"></div>
+      <div class="pd-info">
+        <div class="pd-name" id="pdName"></div>
+        <div class="pd-en-name" id="pdEnName"></div>
+        <div class="pd-team-line" id="pdTeamLine"></div>
+        <div class="pd-attrs" id="pdAttrs"></div>
+        <div class="pd-extra" id="pdExtra"></div>
+      </div>
+    </div>
+    <div class="pd-matches" id="pdMatches"></div>
+    <div class="pd-bio" id="pdBio"></div>
+    <div class="pd-honors" id="pdHonors"></div>
+  </div>
+</div>
+
 <script src="/wc-roster-data.js"></script>
+<script src="/wc-player-detail.js"></script>
+
+<script src="/wc-player-7m.js"></script>
 <script>
+function openPlayerDetail(teamCode, jerseyNum) {
+  if (typeof WC_TEAMS === 'undefined') return;
+  const team = WC_TEAMS.find(t => t.code === teamCode);
+  if (!team) return;
+  const player = team.players.find(p => String(p.jersey) === String(jerseyNum));
+  if (!player) return;
+
+  // Extra detail from PLAYER_DETAIL
+  const dKey = teamCode + '-' + jerseyNum;
+  const d = (typeof PLAYER_DETAIL !== 'undefined') ? (PLAYER_DETAIL[dKey] || {}) : {};
+
+  // 7m full data (keyed by cn_name)
+  const p7m = (typeof PLAYER_7M !== 'undefined') ? (PLAYER_7M[player.cn_name || player.name] || {}) : {};
+  const i7m = p7m.info || {};
+
+  // Photo: prefer existing photo, fallback to 7m
+  const photoWrap = document.getElementById('pdPhotoWrap');
+  if (player.photo) {
+    photoWrap.innerHTML = '<img src="' + player.photo + '" alt="' + (player.cn_name||player.name) + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'pd-no-photo\\\' style=\\\'background:linear-gradient(135deg,'+team.color+','+team.color2+')\\\'>' + String(player.jersey).padStart(2,'0') + '</div>\'">';
+  } else if (p7m.photo7m) {
+    photoWrap.innerHTML = '<img src="' + p7m.photo7m + '" alt="' + (player.cn_name||player.name) + '" style="width:140px;height:160px;object-fit:cover" onerror="this.parentElement.innerHTML=\'<div class=\\\'pd-no-photo\\\' style=\\\'background:linear-gradient(135deg,'+team.color+','+team.color2+')\\\'>' + String(player.jersey).padStart(2,'0') + '</div>\'">';
+  } else {
+    photoWrap.innerHTML = '<div class="pd-no-photo" style="background:linear-gradient(135deg,'+team.color+','+team.color2+')">' + String(player.jersey).padStart(2,'0') + '</div>';
+  }
+
+  // Name
+  document.getElementById('pdName').textContent = player.cn_name || player.name;
+  document.getElementById('pdEnName').textContent = player.name;
+
+  // Team line
+  document.getElementById('pdTeamLine').innerHTML = '<img src="/wc-flags/' + team.code + '.png" onerror="this.style.display=\'none\'"><span class="pd-team-cn">' + team.cn + '</span><span class="pd-team-en">' + team.en + ' · ' + team.group + '组</span>' + (team.tag ? '<span class="rw-tag">' + team.tag + '</span>' : '');
+
+  // Attributes grid - use 7m data where available (more accurate/complete)
+  const posColor = typeof POS_COLORS !== 'undefined' ? (POS_COLORS[player.pos]||'#666') : '#666';
+  const birth = i7m['生日'] || d.b || '';
+  const age = birth ? (new Date().getFullYear() - parseInt(birth.split('-')[0])) : '';
+  const height = i7m['身高'] || d.h || '-';
+  const weight = i7m['体重'] || d.w || '-';
+  const value = i7m['球员身价'] || d.v || '-';
+  const attrs = [
+    {val: player.pos, label: player.pos_zh||'位置', color: posColor},
+    {val: '#' + String(player.jersey).padStart(2,'0'), label: '球衣号'},
+    {val: height, label: '身高'},
+    {val: weight, label: '体重'},
+    {val: d.a !== undefined ? d.a : '-', label: '国家队出场'},
+    {val: d.g !== undefined ? d.g : '-', label: '国家队进球'},
+    {val: age || '-', label: '年龄'},
+  ];
+  document.getElementById('pdAttrs').innerHTML = attrs.map(function(a){
+    var style = a.color ? ' style="color:'+a.color+'"' : '';
+    return '<div class="pd-attr"><div class="pd-attr-val"'+style+'>'+a.val+'</div><div class="pd-attr-label">'+a.label+'</div></div>';
+  }).join('');
+
+  // Extra info - enriched with 7m data
+  var extra = '';
+  if (birth) extra += '<div class="pd-extra-row"><span class="pd-extra-label">出生日期</span><span class="pd-extra-val">' + birth + '</span></div>';
+  var club = i7m['效力球队'] || d.c || '';
+  if (club) extra += '<div class="pd-extra-row"><span class="pd-extra-label">效力球队</span><span class="pd-extra-val">' + club + '</span></div>';
+  if (value && value !== '-') extra += '<div class="pd-extra-row"><span class="pd-extra-label">身价</span><span class="pd-extra-val" style="color:var(--gold);font-weight:700">' + value + '</span></div>';
+  var nation = i7m['国籍'] || d.n || '';
+  if (nation) extra += '<div class="pd-extra-row"><span class="pd-extra-label">国籍</span><span class="pd-extra-val">' + nation + '</span></div>';
+  var posField = i7m['场上位置'] || '';
+  if (posField && posField !== (player.pos_zh||'')) extra += '<div class="pd-extra-row"><span class="pd-extra-label">场上位置</span><span class="pd-extra-val">' + posField + '</span></div>';
+  var transferFee = i7m['转会费'] || '';
+  if (transferFee) extra += '<div class="pd-extra-row"><span class="pd-extra-label">转会费</span><span class="pd-extra-val">' + transferFee + '</span></div>';
+  var prevClub = i7m['前度效力球队'] || '';
+  if (prevClub) extra += '<div class="pd-extra-row"><span class="pd-extra-label">前度效力球队</span><span class="pd-extra-val">' + prevClub + '</span></div>';
+  var pastClubs = i7m['曾经效力球队'] || '';
+  if (pastClubs) extra += '<div class="pd-extra-row"><span class="pd-extra-label">曾经效力球队</span><span class="pd-extra-val" title="' + pastClubs.replace(/"/g, '&quot;') + '">' + pastClubs + '</span></div>';
+  var statsRow = '';
+  if (d.y || d.r) statsRow = '<div class="pd-stats"><span style="color:#e8c547">🟨 ' + (d.y||0) + '</span><span style="color:#e04040;margin-left:12px">🟥 ' + (d.r||0) + '</span></div>';
+  var extraEl = document.getElementById('pdExtra');
+  if (extraEl) extraEl.innerHTML = extra + statsRow;
+
+  // Bio section - prefer 7m bio (more up-to-date), fallback to WC_PLAYER_BIO
+  var bioEl = document.getElementById('pdBio');
+  if (bioEl) {
+    var bioText = p7m.bio || '';
+    bioEl.style.display = bioText ? 'block' : 'none';
+    bioEl.innerHTML = bioText ? ('<div class="pd-section-title">球员简介</div><div class="pd-bio-text">' + bioText + '</div>') : '';
+  }
+
+  // Recent matches section
+  var matchesEl = document.getElementById('pdMatches');
+  if (matchesEl) {
+    var matches = p7m.matches || [];
+    if (matches.length > 0) {
+      var mhtml = '<div class="pd-section-title">近期比赛</div><table class="pd-match-table"><colgroup><col style="width:18%"><col style="width:14%"><col style="width:44%"><col style="width:12%"><col style="width:12%"></colgroup><tr><th>赛事</th><th>时间</th><th class="pd-match-vs">对阵</th><th>进球</th><th>黄牌</th></tr>';
+      for (var mi = 0; mi < matches.length; mi++) {
+        var m = matches[mi];
+        var vs = m['主队'] + ' ' + m['比分'] + ' ' + m['客队'];
+        mhtml += '<tr><td>' + (m['赛事']||'') + '</td><td>' + (m['时间']||'').substring(5) + '</td><td class="pd-match-vs">' + vs + '</td><td>' + (m['进球']||'0') + '</td><td>' + (m['黄牌']||'0') + '</td></tr>';
+      }
+      mhtml += '</table>';
+      matchesEl.innerHTML = mhtml;
+      matchesEl.style.display = '';
+    } else {
+      matchesEl.innerHTML = '';
+      matchesEl.style.display = 'none';
+    }
+  }
+
+  // Honors section
+  var honorsEl = document.getElementById('pdHonors');
+  if (honorsEl) {
+    var honors = p7m.honors || '';
+    if (honors) {
+      var html = '';
+      // Split by category headers (俱乐部/国家队/个人)
+      var catParts = honors.split(/(?=俱乐部|国家队|个人)/);
+      for (var ci = 0; ci < catParts.length; ci++) {
+        var cp = catParts[ci].trim();
+        if (!cp) continue;
+        var catName = cp.match(/^(俱乐部|国家队|个人)(荣誉)?/);
+        if (catName) {
+          html += '<div class="pd-honor-cat">' + catName[1] + '</div>';
+          cp = cp.substring(catName[0].length);
+        }
+        if (!cp) continue;
+        // Find all honor entries: "名称：年份"
+        // 7m data has team name concatenated with honor name (e.g. "拜仁慕尼黑德甲联赛冠军")
+        // Try to split: honor names end with common suffixes like 冠军/亚军/最佳/金靴 etc.
+        var honorSuffix = /(?:冠军|亚军|季军|殿军|最佳|金靴|银靴|铜靴|金球|银球|铜球|先生|射手|进球王|助攻王|奖|杯|联赛|金杯|洲杯|奥运会|世界杯|锦标赛|巡回赛|超级杯|友谊赛|联赛杯|社区盾|国王杯|大名单|入围|入选|当选|获得|殊荣)$/;
+        var re = /([^：]{2,})：([\d\/\、年月]+(?:[、,，]\s*[\d\/\、年月]+)*)/g;
+        var match;
+        var lastEnd = 0;
+        while ((match = re.exec(cp)) !== null) {
+          // Text between last match and current match could be a team/sub-header
+          var between = cp.substring(lastEnd, match.index).trim();
+          if (between) {
+            html += '<div class="pd-honor-club">' + between + '</div>';
+          }
+          var hname = match[1];
+          // Try to split team name from honor name
+          // e.g. "拜仁慕尼黑德甲联赛冠军" → team="拜仁慕尼黑" honor="德甲联赛冠军"
+          var hmatch = hname.match(/^(.+?)((?:[^\s]{2,}?)(?:冠军|亚军|季军|殿军|最佳|金靴|银靴|铜靴|金球|银球|铜球|先生|射手|进球王|助攻王|奖|杯|金杯|洲杯|奥运会|世界杯|锦标赛|超级杯|联赛杯|社区盾|国王杯|大名单|入选|当选|获得))$/);
+          if (hmatch && hmatch[1].length >= 2) {
+            html += '<div class="pd-honor-club">' + hmatch[1] + '</div>';
+            hname = hmatch[2];
+          }
+          html += '<div class="pd-honor-row"><span class="pd-honor-name">' + hname + '：</span><span class="pd-honor-years">' + match[2] + '</span></div>';
+          lastEnd = match.index + match[0].length;
+        }
+        // Trailing text after last match
+        var trailing = cp.substring(lastEnd).trim();
+        if (trailing) {
+          html += '<div class="pd-honor-row"><span class="pd-honor-name">' + trailing + '</span></div>';
+        }
+      }
+      honorsEl.innerHTML = '<div class="pd-section-title">球员荣誉</div><div class="pd-honors-text">' + html + '</div>';
+      honorsEl.style.display = '';
+    } else {
+      honorsEl.innerHTML = '';
+      honorsEl.style.display = 'none';
+    }
+  }
+
+  document.getElementById('pdOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerDetail() {
+  document.getElementById('pdOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePlayerDetail() });
+
 function photoFallback(img) {
   try {
     const d = JSON.parse(img.getAttribute('data-fallback'));
     const area = img.parentElement;
     const card = area.parentElement;
     card.classList.remove('has-photo');
-    area.innerHTML = '<div class="pc2-no-photo" style="background:linear-gradient(135deg,'+d.c1+','+d.c2+')"><span class="pc2-jersey-big">'+d.j+'</span></div><img src="'+d.f+'" class="pc2-flag-badge" onerror="this.style.display=\'none\'"><div class="pc2-pos-badge" style="background:'+d.pc+'">'+d.pn+'</div>';
+    area.innerHTML = '<div class="rw-no-photo" style="background:linear-gradient(135deg,'+d.c1+','+d.c2+')"><span class="rw-jersey">'+d.j+'</span></div><img src="'+d.f+'" class="rw-flag" onerror="this.style.display=\'none\'"><div class="rw-pos" style="background:'+d.pc+'">'+d.pn+'</div>';
+    const nameEl = card.querySelector('.rw-name');
+    if(nameEl) nameEl.style.paddingTop='0';
   } catch(e) { console.error('photoFallback error', e); }
 }
 
@@ -569,57 +826,6 @@ const photoObserver = new IntersectionObserver((entries) => {
   });
 }, { rootMargin: '200px' });
 
-function renderGroups() {
-  const container = document.getElementById('groups-container');
-  if (!container || typeof WC_TEAMS === 'undefined') return;
-  const groups = {};
-  WC_TEAMS.forEach(t => {
-    if (!groups[t.group]) groups[t.group] = [];
-    groups[t.group].push(t);
-  });
-  const scheduleByGroup = {};
-  if (typeof WC_SCHEDULE !== 'undefined') {
-    WC_SCHEDULE.forEach(s => {
-      if (!scheduleByGroup[s.g]) scheduleByGroup[s.g] = [];
-      scheduleByGroup[s.g].push(s);
-    });
-  }
-  let html = '';
-  Object.keys(groups).sort().forEach(g => {
-    const teams = groups[g];
-    const matches = scheduleByGroup[g] || [];
-    html += `<div class="group-card"><h3>${g}组</h3><div class="group-teams">`;
-    teams.forEach(t => {
-      const tag = t.tag ? `<div class="sub" style="color:var(--gold)">${t.tag}</div>` : '';
-      html += `<div class="group-team" style="border-left:3px solid ${t.color};cursor:pointer" onclick="goToRoster('${t.cn}')">
-        <img src="/wc-flags/${t.code}.png" style="width:64px;height:43px;border-radius:5px;object-fit:contain" onerror="this.style.display='none'">
-        <div class="name">${t.cn}</div>${tag}
-      </div>`;
-    });
-    html += '</div>';
-    if (matches.length > 0) {
-      html += `<div class="group-schedule"><h4>小组赛程（北京时间）</h4><table class="group-match-table"><thead><tr><th>日期</th><th>时间</th><th>对阵</th><th>场馆</th><th>城市</th></tr></thead><tbody>`;
-      matches.forEach(m => {
-        html += `<tr><td>${m.d}</td><td>${m.t}</td><td class="match-highlight">${m.m}</td><td>${m.v}</td><td>${m.c}</td></tr>`;
-      });
-      html += '</tbody></table></div>';
-    }
-    html += '</div>';
-  });
-  container.innerHTML = html;
-}
-
-function goToRoster(teamCn) {
-  const headers = document.querySelectorAll('.roster-header');
-  for (const h of headers) {
-    if (h.textContent.includes(teamCn)) {
-      const body = h.nextElementSibling;
-      if (!body.classList.contains('open')) h.click();
-      h.scrollIntoView({behavior:'smooth', block:'center'});
-      break;
-    }
-  }
-}
 
 function renderRoster(filter) {
   const container = document.getElementById('roster-container');
@@ -648,46 +854,38 @@ function renderRoster(filter) {
       
       if (p.photo) {
         const fallbackData = JSON.stringify({c1:team.color,c2:team.color2,j:jerseyStr,f:'/wc-flags/'+team.code+'.png',pc:posColor,pn:p.pos}).replace(/"/g,'&quot;');
-        playerCards += `<div class="pc2 has-photo">
-          <div class="pc2-photo-area">
-            <img data-src="${p.photo}" class="pc2-photo" alt="${cnName}" data-fallback="${fallbackData}" onerror="photoFallback(this)">
-            <img src="/wc-flags/${team.code}.png" class="pc2-flag-badge" onerror="this.style.display='none'">
-            <div class="pc2-pos-badge" style="background:${posColor}">${p.pos}</div>
+        playerCards += `<div class="rw-card has-photo" onclick="openPlayerDetail('${team.code}',${p.jersey})">
+          <div class="rw-photo-area">
+            <img data-src="${p.photo}" class="rw-photo" alt="${cnName}" data-fallback="${fallbackData}" onerror="photoFallback(this)">
+            <img src="/wc-flags/${team.code}.png" class="rw-flag" onerror="this.style.display='none'">
+            <div class="rw-pos" style="background:${posColor}">${p.pos}</div>
           </div>
-          <div class="pc2-info">
-            <div class="pc2-cn-name">${cnName}</div>
-            <div class="pc2-en-name" title="${safeName}">${safeName}</div>
-          </div>
+          <div class="rw-name">${cnName}</div>
+          <div class="rw-num">${jerseyStr}</div>
         </div>`;
       } else {
-        playerCards += `<div class="pc2">
-          <div class="pc2-no-photo" style="background:linear-gradient(135deg,${team.color},${team.color2})">
-            <span class="pc2-jersey-big">${jerseyStr}</span>
-            <img src="/wc-flags/${team.code}.png" class="pc2-flag-badge" onerror="this.style.display='none'">
-            <div class="pc2-pos-badge" style="background:${posColor}">${p.pos}</div>
+        playerCards += `<div class="rw-card" onclick="openPlayerDetail('${team.code}',${p.jersey})">
+          <div class="rw-no-photo" style="background:linear-gradient(135deg,${team.color},${team.color2})">
+            <span class="rw-jersey">${jerseyStr}</span>
+            <img src="/wc-flags/${team.code}.png" class="rw-flag" onerror="this.style.display='none'">
+            <div class="rw-pos" style="background:${posColor}">${p.pos}</div>
           </div>
-          <div class="pc2-info">
-            <div class="pc2-cn-name">${cnName}</div>
-            <div class="pc2-en-name" title="${safeName}">${safeName}</div>
-          </div>
+          <div class="rw-name">${cnName}</div>
+          <div class="rw-num">${jerseyStr}</div>
         </div>`;
       }
     });
     
-    const tagHtml = team.tag ? `<span style="color:var(--gold);font-size:.75em;background:rgba(212,168,83,.1);padding:1px 6px;border-radius:3px;margin-left:6px">${team.tag}</span>` : '';
+    const tagHtml = team.tag ? `<span class="rw-tag">${team.tag}</span>` : '';
     
-    html += `<div class="roster-team">
-      <div class="roster-header" onclick="toggleRoster(this)">
-        <div class="team-color" style="background:${team.color}"></div>
-        <img src="/wc-flags/${team.code}.png" class="flag-img" onerror="this.style.display='none'">
-        <strong style="font-size:1.05em">${team.cn}</strong>${tagHtml}
-        <span style="color:var(--text2);font-size:.85em">${team.group}组 &middot; FIFA排名#${team.rank}</span>
-        <span style="color:var(--text2);font-size:.85em;margin-left:auto">${team.players.length}人${photoCount > 0 ? ' · ' + photoCount + '张照片' : ''}</span>
-        <span style="color:var(--gold);font-size:.7em">&#9660;</span>
+    html += `<div class="rw-team">
+      <div class="rw-team-head" id="rh-${team.code}" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+        <span class="rw-team-bar" style="background:${team.color}"></span>
+        <img src="/wc-flags/${team.code}.png" class="rw-team-flag" onerror="this.style.display='none'">
+        <strong>${team.cn}</strong>${tagHtml}
+        <span class="rw-team-sub">${team.group}组 · #${team.rank} · ${team.players.length}人</span>
       </div>
-      <div class="roster-body">
-        <div class="player-grid2">${playerCards}</div>
-      </div>
+      <div class="rw-scroll">${playerCards}</div>
     </div>`;
   });
   
@@ -696,7 +894,7 @@ function renderRoster(filter) {
   
   const statsEl = document.getElementById('roster-stats');
   if (statsEl) {
-    statsEl.textContent = totalPlayers + '名球员 / ' + totalWithPhoto + '张照片 / ' + (totalPlayers - totalWithPhoto) + '人暂无照片';
+    statsEl.textContent = totalPlayers + '名球员 / ' + totalWithPhoto + '张照片';
   }
 }
 
@@ -706,17 +904,75 @@ function filterRoster(filter) {
   renderRoster(filter);
 }
 
-function toggleRoster(header) {
-  const body = header.nextElementSibling;
-  body.classList.toggle('open');
-  const arrow = header.querySelector('span:last-child');
-  arrow.innerHTML = body.classList.contains('open') ? '&#9650;' : '&#9660;';
+// 跳转到阵容区并展开指定球队
+function goToRoster(teamCode) {
+  var head = document.getElementById('rh-' + teamCode);
+  if (!head) {
+    if (typeof renderRoster === 'function') renderRoster('all');
+    head = document.getElementById('rh-' + teamCode);
+  }
+  if (!head) return;
+  if (!head.classList.contains('open')) {
+    head.classList.add('open');
+    head.nextElementSibling.classList.add('open');
+  }
+  head.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
+
+// 全局队名点击跳转阵容
+document.addEventListener('click', function(e) {
+  // 积分榜队名/国旗
+  var teamEl = e.target.closest('.gs-team');
+  if (teamEl) {
+    var tn = teamEl.querySelector('.gs-tn');
+    if (tn) {
+      var code = GSTAND && GSTAND.teamMap ? (GSTAND.teamMap[tn.textContent] || {}).code : '';
+      if (code) { goToRoster(code); return; }
+    }
+  }
+  // 赛程区队名（非比分区域）
+  if (e.target.classList.contains('gs-sch-t1') || e.target.classList.contains('gs-sch-t2')) {
+    var name = e.target.textContent.trim();
+    if (typeof WC_TEAMS !== 'undefined') {
+      var team = WC_TEAMS.find(function(t) { return t.cn === name; });
+      if (team) { goToRoster(team.code); return; }
+    }
+  }
+  // 焦点球星卡
+  var starCard = e.target.closest('.star-card2');
+  if (starCard) {
+    var flagImg = starCard.querySelector('img[src*="/wc-flags/"]');
+    if (flagImg) {
+      var m = flagImg.src.match(/wc-flags\/([A-Z]+)\.png/);
+      if (m) { goToRoster(m[1]); return; }
+    }
+  }
+  // 淘汰赛区 - 队名或国旗
+  var bMatch = e.target.closest('.b-team');
+  if (bMatch) {
+    var bName = bMatch.querySelector('.b-name');
+    if (bName) {
+      var name = bName.textContent.trim();
+      if (typeof WC_TEAMS !== 'undefined') {
+        var team = WC_TEAMS.find(function(t) { return t.cn === name; });
+        if (team) { goToRoster(team.code); return; }
+      }
+    }
+  }
+});
 
 // 回到顶部按钮
 window.addEventListener('scroll', () => {
   document.getElementById('backTop').classList.toggle('show', window.scrollY > 600);
 });
+// 阻止横向滚动（不影响sticky）
+window.addEventListener('scroll',function(){ if(window.scrollX!==0)window.scrollTo(0,window.scrollY); },{passive:true});
+// 设置小组积分榜sticky top=nav高度
+(function(){
+  function setGsTop(){ var gs=document.getElementById('gsSticky');if(gs)gs.style.top=document.querySelector('nav').offsetHeight+'px'; }
+  setGsTop();
+  window.addEventListener('resize',setGsTop);
+})();
 
 // 初始化
 /* ====== 小组积分 ====== */
@@ -724,14 +980,22 @@ var GSTAND=(function(){
 var SKEY='wc2026_group_scores';
 var scores={};
 var groups={},fixtures={},teamMap={};
+var scheduleByGroup={};
 
 function init(){
   if(typeof WC_TEAMS==='undefined')return;
   WC_TEAMS.forEach(function(t){
     if(!groups[t.group])groups[t.group]=[];
-    groups[t.group].push({code:t.code,cn:t.cn,color:t.color});
+    groups[t.group].push({code:t.code,cn:t.cn,color:t.color,tag:t.tag||''});
     teamMap[t.cn]={code:t.code,color:t.color};
   });
+  // Build schedule lookup from WC_SCHEDULE
+  if(typeof WC_SCHEDULE!=='undefined'){
+    WC_SCHEDULE.forEach(function(s){
+      if(!scheduleByGroup[s.g])scheduleByGroup[s.g]=[];
+      scheduleByGroup[s.g].push(s);
+    });
+  }
   var gk=Object.keys(groups).sort();
   gk.forEach(function(g){
     var t=groups[g];
@@ -783,44 +1047,88 @@ function render(){
       h+='<tr class="'+cls+'"><td>'+(i+1)+'</td><td><span class="gs-team">'+flagH+'<span class="gs-tn">'+t.cn+'</span></span></td><td>'+t.p+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td><td>'+t.gf+'</td><td>'+t.ga+'</td><td>'+(t.gd>=0?'+':'')+t.gd+'</td><td style="font-weight:700;color:var(--gold)">'+t.pts+'</td></tr>';
     });
     h+='</tbody></table>';
-    h+='<div class="gs-matches"><h4>小组赛比分</h4>';
-    fx.forEach(function(fix){
-      var d=scores[fix.id]||{};
-      var s1=d.s1!==undefined?d.s1:'-';
-      var s2=d.s2!==undefined?d.s2:'-';
-      h+='<div class="gs-match"><span class="gs-mt">'+fix.t1+'</span><span class="gs-ms" onclick="GSTAND.editScore(\''+fix.id+'\',0)">'+s1+'</span><span class="gs-vs">:</span><span class="gs-ms" onclick="GSTAND.editScore(\''+fix.id+'\',1)">'+s2+'</span><span class="gs-mt">'+fix.t2+'</span></div>';
-    });
-    h+='</div></div>';
+    // Schedule + scores combined
+    var sch=scheduleByGroup[g]||[];
+    if(sch.length){
+      h+='<div class="gs-schedule"><table class="gs-sch-table"><tbody>';
+      sch.forEach(function(m){
+        var parts=m.m.split(' vs ');
+        var t1cn=parts[0]?parts[0].trim():'';
+        var t2cn=parts[1]?parts[1].trim():'';
+        var matchHtml='';
+        if(t2cn.indexOf('/')!==-1&&m.m.indexOf('/')!==-1){
+          matchHtml='<td class="match-cell" colspan="2"><span class="gs-sch-vs">'+m.m+'</span></td>';
+        }else{
+          var fid=null;
+          fx.forEach(function(fix){
+            if((fix.t1===t1cn&&fix.t2===t2cn)||(fix.t1===t2cn&&fix.t2===t1cn))fid=fix.id;
+          });
+          var d=fid?scores[fid]:null;
+          var fixRef=null;
+          fx.forEach(function(fix){if(fix.id===fid)fixRef=fix});
+          if(d&&d.s1!==undefined&&d.s1!==''){
+            var ds1,ds2;
+            if(fixRef&&fixRef.t1===t1cn){ds1=d.s1;ds2=d.s2}
+            else{ds1=d.s2;ds2=d.s1}
+            if(fid){
+              matchHtml='<td class="gs-sch-t1" onclick="GSTAND.editScore(\''+fid+'\')">'+t1cn+'</td><td class="gs-sch-sc" onclick="GSTAND.editScore(\''+fid+'\')"><b>'+ds1+'</b>:<b>'+ds2+'</b></td><td class="gs-sch-t2" onclick="GSTAND.editScore(\''+fid+'\')">'+t2cn+'</td>';
+            }else{
+              matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc"><b>'+ds1+'</b>:<b>'+ds2+'</b></td><td class="gs-sch-t2">'+t2cn+'</td>';
+            }
+          }else{
+            if(fid){
+              matchHtml='<td class="gs-sch-t1" onclick="GSTAND.editScore(\''+fid+'\')">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending" onclick="GSTAND.editScore(\''+fid+'\')">vs</td><td class="gs-sch-t2" onclick="GSTAND.editScore(\''+fid+'\')">'+t2cn+'</td>';
+            }else{
+              matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending">vs</td><td class="gs-sch-t2">'+t2cn+'</td>';
+            }
+          }
+        }
+        h+='<tr><td class="gs-sch-date">'+m.d+'</td><td class="gs-sch-time">'+m.t+'</td>'+matchHtml+'</tr>';
+      });
+      h+='</tbody></table></div>';
+    }
+    h+='</div>';
   });
   c.innerHTML=h;
   // Force DOM reflow for Edge compatibility
   void c.offsetHeight;
 }
 
-function editScore(id,slot){
-  var el=document.querySelector('.gs-match .gs-ms[onclick*="'+id+'"]');
+function editScore(id){
+  var el=document.querySelector('.gs-sch-score[onclick*="'+id+'"]');
   if(!el)return;
-  var all=document.querySelectorAll('.gs-match .gs-ms[onclick*="'+id+'"]');
-  el=all[slot];
-  if(!el)return;
-  var cv=scores[id]?scores[id]['s'+(slot+1)]:'';
-  var inp=document.createElement('input');
-  inp.type='number';inp.className='gs-ms-input';inp.value=cv===''||cv===undefined?'':cv;inp.min=0;inp.max=99;
-  el.replaceWith(inp);inp.focus();inp.select();
+  var cv1=scores[id]?scores[id].s1:'';
+  var cv2=scores[id]?scores[id].s2:'';
+  var v1=cv1===undefined||cv1===''?'':cv1;
+  var v2=cv2===undefined||cv2===''?'':cv2;
+  var inp1=document.createElement('input');
+  var inp2=document.createElement('input');
+  inp1.type='number';inp2.type='number';
+  inp1.className='gs-ms-input';inp2.className='gs-ms-input';
+  inp1.value=v1;inp2.value=v2;
+  inp1.min=0;inp2.min=0;inp1.max=99;inp2.max=99;
+  var sep=document.createTextNode(' : ');
+  el.replaceWith(inp1);inp1.after(sep);sep.after(inp2);
+  inp1.focus();inp1.select();
   function commit(){
-    var v=inp.value;
+    var va=inp1.value,vb=inp2.value;
     if(!scores[id])scores[id]={};
-    scores[id]['s'+(slot+1)]=v===''?'':parseInt(v);
+    scores[id].s1=va===''?'':parseInt(va);
+    scores[id].s2=vb===''?'':parseInt(vb);
     save();render();
   }
-  inp.addEventListener('blur',commit);
-  inp.addEventListener('keydown',function(e){
-    if(e.key==='Enter')inp.blur();
-    if(e.key==='Escape'){inp.value=cv;inp.blur()}
+  function done(){commit()}
+  inp1.addEventListener('blur',function(){setTimeout(function(){if(!inp2.matches(':focus'))done()},100)});
+  inp2.addEventListener('blur',function(){setTimeout(function(){if(!inp1.matches(':focus'))done()},100)});
+  [inp1,inp2].forEach(function(inp){
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){inp1.blur();inp2.blur()}
+      if(e.key==='Escape'){inp1.value=v1;inp2.value=v2;inp1.blur();inp2.blur()}
+    });
   });
 }
 
-return{init:init,editScore:editScore,reset:reset,scores:scores,save:save,render:render};
+return{init:init,editScore:editScore,reset:reset,scores:scores,save:save,render:render,teamMap:teamMap};
 })();
 
 /* ====== 淘汰赛签表 ====== */
@@ -1054,7 +1362,6 @@ function syncScores(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  renderGroups();
   GSTAND.init();
   BRACKET.init();
   renderRoster('all');

@@ -7,3 +7,5 @@ __pycache__/
 *.svg
 Thumbs.db
 .DS_Store
+wc-photos/
+backup/
