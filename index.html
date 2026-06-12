@@ -811,32 +811,39 @@ function closePlayerDetail() {
     var sec=document.getElementById(_pdPrevSection);
     if(sec) setTimeout(function(){sec.scrollIntoView({behavior:'smooth',block:'start'})},100);
   }
-  // 防误触：关闭后500ms内禁止再打开详情卡
+  // 防误触：关闭后1000ms内禁止再打开详情卡
   _pdClosing = true;
-  setTimeout(function(){ _pdClosing = false; }, 500);
+  setTimeout(function(){ _pdClosing = false; }, 1000);
 }
 
 // 右滑关闭球员详情（从左边向右滑动）
+// 注意：passive:false 才能在 touchmove 里 preventDefault，阻止浏览器后退手势
 (function(){
   var modal=document.querySelector('.pd-modal');
-  var startX=0,startY=0,dx=0,swiping=false;
+  var startX=0,startY=0,dx=0,swiping=false,isHoriz=false;
   modal.addEventListener('touchstart',function(e){
-    startX=e.touches[0].clientX; startY=e.touches[0].clientY; dx=0; swiping=true;
-  },{passive:true});
+    startX=e.touches[0].clientX; startY=e.touches[0].clientY; dx=0; swiping=true; isHoriz=false;
+  },{passive:false});
   modal.addEventListener('touchmove',function(e){
     if(!swiping)return;
     var cx=e.touches[0].clientX, cy=e.touches[0].clientY;
     dx=cx-startX; var dy=cy-startY;
-    if(Math.abs(dy)>Math.abs(dx)){swiping=false;modal.style.transform='';return;}
-    // 只允许向右滑动（dx>0）
-    if(dx>0) modal.style.transform='translateX('+dx+'px)';
-    else modal.style.transform='';
-  },{passive:true});
+    // 一旦判断为横向滑动，阻止浏览器把右滑当"后退"手势
+    if(Math.abs(dx)>Math.abs(dy)){
+      isHoriz=true;
+      e.preventDefault();
+      // 只允许向右滑动（dx>0）
+      if(dx>0) modal.style.transform='translateX('+dx+'px)';
+      else modal.style.transform='';
+    } else {
+      swiping=false; modal.style.transform='';
+    }
+  },{passive:false});
   modal.addEventListener('touchend',function(){
-    if(dx>80) closePlayerDetail();
+    if(isHoriz && dx>80) closePlayerDetail();
     modal.style.transform='';
-    swiping=false;dx=0;
-  },{passive:true});
+    swiping=false;dx=0;isHoriz=false;
+  },{passive:false});
 })();
 
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePlayerDetail() });
