@@ -792,21 +792,15 @@ function openPlayerDetail(teamCode, jerseyNum) {
 
   document.getElementById('pdOverlay').classList.add('open');
   _pdScrollY = window.scrollY;
-  // 用 fixed 锁死背景滚动（overflow:hidden 在手机端无效）
+  // 用 fixed 锁死背景滚动
   document.body.style.position = 'fixed';
   document.body.style.width = '100%';
   document.body.style.top = '-' + _pdScrollY + 'px';
-  // 记录进入详情卡前所在的section，关闭时返回
-  _pdPrevSection = '';
-  document.querySelectorAll('.section').forEach(function(sec){
-    var r=sec.getBoundingClientRect();
-    if(r.top<120&&r.bottom>80) _pdPrevSection=sec.id||'';
-  });
+  document.body.style.overflow = 'hidden';
 }
 
 var _pdScrollY=0;
-var _pdPrevSection='';
-var _pdClosing=false; /* 关闭后500ms内禁止再打开，防止滚动误触 */
+var _pdClosing=false; /* 关闭后1000ms内禁止再打开，防止滚动误触 */
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
   // 恢复背景滚动（还原 fixed 锁）
@@ -815,11 +809,7 @@ function closePlayerDetail() {
   document.body.style.width = '';
   document.body.style.top = '';
   window.scrollTo(0, sy);
-  // 返回到进入详情卡之前的section（_pdClosing锁防止误触）
-  if(_pdPrevSection){
-    var sec=document.getElementById(_pdPrevSection);
-    if(sec) setTimeout(function(){sec.scrollIntoView({behavior:'smooth',block:'start'})},100);
-  }
+  // 注意：不调用 scrollIntoView，和点X按钮行为完全一致
   // 防误触：关闭后1000ms内禁止再打开详情卡
   _pdClosing = true;
   setTimeout(function(){ _pdClosing = false; }, 1000);
