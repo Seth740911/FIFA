@@ -435,9 +435,15 @@ def export_to_xlsx(all_results, xlsx_path):
         info = data.get('info', {})
         ws3.cell(row=row_idx, column=1, value=data.get('player_id', ''))
         ws3.cell(row=row_idx, column=2, value=info.get('name_cn', ''))
-        profile_cell = ws3.cell(row=row_idx, column=3, value=info.get('profile', ''))
+        profile = re.sub(r'<[^>]+>', '', info.get('profile', ''))
+        honours = re.sub(r'<[^>]+>', '', info.get('honours', ''))
+        # 把 &quot; 等HTML实体转回来
+        for orig, repl in [('&quot;', '"'), ('&amp;', '&'), ('&lt;', '<'), ('&gt;', '>'), ('&#8212;', '—')]:
+            profile = profile.replace(orig, repl)
+            honours = honours.replace(orig, repl)
+        profile_cell = ws3.cell(row=row_idx, column=3, value=profile)
         profile_cell.alignment = wrap_align
-        honours_cell = ws3.cell(row=row_idx, column=4, value=info.get('honours', ''))
+        honours_cell = ws3.cell(row=row_idx, column=4, value=honours)
         honours_cell.alignment = wrap_align
         ws3.row_dimensions[row_idx].height = 60
 
