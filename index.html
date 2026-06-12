@@ -631,6 +631,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 <script src="/wc-player-7m.js"></script>
 <script>
 function openPlayerDetail(teamCode, jerseyNum) {
+  if(_pdClosing) return; // 刚关闭详情卡，忽略误触
   if (typeof WC_TEAMS === 'undefined') return;
   const team = WC_TEAMS.find(t => t.code === teamCode);
   if (!team) return;
@@ -800,15 +801,19 @@ function openPlayerDetail(teamCode, jerseyNum) {
 
 var _pdScrollY=0;
 var _pdPrevSection='';
+var _pdClosing=false; /* 关闭后500ms内禁止再打开，防止滚动误触 */
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
   document.body.style.overflow = '';
   window.scrollTo(0,_pdScrollY);
-  // 返回到进入详情卡之前的section
+  // 返回到进入详情卡之前的section（_pdClosing锁防止误触）
   if(_pdPrevSection){
     var sec=document.getElementById(_pdPrevSection);
     if(sec) setTimeout(function(){sec.scrollIntoView({behavior:'smooth',block:'start'})},100);
   }
+  // 防误触：关闭后500ms内禁止再打开详情卡
+  _pdClosing = true;
+  setTimeout(function(){ _pdClosing = false; }, 500);
 }
 
 // 右滑关闭球员详情（从左边向右滑动）
