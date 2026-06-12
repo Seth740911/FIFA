@@ -791,14 +791,17 @@ function openPlayerDetail(teamCode, jerseyNum) {
   }
 
   document.getElementById('pdOverlay').classList.add('open');
-  _pdScrollY=window.scrollY;
+  _pdScrollY = window.scrollY;
+  // 用 fixed 锁死背景滚动（overflow:hidden 在手机端无效）
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.style.top = '-' + _pdScrollY + 'px';
   // 记录进入详情卡前所在的section，关闭时返回
   _pdPrevSection = '';
   document.querySelectorAll('.section').forEach(function(sec){
     var r=sec.getBoundingClientRect();
     if(r.top<120&&r.bottom>80) _pdPrevSection=sec.id||'';
   });
-  document.body.style.overflow = 'hidden';
 }
 
 var _pdScrollY=0;
@@ -806,8 +809,12 @@ var _pdPrevSection='';
 var _pdClosing=false; /* 关闭后500ms内禁止再打开，防止滚动误触 */
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-  window.scrollTo(0,_pdScrollY);
+  // 恢复背景滚动（还原 fixed 锁）
+  var sy = _pdScrollY;
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.top = '';
+  window.scrollTo(0, sy);
   // 返回到进入详情卡之前的section（_pdClosing锁防止误触）
   if(_pdPrevSection){
     var sec=document.getElementById(_pdPrevSection);
@@ -830,19 +837,26 @@ function closePlayerDetail() {
     if(!swiping)return;
     var cx=e.touches[0].clientX, cy=e.touches[0].clientY;
     dx=cx-startX; var dy=cy-startY;
-    // 一旦判断为横向滑动，阻止浏览器把右滑当"后退"手势
-    if(Math.abs(dx)>Math.abs(dy)){
+    // 一锤定音：一旦判断为横向，后续不再改变 isHoriz
+    if(!isHoriz && Math.abs(dx)>Math.abs(dy)){
       isHoriz=true;
+    }
+    if(isHoriz){
       e.preventDefault();
-      // 只允许向右滑动（dx>0）
-      if(dx>0) modal.style.transform='translateX('+dx+'px)';
-      else modal.style.transform='';
+      if(dx>0){
+        modal.style.transform='translateX('+dx+'px)';
+        var ratio=Math.min(dx/180,1);
+        modal.style.opacity = 1 - ratio * 0.7;
+      } else {
+        modal.style.transform='';
+        modal.style.opacity='';
+      }
     } else {
-      swiping=false; modal.style.transform='';
+      swiping=false; modal.style.transform=''; modal.style.opacity='';
     }
   },{passive:false});
   modal.addEventListener('touchend',function(){
-    if(isHoriz && dx>80) closePlayerDetail();
+    if(isHoriz && dx>20) closePlayerDetail();
     modal.style.transform='';
     swiping=false;dx=0;isHoriz=false;
   },{passive:false});
