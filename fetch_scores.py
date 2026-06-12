@@ -1,0 +1,454 @@
+#!/usr/bin/env python3
+"""
+2026 World Cup Live Scores Fetcher
+Fetches match results from FIFA official API and writes to wc-scores.json
+Called periodically by scheduler (every 10 minutes)
+
+Usage:
+  python fetch_scores.py
+"""
+
+import json
+import os
+import sys
+import time
+import urllib.request
+import urllib.error
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_FILE = os.path.join(SCRIPT_DIR, "wc-scores.json")
+
+# FIFA official API - 104 matches, includes group info and scores
+FIFA_API = "https://api.fifa.com/api/v3/calendar/matches?language=en&count=500&idSeason=285023"
+
+# FIFA match status: 0=played, 1=scheduled, 2-9=live stages
+PLAYED_STATUS = 0
+LIVE_STATUSES = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13}
+
+
+def load_teams():
+    """Load team data from wc-roster-data.js for matching.
+    Returns (teams_map, teams_ordered) where teams_ordered preserves
+    the original WC_TEAMS array order (same as JS forEach push order).
+    """
+    js_path = os.path.join(SCRIPT_DIR, "wc-roster-data.js")
+    teams = {}
+    teams_ordered = []
+    if not os.path.exists(js_path):
+        return teams, teams_ordered
+    with open(js_path, "r", encoding="utf-8") as f:
+        text = f.read()
+    start = text.find("const WC_TEAMS = [")
+    if start < 0:
+        return teams, teams_ordered
+    start = text.index("[", start)
+    depth = 0
+    end = start
+    for i in range(start, len(text)):
+        if text[i] == "[":
+            depth += 1
+        elif text[i] == "]":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    arr = json.loads(text[start:end])
+    for t in arr:
+        info = {
+            "cn": t["cn"],
+            "group": t["group"],
+            "code": t["code"],
+            "fifa_id": t.get("teamId", ""),
+        }
+        teams[t["code"]] = info
+        teams_ordered.append(info)
+    return teams, teams_ordered
+
+
+def fetch_fifa():
+    """Fetch match data from FIFA API"""
+    req = urllib.request.Request(FIFA_API, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data.get("Results", [])
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch FIFA API: {e}")
+        return []
+
+
+# ---- Bracket definition (must match JS) ----
+
+def _ph_to_bracket_slot(ph_text):
+    """Convert FIFA PlaceHolder text to our bracket slot format.
+    FIFA: '2A', '1C', '3ABCDF', 'W73', 'RU101'
+    Ours: '2A', '1C', '3rd(ABDF)', 'W73', 'RU101'
+    """
+    if not ph_text:
+        return ""
+    text = ph_text.strip()
+    if text.startswith("W"):
+        return text
+    if text.startswith("RU"):
+        return text
+    # Third place group: 3ABCDF -> 3rd(ABDF)
+    if text.startswith("3") and len(text) > 2 and text[1:2].isalpha():
+        groups_str = text[1:]
+        return "3rd(" + groups_str + ")"
+    return text
+
+
+R32 = [
+    {"n": 1, "t1": "2B", "t2": "2A"},
+    {"n": 2, "t1": "1E", "t2": "3rd(ABCDF)"},
+    {"n": 3, "t1": "1F", "t2": "2C"},
+    {"n": 4, "t1": "1C", "t2": "2F"},
+    {"n": 5, "t1": "1I", "t2": "3rd(CDFGH)"},
+    {"n": 6, "t1": "2E", "t2": "2I"},
+    {"n": 7, "t1": "1A", "t2": "3rd(CEFHI)"},
+    {"n": 8, "t1": "1L", "t2": "3rd(EHIJK)"},
+    {"n": 9, "t1": "1D", "t2": "3rd(BEFIJ)"},
+    {"n": 10, "t1": "1G", "t2": "3rd(AEHIJ)"},
+    {"n": 11, "t1": "2K", "t2": "2L"},
+    {"n": 12, "t1": "1H", "t2": "2J"},
+    {"n": 13, "t1": "1B", "t2": "3rd(EFGIJ)"},
+    {"n": 14, "t1": "1J", "t2": "2H"},
+    {"n": 15, "t1": "1K", "t2": "3rd(DEIJL)"},
+    {"n": 16, "t1": "2D", "t2": "2G"},
+]
+R16 = [
+    {"n": 17, "from": [2, 5]}, {"n": 18, "from": [1, 3]},
+    {"n": 19, "from": [4, 6]}, {"n": 20, "from": [7, 8]},
+    {"n": 21, "from": [11, 12]}, {"n": 22, "from": [9, 10]},
+    {"n": 23, "from": [14, 16]}, {"n": 24, "from": [13, 15]},
+]
+QF = [
+    {"n": 25, "from": [17, 18]}, {"n": 26, "from": [21, 22]},
+    {"n": 27, "from": [19, 20]}, {"n": 28, "from": [23, 24]},
+]
+SF = [
+    {"n": 29, "from": [25, 26]}, {"n": 30, "from": [27, 28]},
+]
+FL = {"n": 31, "from": [29, 30]}
+TP = {"n": 32, "from": [29, 30], "losers": True}
+ALL_BRACKET = {m["n"]: m for m in R32 + R16 + QF + SF + [FL, TP]}
+
+
+def _build_fifa_to_bracket_map(matches):
+    """Build mapping from FIFA MatchNumber to our bracket match number (n).
+    Uses PlaceHolderA/B to identify which bracket slot each FIFA match corresponds to.
+    For R32: uses team slot names directly.
+    For later rounds: converts FIFA W<n> references to our W< bracket_n> using the mapping chain.
+    """
+    # Step 1: Build R32 mapping using PlaceHolder team slots
+    bracket_slot_to_n_r32 = {}
+    for m in R32:
+        key = frozenset([m["t1"], m["t2"]])
+        bracket_slot_to_n_r32[key] = m["n"]
+
+    # Step 2: Parse R32 from FIFA data
+    fifa_num_to_n = {}  # FIFA MatchNumber -> our bracket n
+    for match in matches:
+        stage_info = match.get("StageName")
+        if not stage_info or not isinstance(stage_info, list) or len(stage_info) == 0:
+            continue
+        stage = stage_info[0].get("Description", "")
+        if stage != "Round of 32":
+            continue
+
+        ph_a = match.get("PlaceHolderA")
+        ph_b = match.get("PlaceHolderB")
+        pa = ph_a.get("Description", "") if isinstance(ph_a, dict) else (str(ph_a) if ph_a else "")
+        pb = ph_b.get("Description", "") if isinstance(ph_b, dict) else (str(ph_b) if ph_b else "")
+        if not pa or not pb:
+            continue
+
+        slot_a = _ph_to_bracket_slot(pa)
+        slot_b = _ph_to_bracket_slot(pb)
+        key = frozenset([slot_a, slot_b])
+        bracket_n = bracket_slot_to_n_r32.get(key)
+        if bracket_n is not None:
+            fifa_num_to_n[match.get("MatchNumber", 0)] = bracket_n
+
+    # Step 3: Build full W<n> and RU<n> conversion maps
+    # Start with R32 mappings, then iteratively add R16, QF, SF, etc.
+    fifa_winner_to_our = {}
+    fifa_runnerup_to_our = {}
+    for fifa_num, our_n in fifa_num_to_n.items():
+        fifa_winner_to_our["W" + str(fifa_num)] = "W" + str(our_n)
+        fifa_runnerup_to_our["RU" + str(fifa_num)] = "RU" + str(our_n)
+
+    # Now iteratively process each subsequent round
+    # Build bracket slot -> n for ALL rounds
+    bracket_slot_to_n = {}
+    for m in R32:
+        key = frozenset([m["t1"], m["t2"]])
+        bracket_slot_to_n[key] = m["n"]
+    for m in R16 + QF + SF + [FL, TP]:
+        slots = []
+        for f in m["from"]:
+            if m.get("losers"):
+                slots.append("RU" + str(f))
+            else:
+                slots.append("W" + str(f))
+        key = frozenset(slots)
+        bracket_slot_to_n[key] = m["n"]
+
+    # Process matches round by round: R16 -> QF -> SF -> Final
+    stage_order = ["Round of 16", "Quarter-final", "Semi-final", "Play-off for third place", "Final"]
+    for stage in stage_order:
+        for match in matches:
+            si = match.get("StageName")
+            if not si or not isinstance(si, list) or len(si) == 0:
+                continue
+            if si[0].get("Description", "") != stage:
+                continue
+
+            ph_a = match.get("PlaceHolderA")
+            ph_b = match.get("PlaceHolderB")
+            pa = ph_a.get("Description", "") if isinstance(ph_a, dict) else (str(ph_a) if ph_a else "")
+            pb = ph_b.get("Description", "") if isinstance(ph_b, dict) else (str(ph_b) if ph_b else "")
+            if not pa or not pb:
+                continue
+
+            # Convert FIFA W/RU references to our numbering
+            slot_a = fifa_winner_to_our.get(pa, fifa_runnerup_to_our.get(pa, pa))
+            slot_b = fifa_winner_to_our.get(pb, fifa_runnerup_to_our.get(pb, pb))
+
+            key = frozenset([slot_a, slot_b])
+            bracket_n = bracket_slot_to_n.get(key)
+            if bracket_n is not None:
+                fifa_num = match.get("MatchNumber", 0)
+                fifa_num_to_n[fifa_num] = bracket_n
+                # Add new conversion entries for this round's matches
+                fifa_winner_to_our["W" + str(fifa_num)] = "W" + str(bracket_n)
+                fifa_runnerup_to_our["RU" + str(fifa_num)] = "RU" + str(bracket_n)
+
+    # Step 4: Build final output: FIFA MatchNumber -> bracket info for ALL knockout matches
+    fifa_to_bracket = {}
+    # Re-process all knockout matches with updated conversion maps
+    for match in matches:
+        stage_info = match.get("StageName")
+        if not stage_info or not isinstance(stage_info, list) or len(stage_info) == 0:
+            continue
+        stage = stage_info[0].get("Description", "")
+        if stage == "First Stage":
+            continue
+
+        ph_a = match.get("PlaceHolderA")
+        ph_b = match.get("PlaceHolderB")
+        pa = ph_a.get("Description", "") if isinstance(ph_a, dict) else (str(ph_a) if ph_a else "")
+        pb = ph_b.get("Description", "") if isinstance(ph_b, dict) else (str(ph_b) if ph_b else "")
+        if not pa or not pb:
+            continue
+
+        if stage == "Round of 32":
+            slot_a = _ph_to_bracket_slot(pa)
+            slot_b = _ph_to_bracket_slot(pb)
+        else:
+            slot_a = fifa_winner_to_our.get(pa, fifa_runnerup_to_our.get(pa, pa))
+            slot_b = fifa_winner_to_our.get(pb, fifa_runnerup_to_our.get(pb, pb))
+
+        key = frozenset([slot_a, slot_b])
+        bracket_n = bracket_slot_to_n.get(key)
+        if bracket_n is not None:
+            fifa_to_bracket[match.get("MatchNumber", 0)] = {
+                "n": bracket_n,
+                "slot_a": slot_a,
+                "slot_b": slot_b,
+            }
+
+    return fifa_to_bracket
+
+
+def parse_matches(matches, teams_map, teams_ordered):
+    """Parse FIFA API results into our score format"""
+    group_scores = {}
+    bracket_scores = {}
+    match_details = []
+
+    code_to_cn = {code: info["cn"] for code, info in teams_map.items()}
+
+    # Build group fixtures using ORIGINAL WC_TEAMS order
+    groups = {}
+    for info in teams_ordered:
+        g = info["group"]
+        if g not in groups:
+            groups[g] = []
+        groups[g].append(info)
+
+    gk = sorted(groups.keys())
+    fixture_lookup = {}
+    for g in gk:
+        t = groups[g]
+        fx_list = [
+            {"id": f"{g}1", "t1": t[0]["cn"], "t2": t[1]["cn"]},
+            {"id": f"{g}2", "t1": t[2]["cn"], "t2": t[3]["cn"]},
+            {"id": f"{g}3", "t1": t[0]["cn"], "t2": t[2]["cn"]},
+            {"id": f"{g}4", "t1": t[1]["cn"], "t2": t[3]["cn"]},
+            {"id": f"{g}5", "t1": t[0]["cn"], "t2": t[3]["cn"]},
+            {"id": f"{g}6", "t1": t[1]["cn"], "t2": t[2]["cn"]},
+        ]
+        for fx in fx_list:
+            key = tuple(sorted([fx["t1"], fx["t2"]]))
+            fixture_lookup[key] = fx
+
+    # Build FIFA -> bracket mapping
+    fifa_to_bracket = _build_fifa_to_bracket_map(matches)
+    if fifa_to_bracket:
+        print(f"[INFO] Mapped {len(fifa_to_bracket)} bracket matches from FIFA PlaceHolders")
+
+    abbr_to_code = {code: code for code in teams_map}
+
+    for m in matches:
+        home = m.get("Home") or {}
+        away = m.get("Away") or {}
+        h_abbr = home.get("Abbreviation", "")
+        a_abbr = away.get("Abbreviation", "")
+        h_score = m.get("HomeTeamScore")
+        a_score = m.get("AwayTeamScore")
+        match_status = m.get("MatchStatus", -1)
+        group_info = m.get("GroupName")
+        group_name = ""
+        if group_info and isinstance(group_info, list) and len(group_info) > 0:
+            group_name = group_info[0].get("Description", "")
+        stage_info = m.get("StageName", [])
+        stage = ""
+        if stage_info and isinstance(stage_info, list) and len(stage_info) > 0:
+            stage = stage_info[0].get("Description", "")
+
+        is_finished = match_status == PLAYED_STATUS
+        is_live = match_status in LIVE_STATUSES
+
+        h_code = abbr_to_code.get(h_abbr, h_abbr)
+        a_code = abbr_to_code.get(a_abbr, a_abbr)
+        h_cn = code_to_cn.get(h_code, "")
+        a_cn = code_to_cn.get(a_code, "")
+
+        # Group stage matching
+        matched = False
+        if h_cn and a_cn and "Group" in group_name:
+            key = tuple(sorted([h_cn, a_cn]))
+            fx = fixture_lookup.get(key)
+            if fx:
+                if is_finished or is_live:
+                    hs = h_score if h_score is not None else 0
+                    as_ = a_score if a_score is not None else 0
+                    if fx["t1"] == h_cn:
+                        group_scores[fx["id"]] = {"s1": int(hs), "s2": int(as_)}
+                    else:
+                        group_scores[fx["id"]] = {"s1": int(as_), "s2": int(hs)}
+                matched = True
+
+        # Knockout stage matching
+        bracket_matched = False
+        if stage != "First Stage" and (is_finished or is_live):
+            fifa_num = m.get("MatchNumber", 0)
+            bracket_info = fifa_to_bracket.get(fifa_num)
+            if bracket_info:
+                bracket_n = bracket_info["n"]
+                slot_a = bracket_info["slot_a"]
+                hs = h_score if h_score is not None else 0
+                as_ = a_score if a_score is not None else 0
+                bm = ALL_BRACKET.get(bracket_n)
+                if bm and "t1" in bm:
+                    # R32: determine s1 by checking if slot_a matches t1
+                    if slot_a == bm["t1"]:
+                        bracket_scores[bracket_n] = {"s1": int(hs), "s2": int(as_)}
+                    else:
+                        bracket_scores[bracket_n] = {"s1": int(as_), "s2": int(hs)}
+                else:
+                    # Later rounds: slot_a is home -> s1
+                    bracket_scores[bracket_n] = {"s1": int(hs), "s2": int(as_)}
+                bracket_matched = True
+
+        venue = ""
+        stadium = m.get("Stadium")
+        if stadium and isinstance(stadium, dict):
+            names = stadium.get("Name")
+            if names and isinstance(names, list) and len(names) > 0:
+                venue = names[0].get("Description", "")
+
+        match_details.append({
+            "fifa_id": m.get("IdMatch", ""),
+            "home": h_abbr,
+            "away": a_abbr,
+            "h_cn": h_cn,
+            "a_cn": a_cn,
+            "score_h": h_score,
+            "score_a": a_score,
+            "status": match_status,
+            "finished": is_finished,
+            "live": is_live,
+            "date": m.get("Date", ""),
+            "group": group_name,
+            "stage": stage,
+            "attendance": m.get("Attendance", ""),
+            "venue": venue,
+            "group_matched": matched,
+            "bracket_matched": bracket_matched,
+        })
+
+    return group_scores, bracket_scores, match_details
+
+
+def write_output(group_scores, bracket_scores, match_details):
+    """Write the combined output"""
+    local_group = {}
+    local_bracket = {}
+    if os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+            local_group = existing.get("local_group_scores", {})
+            local_bracket = existing.get("local_bracket_scores", {})
+        except Exception:
+            pass
+
+    output = {
+        "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "source": "FIFA",
+        "group_scores": group_scores,
+        "bracket_scores": bracket_scores,
+        "match_details": match_details,
+        "local_group_scores": local_group,
+        "local_bracket_scores": local_bracket,
+    }
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=1)
+
+    finished = sum(1 for m in match_details if m["finished"])
+    live = sum(1 for m in match_details if m["live"])
+    group_matched = sum(1 for m in match_details if m["group_matched"])
+    bracket_matched = sum(1 for m in match_details if m["bracket_matched"])
+    print(f"[OK] Written {len(match_details)} matches to {OUTPUT_FILE}")
+    print(f"     Finished: {finished}, Live: {live}")
+    print(f"     Group matched: {group_matched}, Bracket mapped: {bracket_matched}")
+    print(f"     Group scores: {len(group_scores)}, Bracket scores: {len(bracket_scores)}")
+
+
+def main():
+    teams_map, teams_ordered = load_teams()
+    if not teams_map:
+        print("[ERROR] No team data loaded from wc-roster-data.js")
+        sys.exit(1)
+
+    print(f"[INFO] Loaded {len(teams_map)} teams")
+
+    matches = fetch_fifa()
+    if not matches:
+        print("[WARN] No matches fetched from FIFA API")
+        sys.exit(0)
+
+    print(f"[INFO] Fetched {len(matches)} matches from FIFA API")
+
+    group_scores, bracket_scores, match_details = parse_matches(matches, teams_map, teams_ordered)
+    write_output(group_scores, bracket_scores, match_details)
+
+
+if __name__ == "__main__":
+    main()

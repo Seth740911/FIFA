@@ -1,0 +1,9 @@
+# 排除安装包和临时文件
+*.exe
+*.msi
+.temp/
+__pycache__/
+*.xlsx
+*.svg
+Thumbs.db
+.DS_Store
