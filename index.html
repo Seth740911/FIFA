@@ -13,13 +13,13 @@
 html{scroll-behavior:smooth}
 html{overscroll-behavior-x:none}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.6;touch-action:pan-y}
-.container{max-width:1400px;margin:0 auto;padding:20px}
+.container{max-width:1400px;margin:0 auto;padding:20px;padding-top:60px}
 header{text-align:center;padding:40px 20px 30px;border-bottom:1px solid var(--border)}
 header h1{font-size:2.5em;background:linear-gradient(135deg,var(--gold),#f0c878,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
 header p{color:var(--text2);margin-top:8px;font-size:1.1em}
 
 /* 顶部锚点导航 */
-nav{display:flex;gap:4px;padding:6px 2px;overflow-x:auto;flex-wrap:nowrap;justify-content:center;position:sticky;top:0;background:var(--bg);z-index:100;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav{display:flex;gap:4px;padding:6px 2px;overflow-x:auto;flex-wrap:nowrap;justify-content:center;position:fixed;top:0;left:0;right:0;width:100%;background:var(--bg);z-index:100;border-bottom:1px solid var(--border);scrollbar-width:none;padding-left:max(2px,env(safe-area-inset-left));padding-right:max(2px,env(safe-area-inset-right))}
 nav::-webkit-scrollbar{display:none}
 nav a{border:1px solid transparent;color:#fff;padding:4px 9px;border-radius:16px;cursor:pointer;font-size:.76em;transition:all .2s;white-space:nowrap;text-decoration:none;font-weight:600;letter-spacing:.3px;line-height:1.4}
 nav a:nth-child(1){background:#e67e22;border-color:#d35400}
@@ -32,7 +32,8 @@ nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 
 /* 区块通用 */
 .section{padding:30px 0}
-h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sticky-head{position:sticky;top:0;background:var(--bg);z-index:90;padding:0 0 8px;border-bottom:1px solid var(--border)}
+h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-bottom:none}
 
 /* 赛事概况 */
 .overview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
@@ -258,8 +259,8 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 <!-- 赛事概况 -->
 <section id="overview" class="section fade-in">
-  <h2>赛事概况</h2>
-  <div class="overview-grid overview-stats" style="grid-template-columns:repeat(4,1fr)">
+  <div class="sticky-head" style="z-index:89"><h2>赛事概况</h2></div>
+  <div class="overview-grid overview-stats">
     <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">48</span><span class="label">参赛球队</span></div>
     <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">12</span><span class="label">小组</span></div>
     <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">104</span><span class="label">比赛场次</span></div>
@@ -279,20 +280,18 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 <!-- 小组积分 -->
 <section id="groupstand" class="section fade-in">
-  <div id="gsSticky" style="position:sticky;top:0;background:var(--bg);z-index:90;padding-bottom:4px;border-bottom:1px solid var(--border)">
-    <h2 id="gsTitle" style="padding:12px 0;border-bottom:none;margin-bottom:0">小组积分榜</h2>
-    <div class="gs-ctrl">
-      <button onclick="syncScores()" class="bc-btn">同步比分</button>
-      <button onclick="GSTAND.reset()" class="bc-btn">重置</button>
-      <span class="bc-note" id="sync-status">点击比分输入，或"同步比分"从FIFA获取</span>
-    </div>
+  <div class="sticky-head" id="gsSticky"><h2 id="gsTitle">小组积分榜</h2></div>
+  <div class="gs-ctrl">
+    <button onclick="syncScores()" class="bc-btn">同步比分</button>
+    <button onclick="GSTAND.reset()" class="bc-btn">重置</button>
+    <span class="bc-note" id="sync-status">点击比分输入，或"同步比分"从FIFA获取</span>
   </div>
   <div class="gs-grid" id="gs-container"></div>
 </section>
 
 <!-- 淘汰赛签表 -->
 <section id="knockout" class="section fade-in">
-  <h2>淘汰赛签表</h2>
+  <div class="sticky-head" id="koSticky"><h2>淘汰赛签表</h2></div>
   <div class="bc-ctrl">
     <button onclick="syncScores()" class="bc-btn">同步比分</button>
     <button onclick="BRACKET.reset()" class="bc-btn">重置</button>
@@ -303,7 +302,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 <!-- 焦点球星 -->
 <section id="stars" class="section fade-in">
-  <h2>焦点球星</h2>
+  <div class="sticky-head" id="starsSticky"><h2>焦点球星</h2></div>
   <div class="star-grid">
   <div class="star-card2" style="--team-color:#9CC9F2">
     <div class="sc2-no-photo-area">
@@ -566,7 +565,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 <!-- 场馆 -->
 <section id="venues" class="section fade-in">
-  <h2>举办城市与场馆</h2>
+  <div class="sticky-head" id="venuesSticky"><h2>举办城市与场馆</h2></div>
   <h3 style="color:var(--accent);margin-top:20px">美国</h3>
   <div class="venue-card"><div><strong>大都会人寿体育场</strong><br><span style="color:var(--text2)">纽约/新泽西</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">82,500</span><br><span style="color:var(--text2);font-size:.85em">8(含决赛)场</span></div></div>
   <div class="venue-card"><div><strong>SoFi体育场</strong><br><span style="color:var(--text2)">洛杉矶</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">70,000</span><br><span style="color:var(--text2);font-size:.85em">8场</span></div></div>
@@ -590,8 +589,8 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 <!-- 各队阵容 -->
 <section id="roster" class="section fade-in">
-  <h2>各队阵容</h2>
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+  <div class="sticky-head" id="rosterSticky"><h2>各队阵容</h2></div>
+  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
     <span style="color:var(--text2);font-size:.9em">筛选：</span>
     <button onclick="filterRoster('all')" class="roster-filter active" data-filter="all">全部</button>
     <button onclick="filterRoster('has-photo')" class="roster-filter" data-filter="has-photo">有照片</button>
@@ -789,13 +788,51 @@ function openPlayerDetail(teamCode, jerseyNum) {
   }
 
   document.getElementById('pdOverlay').classList.add('open');
+  _pdScrollY=window.scrollY;
+  // 记录进入详情卡前所在的section，关闭时返回
+  _pdPrevSection = '';
+  document.querySelectorAll('.section').forEach(function(sec){
+    var r=sec.getBoundingClientRect();
+    if(r.top<120&&r.bottom>80) _pdPrevSection=sec.id||'';
+  });
   document.body.style.overflow = 'hidden';
 }
 
+var _pdScrollY=0;
+var _pdPrevSection='';
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  window.scrollTo(0,_pdScrollY);
+  // 返回到进入详情卡之前的section
+  if(_pdPrevSection){
+    var sec=document.getElementById(_pdPrevSection);
+    if(sec) setTimeout(function(){sec.scrollIntoView({behavior:'smooth',block:'start'})},100);
+  }
 }
+
+// 右滑关闭球员详情（从左边向右滑动）
+(function(){
+  var modal=document.querySelector('.pd-modal');
+  var startX=0,startY=0,dx=0,swiping=false;
+  modal.addEventListener('touchstart',function(e){
+    startX=e.touches[0].clientX; startY=e.touches[0].clientY; dx=0; swiping=true;
+  },{passive:true});
+  modal.addEventListener('touchmove',function(e){
+    if(!swiping)return;
+    var cx=e.touches[0].clientX, cy=e.touches[0].clientY;
+    dx=cx-startX; var dy=cy-startY;
+    if(Math.abs(dy)>Math.abs(dx)){swiping=false;modal.style.transform='';return;}
+    // 只允许向右滑动（dx>0）
+    if(dx>0) modal.style.transform='translateX('+dx+'px)';
+    else modal.style.transform='';
+  },{passive:true});
+  modal.addEventListener('touchend',function(){
+    if(dx>80) closePlayerDetail();
+    modal.style.transform='';
+    swiping=false;dx=0;
+  },{passive:true});
+})();
 
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePlayerDetail() });
 
@@ -967,11 +1004,16 @@ window.addEventListener('scroll', () => {
 });
 // 阻止横向滚动（不影响sticky）
 window.addEventListener('scroll',function(){ if(window.scrollX!==0)window.scrollTo(0,window.scrollY); },{passive:true});
-// 设置小组积分榜sticky top=nav高度
+// 设置所有sticky-head top=nav高度，同时补偿container padding
 (function(){
-  function setGsTop(){ var gs=document.getElementById('gsSticky');if(gs)gs.style.top=document.querySelector('nav').offsetHeight+'px'; }
-  setGsTop();
-  window.addEventListener('resize',setGsTop);
+  function setStickyTop(){
+    var nav=document.querySelector('nav');
+    var nh=nav.offsetHeight;
+    document.querySelectorAll('.sticky-head').forEach(function(el){ el.style.top=nh+'px'; });
+    document.querySelector('.container').style.paddingTop=(nh+20)+'px';
+  }
+  setStickyTop();
+  window.addEventListener('resize',setStickyTop);
 })();
 
 // 初始化
