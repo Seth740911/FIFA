@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """2026世界杯观赛指南 - 后端服务器 (端口8086)
 纯静态网页服务，双栈监听，后台定时同步比分和红黄牌
+新增：/proxy/ 端点代理 HLS 请求，解决 bufferStalledError
 """
 
 import os
@@ -22,12 +23,20 @@ FETCH_SCRIPT = os.path.join(WEB_DIR, "fetch_scores.py")
 VIDEO_DIR = r"D:\迅雷下载"
 
 
+def _urlopen(url, headers=None, timeout=15):
+    """统一 urlopen"""
+    req = urllib.request.Request(url)
+    if headers:
+        for k, v in headers.items():
+            req.add_header(k, v)
+    return urllib.request.urlopen(req, timeout=timeout)
+
+
 class FIFAHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WEB_DIR, **kwargs)
 
     def end_headers(self):
-        # 禁止缓存 JSON 和 HTML，确保比分数据实时更新
         if self.path.endswith('.json') or self.path.endswith('.html') or self.path == '/':
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             self.send_header('Pragma', 'no-cache')
@@ -35,19 +44,19 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
-        # /api/sync: 触发 fetch_scores.py 同步后返回最新数据
         if self.path.split('?')[0] == '/api/sync':
             self._handle_sync()
             return
-        # /api/video?fifaId=xxx: 获取比赛集锦m3u8播放地址
         if self.path.split('?')[0] == '/api/video':
             self._handle_api_video()
             return
-        # /api/videos: 获取所有已注册的视频列表
         if self.path.split('?')[0] == '/api/videos':
             self._handle_api_videos()
             return
-        # /video/: 提供迅雷下载的视频文件 or 代理远端URL
+        # /proxy/?url=ENCODED_URL -> 代理该 URL（用于 HLS 代理）
+        if self.path.startswith('/proxy/?'):
+            self._handle_proxy()
+            return
         if self.path.startswith('/video/'):
             self._handle_video()
             return
@@ -59,17 +68,22 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             return
         self.send_error(404)
 
+    def _handle_proxy(self):
+        """代理任意 URL（用于 HLS 片段代理，避免 CORS/网络问题）"""
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        url = qs.get('url', [''])[0]
+        if not url:
+            self.send_error(400, 'Missing url parameter')
+            return
+        self._proxy_remote(url)
+
     def _handle_video(self):
-        """Proxy remote m3u8/TS URLs or serve local video files from VIDEO_DIR"""
+        """提供本地视频文件 or 代理远端 URL"""
         rel = self.path[len('/video/'):]
         rel = urllib.parse.unquote(rel)
-
-        # Remote URL proxy: /video/https://...
         if rel.startswith('http://') or rel.startswith('https://'):
             self._proxy_remote(rel)
             return
-
-        # Local file serving: /video/path → VIDEO_DIR/path
         fpath = os.path.normpath(os.path.join(VIDEO_DIR, rel))
         if not fpath.startswith(os.path.normpath(VIDEO_DIR)):
             self.send_error(403)
@@ -97,7 +111,7 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def _proxy_remote(self, url):
-        """Proxy a remote URL (m3u8/TS/key) to avoid CORS issues"""
+        """代理远端 URL"""
         ext = os.path.splitext(urllib.parse.urlparse(url).path)[1].lower()
         ct = {
             '.m3u8': 'application/vnd.apple.mpegurl',
@@ -106,11 +120,11 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             '.mp4': 'video/mp4',
         }.get(ext, 'application/octet-stream')
         try:
-            req = urllib.request.Request(url, headers={
+            with _urlopen(url, headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': '*/*',
-            })
-            with urllib.request.urlopen(req, timeout=30) as resp:
+                'Referer': 'https://www.fifa.com/',
+            }) as resp:
                 data = resp.read()
             self.send_response(200)
             self.send_header('Content-Type', ct)
@@ -122,7 +136,6 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.send_error(502, f'Proxy error: {e}')
 
     def _handle_api_videos(self):
-        """Return the full wc-videos.json mapping"""
         video_map_path = os.path.join(WEB_DIR, 'wc-videos.json')
         try:
             with open(video_map_path, 'r', encoding='utf-8') as f:
@@ -132,14 +145,6 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self._json_response({'error': str(e)}, 500)
 
     def _handle_video_register(self):
-        """Register a FIFA watch URL and auto-map entryId to matchId.
-        POST body: {"url": "https://www.fifa.com/en/watch/XXXX"} or {"entryId": "XXXX"}
-        Flow:
-          1. Extract entryId from URL
-          2. Call videoDetails API → get semanticTags with Match category
-          3. Save {matchId: {entryId, title}} to wc-videos.json
-          4. Return match info
-        """
         try:
             length = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(length).decode('utf-8')) if length else {}
@@ -150,7 +155,6 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         url = body.get('url', '')
         entry_id = body.get('entryId', '')
 
-        # Extract entryId from URL
         if url and not entry_id:
             import re
             m = re.search(r'/watch/([a-zA-Z0-9]+)', url)
@@ -165,24 +169,18 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             return
 
         try:
-            # 1. Call videoDetails API to get semanticTags
             details_url = f'https://cxm-api.fifa.com/fifaplusweb/api/sections/videoDetails/{entry_id}?locale=en'
-            req = urllib.request.Request(details_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with _urlopen(details_url, headers={'User-Agent': 'Mozilla/5.0'}) as resp:
                 details = json.loads(resp.read().decode('utf-8'))
 
             title = details.get('title', '')
             tags = details.get('semanticTags', [])
-
-            # 2. Find Match tag to get matchId
             match_tag = next((t for t in tags if t.get('sourceCategory') == 'Match'), None)
             if not match_tag:
-                self._json_response({'error': 'No Match tag found in video', 'title': title}, 404)
+                self._json_response({'error': 'No Match tag found', 'title': title}, 404)
                 return
 
             match_id = match_tag.get('id', '')
-
-            # 3. Load and update wc-videos.json
             video_map_path = os.path.join(WEB_DIR, 'wc-videos.json')
             vmap = {}
             if os.path.exists(video_map_path):
@@ -193,36 +191,23 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                     pass
 
             vmap[match_id] = {'entryId': entry_id, 'title': title}
-
             with open(video_map_path, 'w', encoding='utf-8') as f:
                 json.dump(vmap, f, ensure_ascii=False, indent=2)
 
             print(f"  [video] Registered: {match_id} -> {entry_id} ({title})")
-            self._json_response({
-                'matchId': match_id,
-                'entryId': entry_id,
-                'title': title,
-                'registered': True,
-            })
+            self._json_response({'matchId': match_id, 'entryId': entry_id, 'title': title, 'registered': True})
 
         except Exception as e:
             print(f"  [video] Register error: {e}")
             self._json_response({'error': str(e)}, 500)
 
     def _handle_api_video(self):
-        """Get m3u8 play URL for a given FIFA match ID.
-        1. Look up video entryId from wc-videos.json (fifaId → entryId)
-        2. Call FIFA videoPlayerData API to get preplayParameters
-        3. Call uplynk preplay API to get m3u8 URL
-        4. Return m3u8 URL + poster + duration to frontend
-        """
         qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
         fifa_id = qs.get('fifaId', [''])[0]
         if not fifa_id:
             self.send_error(400, 'Missing fifaId')
             return
         try:
-            # 1. Load video mapping
             video_map_path = os.path.join(WEB_DIR, 'wc-videos.json')
             if not os.path.exists(video_map_path):
                 self._json_response({'error': 'no video mapping'}, 404)
@@ -238,10 +223,8 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                 self._json_response({'error': 'video not available'}, 404)
                 return
 
-            # 2. Call FIFA videoPlayerData API
             api_url = f'https://cxm-api.fifa.com/fifaplusweb/api/videoPlayerData/{entry_id}?locale=en&personalizedAds=false'
-            req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with _urlopen(api_url, headers={'User-Agent': 'Mozilla/5.0'}) as resp:
                 pdata = json.loads(resp.read().decode('utf-8'))
             pp = pdata.get('preplayParameters', {})
             asset_guid = pdata.get('verizonAssetGuid', '')
@@ -251,10 +234,8 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                 self._json_response({'error': 'missing preplay params'}, 502)
                 return
 
-            # 3. Call uplynk preplay API
             preplay_url = f'https://content.uplynk.com/preplay/{asset_guid}.json?{query_str}&sig={signature}'
-            req2 = urllib.request.Request(preplay_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req2, timeout=15) as resp2:
+            with _urlopen(preplay_url, headers={'User-Agent': 'Mozilla/5.0'}) as resp2:
                 preplay = json.loads(resp2.read().decode('utf-8'))
             play_url = preplay.get('playURL', '')
             poster = pdata.get('videoPosterImage', {}).get('src', '')
@@ -262,6 +243,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             if not play_url:
                 self._json_response({'error': 'no playURL'}, 502)
                 return
+
+            # 返回真实 playURL，前端通过 /proxy/ 代理所有 HLS 请求
+            print(f"  [video] play_url = {play_url[:100]}")
             self._json_response({'url': play_url, 'poster': poster, 'duration': duration})
         except Exception as e:
             print(f"  [video] Error: {e}")
@@ -275,27 +259,19 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
 
     def _handle_sync(self):
-        """Run fetch_scores.py in background, return current wc-scores.json immediately.
-        If a sync is already running, skip and return current data."""
-        # Check if a sync is already in progress
         if hasattr(self.server, '_sync_running') and self.server._sync_running:
-            # Return current data without starting another sync
             self._return_scores()
             return
-        
         self.server._sync_running = True
         def _run_and_clear():
             try:
                 _run_fetch()
             finally:
                 self.server._sync_running = False
-        
         threading.Thread(target=_run_and_clear, daemon=True).start()
-        # Return current data immediately
         self._return_scores()
-    
+
     def _return_scores(self):
-        """Return the current wc-scores.json file"""
         try:
             with open(os.path.join(WEB_DIR, 'wc-scores.json'), 'r', encoding='utf-8') as f:
                 data = f.read()
@@ -308,11 +284,10 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def log_message(self, format, *args):
-        pass  # 静默日志
+        pass
 
 
 def _run_fetch():
-    """Run fetch_scores.py to sync scores and cards from FIFA API"""
     try:
         result = subprocess.run(
             [sys.executable, FETCH_SCRIPT],
@@ -330,7 +305,6 @@ def _run_fetch():
 
 
 def _startup_sync():
-    """Run fetch_scores.py once on startup"""
     time.sleep(3)
     print("[sync] 启动同步比分和红黄牌...")
     _run_fetch()
@@ -346,7 +320,6 @@ def main():
     print(f"2026世界杯观赛指南 - 端口 {listen_port}")
     print(f"http://127.0.0.1:{listen_port}")
 
-    # Startup sync (one-time, no loop)
     sync_thread = threading.Thread(target=_startup_sync, daemon=True)
     sync_thread.start()
 

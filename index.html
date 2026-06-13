@@ -285,6 +285,21 @@ h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 .gs-sch-t1:hover,.gs-sch-t2:hover{background:none}
 .gs-sch-row{cursor:pointer}
 .gs-sch-row:hover{background:rgba(212,168,83,.08)}
+.gs-sch-hint{font-size:.65em;color:var(--text2);opacity:.6;margin-left:4px;white-space:nowrap}
+.gs-sch-row:hover .gs-sch-hint{opacity:1;color:var(--gold)}
+.gs-team-hint{font-size:.6em;color:var(--gold);opacity:.5;margin-left:2px}
+.gs-team:hover .gs-team-hint{opacity:1}
+
+/* 首次引导气泡 */
+.guide-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.guide-box{background:#1a1a2e;border:1px solid var(--gold);border-radius:16px;padding:28px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.guide-box h3{color:var(--gold);font-size:1.1em;margin:0 0 16px}
+.guide-box ul{list-style:none;padding:0;margin:0 0 20px;text-align:left}
+.guide-box li{padding:6px 0;color:#ccc;font-size:.88em;line-height:1.5}
+.guide-box li b{color:#fff}
+.guide-box li .guide-icon{display:inline-block;width:20px;text-align:center;margin-right:4px}
+.guide-btn{background:var(--gold);color:#000;border:none;border-radius:8px;padding:10px 28px;font-size:.95em;font-weight:600;cursor:pointer}
+.guide-btn:hover{opacity:.9}
 .gs-ctrl{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 
 @media(max-width:900px){
@@ -1519,6 +1534,18 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// 操作提示（每次进入都显示）
+(function(){
+  var d=document.createElement('div');
+  d.className='guide-overlay';
+  d.innerHTML='<div class="guide-box"><h3>操作提示</h3><ul>'+
+    '<li><span class="guide-icon">⚽</span>点击<b>比分条</b>（详情）→ 查看赛事时间轴和视频集锦</li>'+
+    '<li><span class="guide-icon">👤</span>点击<b>队名</b>（›）→ 跳转到该队球员阵容墙</li>'+
+    '<li><span class="guide-icon">🏆</span>点击<b>淘汰赛队名</b> → 同样跳转到球员阵容</li>'+
+    '</ul><button class="guide-btn" onclick="this.closest(\'.guide-overlay\').remove()">知道了</button></div>';
+  document.body.appendChild(d);
+})();
+
 // 回到顶部按钮
 window.addEventListener('scroll', () => {
   document.getElementById('backTop').classList.toggle('show', window.scrollY > 600);
@@ -1608,7 +1635,7 @@ function render(){
     st.forEach(function(t,i){
       var cls=i<2?'gs-adv':i===2?'gs-3rd':'';
       var flagH=teamMap[t.cn]?'<img src="/wc-flags/'+t.code+'.png" class="gs-flag" onerror="this.style.display=\'none\'">':'';
-      h+='<tr class="'+cls+'"><td>'+(i+1)+'</td><td><span class="gs-team">'+flagH+'<span class="gs-tn">'+t.cn+'</span></span></td><td>'+t.p+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td><td>'+t.gf+'</td><td>'+t.ga+'</td><td>'+(t.gd>=0?'+':'')+t.gd+'</td><td style="font-weight:700;color:var(--gold)">'+t.pts+'</td></tr>';
+      h+='<tr class="'+cls+'"><td>'+(i+1)+'</td><td><span class="gs-team">'+flagH+'<span class="gs-tn">'+t.cn+'</span><span class="gs-team-hint">›</span></span></td><td>'+t.p+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td><td>'+t.gf+'</td><td>'+t.ga+'</td><td>'+(t.gd>=0?'+':'')+t.gd+'</td><td style="font-weight:700;color:var(--gold)">'+t.pts+'</td></tr>';
     });
     h+='</tbody></table>';
     // Schedule + scores combined
@@ -1634,13 +1661,13 @@ function render(){
             var ds1,ds2;
             if(fixRef&&fixRef.t1===t1cn){ds1=d.s1;ds2=d.s2}
             else{ds1=d.s2;ds2=d.s1}
-             if(fid){
-               var fifaId=FIX_TO_FIFA[fid]||'';
-               var trAttr=fifaId?' class="gs-sch-row" data-fifa="'+fifaId+'"':'';
-               matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc"><b>'+ds1+'</b>:<b>'+ds2+'</b></td><td class="gs-sch-t2">'+t2cn+'</td>';
-             }else{
-               var trAttr='';
-               matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc"><b>'+ds1+'</b>:<b>'+ds2+'</b></td><td class="gs-sch-t2">'+t2cn+'</td>';
+              if(fid){
+                var fifaId=FIX_TO_FIFA[fid]||'';
+                var trAttr=fifaId?' class="gs-sch-row" data-fifa="'+fifaId+'"':'';
+                matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc"><b>'+ds1+'</b>:<b>'+ds2+'</b>'+(fifaId?'<span class="gs-sch-hint">详情</span>':'')+'</td><td class="gs-sch-t2">'+t2cn+'</td>';
+              }else{
+                var trAttr='';
+                matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc"><b>'+ds1+'</b>:<b>'+ds2+'</b></td><td class="gs-sch-t2">'+t2cn+'</td>';
              }
            }else{
              if(fid){
@@ -2239,24 +2266,44 @@ function _setupVideo(ev) {
     });
 }
 
-function _playM3u8(m3u8Url) {
+function _playM3u8(m3u8Url, _viaProxy) {
   var videoDiv = document.getElementById('tlVideo');
   var video = document.getElementById('tlPlayer');
   videoDiv.style.display = 'block';
   video.style.display = 'block';
 
   if (Hls.isSupported()) {
-    _hlsInstance = new Hls();
+    var hlsConfig = {};
+    if (_viaProxy) {
+      // 回退模式：所有请求走服务器代理
+      hlsConfig.xhrSetup = function(xhr, url) {
+        if (url.indexOf('/proxy/') !== 0) {
+          xhr.open('GET', '/proxy/?url=' + encodeURIComponent(url), true);
+        }
+      };
+    }
+    _hlsInstance = new Hls(hlsConfig);
     _hlsInstance.loadSource(m3u8Url);
     _hlsInstance.attachMedia(video);
     _hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
       video.play();
     });
-    _hlsInstance.on(Hls.Events.ERROR, function(event, data) {
-      console.warn('[HLS] error:', data.type, data.details);
-    });
+    // 直连失败时自动回退到代理
+    if (!_viaProxy) {
+      var _retried = false;
+      _hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+        if (_retried) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          _retried = true;
+          console.warn('[HLS] 直连失败，回退代理');
+          _hlsInstance.destroy();
+          _hlsInstance = null;
+          _playM3u8(m3u8Url, true);
+        }
+      });
+    }
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = m3u8Url;
+    video.src = _viaProxy ? '/proxy/?url=' + encodeURIComponent(m3u8Url) : m3u8Url;
     video.play();
   }
 }

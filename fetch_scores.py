@@ -21,6 +21,15 @@ CARDS_FILE = os.path.join(SCRIPT_DIR, "wc-cards.json")
 EVENTS_FILE = os.path.join(SCRIPT_DIR, "wc-events.json")
 VIDEOS_FILE = os.path.join(SCRIPT_DIR, "wc-videos.json")
 
+
+def _urlopen(url, headers=None, timeout=15):
+    """统一 urlopen"""
+    req = urllib.request.Request(url)
+    if headers:
+        for k, v in headers.items():
+            req.add_header(k, v)
+    return urllib.request.urlopen(req, timeout=timeout)
+
 # FIFA official API - 104 matches, includes group info and scores
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches?language=en&count=500&idSeason=285023"
 # Per-match Live API - has Bookings (cards) + Players roster
@@ -72,12 +81,11 @@ def load_teams():
 
 def fetch_fifa():
     """Fetch match data from FIFA API"""
-    req = urllib.request.Request(FIFA_API, headers={
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "application/json",
-    })
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with _urlopen(FIFA_API, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+        }) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         return data.get("Results", [])
     except Exception as e:
@@ -472,12 +480,11 @@ def load_player_id_map():
 def fetch_live_match(match_id):
     """Fetch Live API for a single match to get Bookings + Players"""
     url = FIFA_LIVE_API.format(match_id=match_id)
-    req = urllib.request.Request(url, headers={
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "application/json",
-    })
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with _urlopen(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+        }) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except Exception as e:
         print(f"[WARN] Failed to fetch Live API for match {match_id}: {e}")
@@ -744,8 +751,7 @@ def discover_videos():
     for cid in CAROUSEL_IDS:
         url = f"{CXM_API}/sections/promoCarousel/{cid}?locale=en"
         try:
-            req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with _urlopen(url, headers=HEADERS) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             items = data.get("items", [])
             for item in items:
@@ -768,8 +774,7 @@ def discover_videos():
     for nid in NEWS_IDS:
         url = f"{CXM_API}/sections/news/{nid}?locale=en&limit=50"
         try:
-            req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with _urlopen(url, headers=HEADERS) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             items = data.get("items", [])
             for item in items:
@@ -796,8 +801,7 @@ def discover_videos():
         # Call videoDetails to find matchId via semanticTags
         try:
             details_url = f"{CXM_API}/sections/videoDetails/{eid}?locale=en"
-            req = urllib.request.Request(details_url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with _urlopen(details_url, headers=HEADERS) as resp:
                 details = json.loads(resp.read().decode("utf-8"))
         except Exception as e:
             print(f"[video] videoDetails {eid} error: {e}")
