@@ -1,0 +1,496 @@
+{
+ "last_updated": "2026-06-13T11:04:58Z",
+ "events": {
+  "400021443": {
+   "home": "MEX",
+   "away": "RSA",
+   "h_cn": "墨西哥",
+   "a_cn": "南非",
+   "score_h": 2,
+   "score_a": 0,
+   "timeline": [
+    {
+     "min": "9'",
+     "type": "goal",
+     "id_player": "429157",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "17'",
+     "type": "yellow",
+     "id_player": "403616",
+     "side": "away"
+    },
+    {
+     "min": "23'",
+     "type": "yellow",
+     "id_player": "464533",
+     "side": "home"
+    },
+    {
+     "min": "49'",
+     "type": "red",
+     "id_player": "390475",
+     "side": "away"
+    },
+    {
+     "min": "56'",
+     "type": "sub",
+     "id_off": "419211",
+     "id_on": "494248",
+     "side": "away"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "463236",
+     "id_on": "395984",
+     "side": "away"
+    },
+    {
+     "min": "66'",
+     "type": "sub",
+     "id_off": "464533",
+     "id_on": "448051",
+     "side": "home"
+    },
+    {
+     "min": "66'",
+     "type": "sub",
+     "id_off": "416576",
+     "id_on": "500037",
+     "side": "home"
+    },
+    {
+     "min": "67'",
+     "type": "goal",
+     "id_player": "356731",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "74'",
+     "type": "yellow",
+     "id_player": "463221",
+     "side": "away"
+    },
+    {
+     "min": "76'",
+     "type": "sub",
+     "id_off": "419518",
+     "id_on": "400634",
+     "side": "home"
+    },
+    {
+     "min": "76'",
+     "type": "sub",
+     "id_off": "356731",
+     "id_on": "514336",
+     "side": "home"
+    },
+    {
+     "min": "76'",
+     "type": "sub",
+     "id_off": "481242",
+     "id_on": "430917",
+     "side": "away"
+    },
+    {
+     "min": "76'",
+     "type": "sub",
+     "id_off": "395050",
+     "id_on": "419223",
+     "side": "away"
+    },
+    {
+     "min": "79'",
+     "type": "sub",
+     "id_off": "429157",
+     "id_on": "430766",
+     "side": "home"
+    },
+    {
+     "min": "84'",
+     "type": "red",
+     "id_player": "395984",
+     "side": "away"
+    },
+    {
+     "min": "90'+2'",
+     "type": "red",
+     "id_player": "395516",
+     "side": "home"
+    }
+   ]
+  },
+  "400021441": {
+   "home": "KOR",
+   "away": "CZE",
+   "h_cn": "韩国",
+   "a_cn": "捷克",
+   "score_h": 2,
+   "score_a": 1,
+   "timeline": [
+    {
+     "min": "59'",
+     "type": "goal",
+     "id_player": "441170",
+     "id_assist": "",
+     "side": "away"
+    },
+    {
+     "min": "62'",
+     "type": "sub",
+     "id_off": "390525",
+     "id_on": "395083",
+     "side": "home"
+    },
+    {
+     "min": "63'",
+     "type": "sub",
+     "id_off": "486082",
+     "id_on": "433754",
+     "side": "away"
+    },
+    {
+     "min": "63'",
+     "type": "sub",
+     "id_off": "401481",
+     "id_on": "483961",
+     "side": "away"
+    },
+    {
+     "min": "63'",
+     "type": "sub",
+     "id_off": "484011",
+     "id_on": "433668",
+     "side": "away"
+    },
+    {
+     "min": "67'",
+     "type": "goal",
+     "id_player": "395084",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "69'",
+     "type": "sub",
+     "id_off": "307849",
+     "id_on": "448586",
+     "side": "home"
+    },
+    {
+     "min": "69'",
+     "type": "sub",
+     "id_off": "423880",
+     "id_on": "423855",
+     "side": "home"
+    },
+    {
+     "min": "80'",
+     "type": "goal",
+     "id_player": "448586",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "84'",
+     "type": "sub",
+     "id_off": "395084",
+     "id_on": "430385",
+     "side": "home"
+    },
+    {
+     "min": "84'",
+     "type": "sub",
+     "id_off": "402817",
+     "id_on": "479316",
+     "side": "home"
+    },
+    {
+     "min": "84'",
+     "type": "sub",
+     "id_off": "523097",
+     "id_on": "484003",
+     "side": "away"
+    },
+    {
+     "min": "90'+6'",
+     "type": "yellow",
+     "id_player": "492315",
+     "side": "home"
+    }
+   ]
+  },
+  "400021449": {
+   "home": "CAN",
+   "away": "BIH",
+   "h_cn": "加拿大",
+   "a_cn": "波黑",
+   "score_h": 1,
+   "score_a": 1,
+   "timeline": [
+    {
+     "min": "11'",
+     "type": "yellow",
+     "id_player": "441252",
+     "side": "home"
+    },
+    {
+     "min": "21'",
+     "type": "goal",
+     "id_player": "519954",
+     "id_assist": "",
+     "side": "away"
+    },
+    {
+     "min": "44'",
+     "type": "yellow",
+     "id_player": "436743",
+     "side": "away"
+    },
+    {
+     "min": "45'+1'",
+     "type": "yellow",
+     "id_player": "519954",
+     "side": "away"
+    },
+    {
+     "min": "53'",
+     "type": "yellow",
+     "id_player": "480322",
+     "side": "home"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "441257",
+     "id_on": "493970",
+     "side": "home"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "430138",
+     "id_on": "466687",
+     "side": "home"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "441259",
+     "id_on": "448411",
+     "side": "home"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "482974",
+     "id_on": "489523",
+     "side": "away"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "519954",
+     "id_on": "485063",
+     "side": "away"
+    },
+    {
+     "min": "74'",
+     "type": "sub",
+     "id_off": "494640",
+     "id_on": "504990",
+     "side": "away"
+    },
+    {
+     "min": "74'",
+     "type": "sub",
+     "id_off": "464566",
+     "id_on": "372436",
+     "side": "away"
+    },
+    {
+     "min": "76'",
+     "type": "sub",
+     "id_off": "486929",
+     "id_on": "390670",
+     "side": "home"
+    },
+    {
+     "min": "78'",
+     "type": "goal",
+     "id_player": "390670",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "83'",
+     "type": "sub",
+     "id_off": "376230",
+     "id_on": "389886",
+     "side": "away"
+    },
+    {
+     "min": "90'+1'",
+     "type": "sub",
+     "id_off": "433635",
+     "id_on": "370986",
+     "side": "home"
+    },
+    {
+     "min": "90'+3'",
+     "type": "yellow",
+     "id_player": "489520",
+     "side": "away"
+    }
+   ]
+  },
+  "400021458": {
+   "home": "USA",
+   "away": "PAR",
+   "h_cn": "美国",
+   "a_cn": "巴拉圭",
+   "score_h": 4,
+   "score_a": 1,
+   "timeline": [
+    {
+     "min": "",
+     "type": "sub",
+     "id_off": "390267",
+     "id_on": "499912",
+     "side": "home"
+    },
+    {
+     "min": "",
+     "type": "sub",
+     "id_off": "476348",
+     "id_on": "495046",
+     "side": "away"
+    },
+    {
+     "min": "7'",
+     "type": "goal",
+     "id_player": "476348",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "9'",
+     "type": "yellow",
+     "id_player": "479601",
+     "side": "away"
+    },
+    {
+     "min": "31'",
+     "type": "goal",
+     "id_player": "466624",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "45'+5'",
+     "type": "goal",
+     "id_player": "466624",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "53'",
+     "type": "yellow",
+     "id_player": "369761",
+     "side": "away"
+    },
+    {
+     "min": "59'",
+     "type": "yellow",
+     "id_player": "390238",
+     "side": "home"
+    },
+    {
+     "min": "62'",
+     "type": "sub",
+     "id_off": "369768",
+     "id_on": "485802",
+     "side": "away"
+    },
+    {
+     "min": "72'",
+     "type": "sub",
+     "id_off": "406280",
+     "id_on": "406304",
+     "side": "home"
+    },
+    {
+     "min": "72'",
+     "type": "sub",
+     "id_off": "466624",
+     "id_on": "419082",
+     "side": "home"
+    },
+    {
+     "min": "73'",
+     "type": "goal",
+     "id_player": "495046",
+     "id_assist": "",
+     "side": "away"
+    },
+    {
+     "min": "79'",
+     "type": "yellow",
+     "id_player": "463128",
+     "side": "away"
+    },
+    {
+     "min": "79'",
+     "type": "sub",
+     "id_off": "369761",
+     "id_on": "463125",
+     "side": "away"
+    },
+    {
+     "min": "79'",
+     "type": "sub",
+     "id_off": "479601",
+     "id_on": "486875",
+     "side": "away"
+    },
+    {
+     "min": "79'",
+     "type": "sub",
+     "id_off": "463128",
+     "id_on": "386458",
+     "side": "away"
+    },
+    {
+     "min": "82'",
+     "type": "sub",
+     "id_off": "448214",
+     "id_on": "419068",
+     "side": "home"
+    },
+    {
+     "min": "88'",
+     "type": "yellow",
+     "id_player": "485802",
+     "side": "away"
+    },
+    {
+     "min": "90'+3'",
+     "type": "yellow",
+     "id_player": "369749",
+     "side": "away"
+    },
+    {
+     "min": "90'+8'",
+     "type": "goal",
+     "id_player": "419068",
+     "id_assist": "",
+     "side": "home"
+    }
+   ]
+  }
+ }
+}

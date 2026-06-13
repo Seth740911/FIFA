@@ -18,6 +18,8 @@ import urllib.error
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "wc-scores.json")
 CARDS_FILE = os.path.join(SCRIPT_DIR, "wc-cards.json")
+EVENTS_FILE = os.path.join(SCRIPT_DIR, "wc-events.json")
+VIDEOS_FILE = os.path.join(SCRIPT_DIR, "wc-videos.json")
 
 # FIFA official API - 104 matches, includes group info and scores
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches?language=en&count=500&idSeason=285023"
@@ -501,85 +503,83 @@ def _compute_stage_flags(match_details):
 
 
 def fetch_and_aggregate_cards(match_details, pid_map):
-    """Fetch card data from FIFA Live API for all finished matches.
-    Returns aggregated dict with cards broken down by stage:
-      {"TEAM-JERSEY": {"y_group":N,"r_group":N,"y_ko":N,"r_ko":N}, ...}
-    Also tracks stage completion flags.
+    """Fetch card data + match events from FIFA Live API.
+    Incremental: only fetches matches not already in wc-events.json.
+    Returns (cards, stage_info, events).
     """
-    # Load existing processed match set
-    processed_matches = set()
+    import re
+
+    # Load existing events
+    existing_events = {}
+    if os.path.exists(EVENTS_FILE):
+        try:
+            with open(EVENTS_FILE, "r", encoding="utf-8") as f:
+                old = json.load(f)
+            existing_events = old.get("events", {})
+        except Exception:
+            pass
+
+    # Load existing cards
+    existing_cards = {}
     if os.path.exists(CARDS_FILE):
         try:
             with open(CARDS_FILE, "r", encoding="utf-8") as f:
                 old = json.load(f)
-            processed_matches = set(old.get("processed_matches", []))
+            existing_cards = old.get("cards", {})
         except Exception:
             pass
 
-    # Find all finished match IDs we haven't processed yet
-    new_finished = []
+    # Find finished/live match IDs that need fetching
+    all_finished = []
     for m in match_details:
         mid = m.get("fifa_id", "")
-        if m.get("finished") and mid and mid not in processed_matches:
-            new_finished.append(mid)
+        if (m.get("finished") or m.get("live")) and mid:
+            all_finished.append(mid)
 
-    if not new_finished and processed_matches:
-        # No new matches; re-fetch all finished in case counts changed (VAR etc.)
-        for m in match_details:
-            mid = m.get("fifa_id", "")
-            if m.get("finished") and mid:
-                new_finished.append(mid)
+    # Delta: only fetch matches not already in events
+    new_ids = [mid for mid in all_finished if mid not in existing_events]
+    print(f"[INFO] Events: {len(existing_events)} cached, {len(new_ids)} new to fetch")
 
-    if not new_finished:
-        print(f"[INFO] No finished matches to fetch cards for")
-        # Still compute stage flags and return existing cards
+    if not all_finished:
         stage_info = _compute_stage_flags(match_details)
-        # Convert existing format if needed
-        existing = {}
-        if os.path.exists(CARDS_FILE):
-            try:
-                with open(CARDS_FILE, "r", encoding="utf-8") as f:
-                    old = json.load(f)
-                existing = old.get("cards", {})
-            except Exception:
-                pass
-        return existing, stage_info
+        return existing_cards, stage_info, existing_events
 
-    # Build match_id -> stage lookup
+    # Build lookups
     match_stage = {}
+    match_info = {}
     for m in match_details:
-        match_stage[m.get("fifa_id", "")] = m.get("stage", "")
+        mid = m.get("fifa_id", "")
+        match_stage[mid] = m.get("stage", "")
+        match_info[mid] = m
 
-    # Reset aggregation - rebuild from scratch
-    cards = {}  # "TEAM-JERSEY" -> {"y_group":0, "r_group":0, "y_ko":0, "r_ko":0}
-
-    for mid in new_finished:
+    # Only fetch new matches
+    fetched = 0
+    for mid in new_ids:
         live = fetch_live_match(mid)
         if not live:
             continue
+        fetched += 1
 
         stage = match_stage.get(mid, "")
         is_group = stage == "First Stage"
+        mi = match_info.get(mid, {})
 
-        # Build IdPlayer -> key mapping from both teams' Players arrays
-        player_key_map = {}  # IdPlayer -> "TEAM-JERSEY"
+        # Build IdPlayer -> key mapping
+        player_key_map = {}
         for side in ["HomeTeam", "AwayTeam"]:
             team = live.get(side, {})
-            players = team.get("Players", [])
-            for p in players:
+            for p in team.get("Players", []):
                 fifa_pid = str(p.get("IdPlayer", ""))
                 if fifa_pid in pid_map:
                     info = pid_map[fifa_pid]
-                    key = f"{info['code']}-{info['jersey']}"
-                    player_key_map[fifa_pid] = key
+                    player_key_map[fifa_pid] = f"{info['code']}-{info['jersey']}"
 
-        # Process Bookings from both teams
+        # Process Bookings for cards
         for side in ["HomeTeam", "AwayTeam"]:
             team = live.get(side, {})
-            bookings = team.get("Bookings", [])
-            for b in bookings:
+            for b in team.get("Bookings", []):
                 fifa_pid = str(b.get("IdPlayer", ""))
-                card_type = b.get("Card", 0)  # 1=yellow, 2=red
+                card_type = b.get("Card", 0)
                 if not fifa_pid or card_type not in (1, 2):
                     continue
                 key = player_key_map.get(fifa_pid)
@@ -588,45 +588,269 @@ def fetch_and_aggregate_cards(match_details, pid_map):
                     if info:
                         key = f"{info['code']}-{info['jersey']}"
                 if key:
-                    if key not in cards:
-                        cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
+                    if key not in existing_cards:
+                        existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
                     if card_type == 1:
                         if is_group:
-                            cards[key]["y_group"] += 1
+                            existing_cards[key]["y_group"] += 1
                         else:
-                            cards[key]["y_ko"] += 1
+                            existing_cards[key]["y_ko"] += 1
                     elif card_type == 2:
                         if is_group:
-                            cards[key]["r_group"] += 1
+                            existing_cards[key]["r_group"] += 1
                         else:
-                            cards[key]["r_ko"] += 1
+                            existing_cards[key]["r_ko"] += 1
 
-        processed_matches.add(mid)
-        time.sleep(0.3)  # Rate limit
+        # Extract timeline events
+        ev_list = []
+        home_team = live.get("HomeTeam", {})
+        away_team = live.get("AwayTeam", {})
+        h_abbr = home_team.get("Abbreviation", mi.get("home", ""))
+        a_abbr = away_team.get("Abbreviation", mi.get("away", ""))
+        h_score = home_team.get("Score", 0)
+        a_score = away_team.get("Score", 0)
+
+        # Goals (from HomeTeam.Goals + AwayTeam.Goals)
+        for side_name in ["HomeTeam", "AwayTeam"]:
+            team = live.get(side_name, {})
+            side = "home" if side_name == "HomeTeam" else "away"
+            for g in team.get("Goals", []):
+                ev_list.append({
+                    "min": g.get("Minute", ""),
+                    "type": "goal",
+                    "id_player": str(g.get("IdPlayer", "")),
+                    "id_assist": str(g.get("IdAssistPlayer", "")) if g.get("IdAssistPlayer") else "",
+                    "side": side,
+                })
+
+        # Bookings
+        for side_name in ["HomeTeam", "AwayTeam"]:
+            team = live.get(side_name, {})
+            side = "home" if side_name == "HomeTeam" else "away"
+            for b in team.get("Bookings", []):
+                card_type = b.get("Card", 0)
+                ctype = "yellow" if card_type == 1 else "red" if card_type == 2 else ""
+                if not ctype:
+                    continue
+                ev_list.append({
+                    "min": b.get("Minute", ""),
+                    "type": ctype,
+                    "id_player": str(b.get("IdPlayer", "")),
+                    "side": side,
+                })
+
+        # Substitutions
+        for side_name in ["HomeTeam", "AwayTeam"]:
+            team = live.get(side_name, {})
+            side = "home" if side_name == "HomeTeam" else "away"
+            for s in team.get("Substitutions", []):
+                ev_list.append({
+                    "min": s.get("Minute", ""),
+                    "type": "sub",
+                    "id_off": str(s.get("IdPlayerOff", "")),
+                    "id_on": str(s.get("IdPlayerOn", "")),
+                    "side": side,
+                })
+
+        if ev_list:
+            def sort_key(ev):
+                m_str = ev.get("min", "")
+                nums = re.findall(r'\d+', m_str)
+                if len(nums) >= 2:
+                    return int(nums[0]) + int(nums[1]) * 0.1
+                return int(nums[0]) if nums else 0
+            ev_list.sort(key=sort_key)
+
+        existing_events[mid] = {
+            "home": h_abbr,
+            "away": a_abbr,
+            "h_cn": mi.get("h_cn", ""),
+            "a_cn": mi.get("a_cn", ""),
+            "score_h": h_score,
+            "score_a": a_score,
+            "timeline": ev_list,
+        }
+
+        time.sleep(0.3)
+
+    if new_ids:
+        print(f"[INFO] Fetched {fetched}/{len(new_ids)} new matches from Live API")
 
     # Compute stage flags
     stage_info = _compute_stage_flags(match_details)
 
-    # Save
+    # Save cards
     output = {
         "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "processed_matches": sorted(processed_matches),
+        "processed_matches": sorted(all_finished),
         "stages": stage_info,
-        "cards": cards,
+        "cards": existing_cards,
     }
     with open(CARDS_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=1)
 
-    total_yg = sum(c["y_group"] for c in cards.values())
-    total_rg = sum(c["r_group"] for c in cards.values())
-    total_yk = sum(c["y_ko"] for c in cards.values())
-    total_rk = sum(c["r_ko"] for c in cards.values())
-    print(f"[OK] Cards written: {len(cards)} players "
+    total_yg = sum(c["y_group"] for c in existing_cards.values())
+    total_rg = sum(c["r_group"] for c in existing_cards.values())
+    total_yk = sum(c["y_ko"] for c in existing_cards.values())
+    total_rk = sum(c["r_ko"] for c in existing_cards.values())
+    print(f"[OK] Cards: {len(existing_cards)} players "
           f"(group: {total_yg}Y {total_rg}R, ko: {total_yk}Y {total_rk}R)")
     print(f"     Stages: group={'done' if stage_info['group_finished'] else 'active'}, "
           f"qf={'done' if stage_info['qf_finished'] else 'active'}")
 
-    return cards, stage_info
+    # Save events
+    ev_output = {
+        "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "events": existing_events,
+    }
+    with open(EVENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(ev_output, f, ensure_ascii=False, indent=1)
+    print(f"[OK] Events: {len(existing_events)} matches with timeline data")
+
+    return existing_cards, stage_info, existing_events
+
+
+def discover_videos():
+    """Auto-discover WC2026 highlight videos from FIFA+ carousel feeds.
+    
+    Strategy:
+    1. Poll promoCarousel/2Q6UcV6pn5i5Zmiwto9gwD for latest WC2026 highlights
+    2. For each video entryId, call videoDetails to get semanticTags → matchId
+    3. Merge new entries into wc-videos.json
+    
+    Returns number of newly discovered videos.
+    """
+    CXM_API = "https://cxm-api.fifa.com/fifaplusweb/api"
+    HEADERS = {"User-Agent": "Mozilla/5.0"}
+    
+    # Carousel IDs that carry WC2026 video content
+    # These come from the WC2026 tournament page sections
+    CAROUSEL_IDS = [
+        "2Q6UcV6pn5i5Zmiwto9gwD",  # WC2026 highlights promoCarousel
+        "1klF18lgpe12FFtd1IoTSs",  # WC2026 highlights news section
+    ]
+    
+    # Load existing video mapping
+    vmap = {}
+    if os.path.exists(VIDEOS_FILE):
+        try:
+            with open(VIDEOS_FILE, "r", encoding="utf-8") as f:
+                vmap = json.load(f)
+        except Exception:
+            pass
+    
+    # Collect all entryIds from carousels
+    seen_entry_ids = set()
+    for cid in CAROUSEL_IDS:
+        url = f"{CXM_API}/sections/promoCarousel/{cid}?locale=en"
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            items = data.get("items", [])
+            for item in items:
+                eid = item.get("entryId", "")
+                if eid and item.get("programmeType") == 3:
+                    seen_entry_ids.add(eid)
+            print(f"[video] Carousel {cid}: {len(items)} items, {len([i for i in items if i.get('programmeType')==3])} videos")
+        except Exception as e:
+            print(f"[video] Carousel {cid} error: {e}")
+    
+    if not seen_entry_ids:
+        print("[video] No video entries found in carousels")
+        return 0
+    
+    # Also collect from news section (uses /sections/news/ endpoint)
+    NEWS_IDS = [
+        "1klF18lgpe12FFtd1IoTSs",  # WC2026 match highlights news
+        "15XcFrdPBpm6UfhP15fuNq",  # WC2026 alt-cast highlights news
+    ]
+    for nid in NEWS_IDS:
+        url = f"{CXM_API}/sections/news/{nid}?locale=en&limit=50"
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            items = data.get("items", [])
+            for item in items:
+                eid = item.get("entryId", "")
+                if eid and item.get("programmeType") == 3:
+                    seen_entry_ids.add(eid)
+            print(f"[video] News {nid}: {len([i for i in items if i.get('programmeType')==3])} videos")
+        except Exception as e:
+            print(f"[video] News {nid} error: {e}")
+    
+    # Check which entryIds are already mapped
+    existing_entry_ids = set()
+    for mid, entry in vmap.items():
+        if isinstance(entry, dict):
+            existing_entry_ids.add(entry.get("entryId", ""))
+        else:
+            existing_entry_ids.add(entry)
+    
+    new_count = 0
+    for eid in seen_entry_ids:
+        if eid in existing_entry_ids:
+            continue
+        
+        # Call videoDetails to find matchId via semanticTags
+        try:
+            details_url = f"{CXM_API}/sections/videoDetails/{eid}?locale=en"
+            req = urllib.request.Request(details_url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                details = json.loads(resp.read().decode("utf-8"))
+        except Exception as e:
+            print(f"[video] videoDetails {eid} error: {e}")
+            continue
+        
+        title = details.get("title", "")
+        tags = details.get("semanticTags", [])
+        match_tag = next((t for t in tags if t.get("sourceCategory") == "Match"), None)
+        
+        if not match_tag:
+            # Not a match highlight video (could be alt cast, promo, etc.)
+            print(f"[video] Skip {eid}: no Match tag (title: {title[:60]})")
+            continue
+        
+        match_id = match_tag.get("id", "")
+        if not match_id:
+            continue
+        
+        # Determine video type: "highlights" for official, title-based for others
+        is_highlights = "Highlights" in title and "Alt Cast" not in title
+        video_type = "highlights" if is_highlights else "alt_cast"
+        
+        # Build entry - support multiple videos per match
+        existing = vmap.get(match_id, {})
+        if isinstance(existing, str):
+            # Legacy format: just an entryId string
+            existing = {"entryId": existing, "title": "", "type": "highlights"}
+        
+        if not isinstance(existing, dict):
+            existing = {}
+        
+        # Always keep "highlights" as primary, only add alt_cast if no highlights yet
+        if video_type == "highlights":
+            vmap[match_id] = {"entryId": eid, "title": title}
+            new_count += 1
+            print(f"[video] NEW: {match_id} -> {eid} ({title})")
+        elif not existing.get("entryId"):
+            # No highlights yet, use alt_cast as placeholder
+            vmap[match_id] = {"entryId": eid, "title": title}
+            new_count += 1
+            print(f"[video] NEW (alt): {match_id} -> {eid} ({title})")
+        else:
+            print(f"[video] Skip {eid}: alt_cast, highlights already exists for {match_id}")
+    
+    # Save updated mapping
+    if new_count > 0:
+        with open(VIDEOS_FILE, "w", encoding="utf-8") as f:
+            json.dump(vmap, f, ensure_ascii=False, indent=2)
+        print(f"[video] Saved {len(vmap)} video mappings ({new_count} new)")
+    else:
+        print(f"[video] No new videos (total: {len(vmap)})")
+    
+    return new_count
 
 
 def main():
@@ -651,6 +875,9 @@ def main():
     pid_map = load_player_id_map()
     print(f"[INFO] Loaded {len(pid_map)} player ID mappings")
     fetch_and_aggregate_cards(match_details, pid_map)
+
+    # Auto-discover WC2026 highlight videos
+    discover_videos()
 
 
 if __name__ == "__main__":
