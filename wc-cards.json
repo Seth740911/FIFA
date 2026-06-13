@@ -1,0 +1,123 @@
+{
+ "last_updated": "2026-06-13T06:16:25Z",
+ "processed_matches": [
+  "400021441",
+  "400021443",
+  "400021449",
+  "400021458"
+ ],
+ "stages": {
+  "group_finished": false,
+  "qf_finished": false
+ },
+ "cards": {
+  "MEX-26": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "MEX-3": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "RSA-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "RSA-13": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "RSA-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "RSA-11": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KOR-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CAN-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CAN-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-25": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-18": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "USA-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-8": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-18": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-6": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  }
+ }
+}

@@ -17,9 +17,12 @@ import urllib.error
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "wc-scores.json")
+CARDS_FILE = os.path.join(SCRIPT_DIR, "wc-cards.json")
 
 # FIFA official API - 104 matches, includes group info and scores
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches?language=en&count=500&idSeason=285023"
+# Per-match Live API - has Bookings (cards) + Players roster
+FIFA_LIVE_API = "https://api.fifa.com/api/v3/live/football/{match_id}?language=en"
 
 # FIFA match status: 0=played, 1=scheduled, 2-9=live stages
 PLAYED_STATUS = 0
@@ -431,6 +434,201 @@ def write_output(group_scores, bracket_scores, match_details):
     print(f"     Group scores: {len(group_scores)}, Bracket scores: {len(bracket_scores)}")
 
 
+def load_player_id_map():
+    """Build mapping: FIFA IdPlayer -> (team_code, jersey) from wc-roster-data.js"""
+    js_path = os.path.join(SCRIPT_DIR, "wc-roster-data.js")
+    pid_map = {}  # IdPlayer -> {"code": team_code, "jersey": jersey}
+    if not os.path.exists(js_path):
+        return pid_map
+    with open(js_path, "r", encoding="utf-8") as f:
+        text = f.read()
+    start = text.find("const WC_TEAMS = [")
+    if start < 0:
+        return pid_map
+    start = text.index("[", start)
+    depth = 0
+    end = start
+    for i in range(start, len(text)):
+        if text[i] == "[":
+            depth += 1
+        elif text[i] == "]":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    arr = json.loads(text[start:end])
+    for t in arr:
+        code = t["code"]
+        for p in t.get("players", []):
+            fifa_id = str(p.get("id", ""))
+            jersey = p.get("jersey", 0)
+            if fifa_id:
+                pid_map[fifa_id] = {"code": code, "jersey": jersey}
+    return pid_map
+
+
+def fetch_live_match(match_id):
+    """Fetch Live API for a single match to get Bookings + Players"""
+    url = FIFA_LIVE_API.format(match_id=match_id)
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        print(f"[WARN] Failed to fetch Live API for match {match_id}: {e}")
+        return None
+
+
+def _compute_stage_flags(match_details):
+    """Determine if group stage and QF stage are finished.
+    Returns {"group_finished": bool, "qf_finished": bool}
+    """
+    GROUP_STAGES = {"First Stage"}
+    QF_STAGE = "Quarter-final"
+    
+    group_total = sum(1 for m in match_details if m.get("stage") in GROUP_STAGES)
+    group_finished = sum(1 for m in match_details if m.get("stage") in GROUP_STAGES and m.get("finished"))
+    qf_total = sum(1 for m in match_details if m.get("stage") == QF_STAGE)
+    qf_finished = sum(1 for m in match_details if m.get("stage") == QF_STAGE and m.get("finished"))
+    
+    return {
+        "group_finished": group_total > 0 and group_finished >= group_total,
+        "qf_finished": qf_total > 0 and qf_finished >= qf_total,
+    }
+
+
+def fetch_and_aggregate_cards(match_details, pid_map):
+    """Fetch card data from FIFA Live API for all finished matches.
+    Returns aggregated dict with cards broken down by stage:
+      {"TEAM-JERSEY": {"y_group":N,"r_group":N,"y_ko":N,"r_ko":N}, ...}
+    Also tracks stage completion flags.
+    """
+    # Load existing processed match set
+    processed_matches = set()
+    if os.path.exists(CARDS_FILE):
+        try:
+            with open(CARDS_FILE, "r", encoding="utf-8") as f:
+                old = json.load(f)
+            processed_matches = set(old.get("processed_matches", []))
+        except Exception:
+            pass
+
+    # Find all finished match IDs we haven't processed yet
+    new_finished = []
+    for m in match_details:
+        mid = m.get("fifa_id", "")
+        if m.get("finished") and mid and mid not in processed_matches:
+            new_finished.append(mid)
+
+    if not new_finished and processed_matches:
+        # No new matches; re-fetch all finished in case counts changed (VAR etc.)
+        for m in match_details:
+            mid = m.get("fifa_id", "")
+            if m.get("finished") and mid:
+                new_finished.append(mid)
+
+    if not new_finished:
+        print(f"[INFO] No finished matches to fetch cards for")
+        # Still compute stage flags and return existing cards
+        stage_info = _compute_stage_flags(match_details)
+        # Convert existing format if needed
+        existing = {}
+        if os.path.exists(CARDS_FILE):
+            try:
+                with open(CARDS_FILE, "r", encoding="utf-8") as f:
+                    old = json.load(f)
+                existing = old.get("cards", {})
+            except Exception:
+                pass
+        return existing, stage_info
+
+    # Build match_id -> stage lookup
+    match_stage = {}
+    for m in match_details:
+        match_stage[m.get("fifa_id", "")] = m.get("stage", "")
+
+    # Reset aggregation - rebuild from scratch
+    cards = {}  # "TEAM-JERSEY" -> {"y_group":0, "r_group":0, "y_ko":0, "r_ko":0}
+
+    for mid in new_finished:
+        live = fetch_live_match(mid)
+        if not live:
+            continue
+
+        stage = match_stage.get(mid, "")
+        is_group = stage == "First Stage"
+
+        # Build IdPlayer -> key mapping from both teams' Players arrays
+        player_key_map = {}  # IdPlayer -> "TEAM-JERSEY"
+        for side in ["HomeTeam", "AwayTeam"]:
+            team = live.get(side, {})
+            players = team.get("Players", [])
+            for p in players:
+                fifa_pid = str(p.get("IdPlayer", ""))
+                if fifa_pid in pid_map:
+                    info = pid_map[fifa_pid]
+                    key = f"{info['code']}-{info['jersey']}"
+                    player_key_map[fifa_pid] = key
+
+        # Process Bookings from both teams
+        for side in ["HomeTeam", "AwayTeam"]:
+            team = live.get(side, {})
+            bookings = team.get("Bookings", [])
+            for b in bookings:
+                fifa_pid = str(b.get("IdPlayer", ""))
+                card_type = b.get("Card", 0)  # 1=yellow, 2=red
+                if not fifa_pid or card_type not in (1, 2):
+                    continue
+                key = player_key_map.get(fifa_pid)
+                if not key:
+                    info = pid_map.get(fifa_pid)
+                    if info:
+                        key = f"{info['code']}-{info['jersey']}"
+                if key:
+                    if key not in cards:
+                        cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
+                    if card_type == 1:
+                        if is_group:
+                            cards[key]["y_group"] += 1
+                        else:
+                            cards[key]["y_ko"] += 1
+                    elif card_type == 2:
+                        if is_group:
+                            cards[key]["r_group"] += 1
+                        else:
+                            cards[key]["r_ko"] += 1
+
+        processed_matches.add(mid)
+        time.sleep(0.3)  # Rate limit
+
+    # Compute stage flags
+    stage_info = _compute_stage_flags(match_details)
+
+    # Save
+    output = {
+        "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "processed_matches": sorted(processed_matches),
+        "stages": stage_info,
+        "cards": cards,
+    }
+    with open(CARDS_FILE, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=1)
+
+    total_yg = sum(c["y_group"] for c in cards.values())
+    total_rg = sum(c["r_group"] for c in cards.values())
+    total_yk = sum(c["y_ko"] for c in cards.values())
+    total_rk = sum(c["r_ko"] for c in cards.values())
+    print(f"[OK] Cards written: {len(cards)} players "
+          f"(group: {total_yg}Y {total_rg}R, ko: {total_yk}Y {total_rk}R)")
+    print(f"     Stages: group={'done' if stage_info['group_finished'] else 'active'}, "
+          f"qf={'done' if stage_info['qf_finished'] else 'active'}")
+
+    return cards, stage_info
+
+
 def main():
     teams_map, teams_ordered = load_teams()
     if not teams_map:
@@ -448,6 +646,11 @@ def main():
 
     group_scores, bracket_scores, match_details = parse_matches(matches, teams_map, teams_ordered)
     write_output(group_scores, bracket_scores, match_details)
+
+    # Fetch card data
+    pid_map = load_player_id_map()
+    print(f"[INFO] Loaded {len(pid_map)} player ID mappings")
+    fetch_and_aggregate_cards(match_details, pid_map)
 
 
 if __name__ == "__main__":

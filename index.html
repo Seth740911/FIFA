@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026美加墨世界杯观赛指南</title>
+<title>2026 美加墨世界杯</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -21,7 +21,7 @@ header p{color:var(--text2);margin-top:8px;font-size:1.1em}
 /* 顶部锚点导航 */
 nav{display:flex;gap:4px;padding:6px 2px;overflow-x:auto;flex-wrap:nowrap;justify-content:center;position:fixed;top:0;left:0;right:0;width:100%;background:var(--bg);z-index:100;border-bottom:1px solid var(--border);scrollbar-width:none;padding-left:max(2px,env(safe-area-inset-left));padding-right:max(2px,env(safe-area-inset-right))}
 nav::-webkit-scrollbar{display:none}
-nav a{border:1px solid transparent;color:#fff;padding:4px 9px;border-radius:16px;cursor:pointer;font-size:.76em;transition:all .2s;white-space:nowrap;text-decoration:none;font-weight:600;letter-spacing:.3px;line-height:1.4}
+nav a{border:1px solid transparent;color:#fff;padding:6px 12px;border-radius:18px;cursor:pointer;font-size:.88em;transition:all .2s;white-space:nowrap;text-decoration:none;font-weight:600;letter-spacing:.2px;line-height:1.3;display:inline-flex;align-items:center}
 nav a:nth-child(1){background:#e67e22;border-color:#d35400}
 nav a:nth-child(2){background:#2ecc71;border-color:#27ae60}
 nav a:nth-child(3){background:#e74c3c;border-color:#c0392b}
@@ -32,8 +32,8 @@ nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 
 /* 区块通用 */
 .section{padding:30px 0}
-.sticky-head{position:sticky;top:0;background:var(--bg);z-index:90;padding:0 0 8px;border-bottom:1px solid var(--border)}
-h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-bottom:none}
+.sticky-head{position:sticky;top:0;background:var(--bg);z-index:90;padding:0 0 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;min-height:40px}
+h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 
 /* 赛事概况 */
 .overview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
@@ -43,44 +43,56 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 
 /* 分组与赛程 */
 
-/* 焦点球星 */
-.star-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.star-card2{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s;position:relative}
-.star-card2:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.star-card2::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-color)}
-.sc2-photo-area{position:relative;width:100%;aspect-ratio:2/3;overflow:hidden;background:#111}
-.sc2-photo{width:100%;height:100%;object-fit:cover;object-position:top;display:block;opacity:0;transition:opacity .3s}
+/* 焦点球星 - 照片墙 */
+.star-scroll{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.star-scroll::-webkit-scrollbar{height:5px}
+.star-scroll::-webkit-scrollbar-track{background:transparent}
+.star-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.star-card2{flex-shrink:0;width:120px;background:#fff;border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;position:relative}
+.star-card2:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.star-card2::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-color)}
+.sc2-photo-area{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:#f5f5f5}
+.sc2-photo{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;opacity:0;transition:opacity .3s}
 .sc2-photo.loaded{opacity:1}
-.sc2-photo-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#2a2a4e)}
-.sc2-flag-badge{position:absolute;top:8px;right:8px;width:32px;height:22px;border-radius:4px;border:2px solid rgba(0,0,0,.4);z-index:2;object-fit:contain}
-.sc2-photo-overlay{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);z-index:1}
-.sc2-name-on-photo{position:absolute;bottom:8px;left:10px;right:10px;font-size:1.3em;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8);z-index:2;letter-spacing:.5px}
-.sc2-no-photo-area{position:relative;width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#111 0%,#1a1a2e 50%,#0d0d1a 100%);overflow:hidden}
-.sc2-no-photo-area::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(212,168,83,.08),transparent 60%)}
-.sc2-flag-big{width:72px;height:48px;border-radius:6px;border:2px solid rgba(212,168,83,.2);position:relative;z-index:1;object-fit:contain}
-.sc2-name-on-flag{font-size:1.3em;font-weight:800;color:var(--gold);margin-top:10px;position:relative;z-index:1;letter-spacing:.5px}
-.sc2-info{padding:12px 14px 16px}
-.sc2-meta{color:var(--text2);font-size:.85em;margin-bottom:4px}
-.sc2-club{font-weight:700;font-size:.95em;color:var(--accent);margin-bottom:6px}
-.sc2-highlight{color:var(--text2);font-size:.82em;line-height:1.4}
+.sc2-silhouette-area{position:relative;width:100%;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.sc2-silhouette-area img.sc2-sil{width:80px;height:auto;opacity:.25;position:absolute;top:15%;filter:brightness(0)}
+.sc2-silhouette-area img.sc2-sflag{width:40px;height:27px;border-radius:3px;border:1px solid rgba(0,0,0,.1);position:relative;z-index:1;object-fit:contain}
+.sc2-flag-badge{position:absolute;top:4px;right:4px;width:22px;height:15px;border-radius:2px;border:1px solid rgba(255,255,255,.7);z-index:2;object-fit:contain}
+.sc2-pos-badge{position:absolute;top:4px;left:4px;padding:1px 5px;border-radius:2px;font-size:.55em;font-weight:700;color:#fff;z-index:2;letter-spacing:.5px;background:var(--team-color)}
+.sc2-name{padding:5px 6px 2px;background:#fff;font-size:.72em;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc2-club{padding:0 6px 5px;background:#fff;font-size:.6em;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* 场馆 */
-.venue-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
+.venue-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;margin:3px 0;display:flex;justify-content:space-between;align-items:center}
 .venue-card:hover{border-color:var(--gold)}
 
 /* 各队阵容 */
 /* 阵容照片墙 */
 .rw-team{margin:12px 0}
-.rw-team-head{display:flex;align-items:center;gap:8px;padding:8px 4px;cursor:pointer;border-radius:6px;transition:background .15s}
+.rw-team-head{display:flex;align-items:center;gap:6px;padding:5px 4px;cursor:pointer;border-radius:6px;transition:background .15s;scroll-margin-top:88px}
 .rw-team-head:hover{background:var(--card2)}
-.rw-team-bar{width:4px;height:24px;border-radius:2px;flex-shrink:0}
-.rw-team-flag{height:18px;width:auto;border-radius:2px;object-fit:contain;flex-shrink:0}
-.rw-team-head strong{font-size:.95em;white-space:nowrap;cursor:pointer}
-.rw-team-head::after{content:"▸";color:var(--text2);font-size:.9em;margin-left:auto;padding-left:8px;transition:transform .2s}
+.rw-team-bar{width:4px;height:18px;border-radius:2px;flex-shrink:0}
+.rw-team-flag{height:16px;width:auto;border-radius:2px;object-fit:contain;flex-shrink:0}
+.rw-team-head strong{font-size:.9em;white-space:nowrap;cursor:pointer}
+.rw-team-head::after{content:"▸";color:var(--text2);font-size:.9em;padding-left:8px;transition:transform .2s;flex-shrink:0}
 .rw-team-head:hover::after{color:var(--gold)}
 .rw-team-head.open::after{transform:rotate(90deg);color:var(--gold)}
-.rw-tag{color:var(--gold);font-size:.7em;background:rgba(212,168,83,.12);padding:1px 6px;border-radius:3px}
-.rw-team-sub{color:var(--text2);font-size:.78em;margin-left:8px}
+.rw-team-cards{display:flex;align-items:center;gap:4px;margin-left:auto;font-size:.82em;color:var(--text2)}
+.rw-tc-y{display:inline-block;width:11px;height:14px;background:#e8c840;border-radius:1.5px;margin-right:1px;cursor:pointer}
+.rw-tc-r{display:inline-block;width:11px;height:14px;background:#d42a2a;border-radius:1.5px;margin-left:4px;margin-right:1px;cursor:pointer}
+.rw-card-drop{display:none;background:var(--card);border:1px solid var(--border);border-radius:8px;margin:2px 0;padding:8px 10px}
+.rw-card-drop.open{display:block}
+.rw-cd-label{font-size:.8em;color:var(--text2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.rw-cd-list{display:flex;flex-direction:column;gap:4px}
+.rw-cd-player{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;cursor:pointer;transition:background .15s}
+.rw-cd-player:hover{background:var(--card2)}
+.rw-cd-jersey{width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:.72em;font-weight:700;color:#fff;flex-shrink:0}
+.rw-cd-name{font-size:.88em;flex:1}
+.rw-cd-pos{font-size:.68em;padding:1px 5px;border-radius:3px;color:#fff;flex-shrink:0}
+.rw-cd-card{display:inline-block;width:9px;height:12px;border-radius:1.5px;flex-shrink:0}
+.rw-cd-card-y{background:#e8c840}
+.rw-cd-card-r{background:#d42a2a}
+.rw-cd-count{font-size:.75em;color:var(--text2)}
 .rw-scroll{display:none;gap:10px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .rw-scroll.open{display:flex}
 .rw-scroll::-webkit-scrollbar{height:5px}
@@ -104,29 +116,41 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 /* 球员详情弹层 */
 .pd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .pd-overlay.open{display:flex}
-.pd-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:480px;width:92%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.pd-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;width:92%;max-height:90vh;overflow-y:auto;overflow-x:hidden;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.pd-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);border:none;color:#fff;font-size:1.5em;width:36px;height:60px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;transition:background .15s,opacity .15s;opacity:.6}
+.pd-nav:hover{background:rgba(0,0,0,.7);opacity:1}
+.pd-nav:active{background:var(--gold);opacity:1}
+.pd-nav-prev{left:8px}
+.pd-nav-next{right:8px}
 .pd-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:1.6em;cursor:pointer;z-index:2;line-height:1;transition:color .15s}
 .pd-close:hover{color:var(--gold)}
-.pd-top{display:flex;gap:0;overflow:hidden;border-radius:16px 16px 0 0;max-height:300px}
-.pd-photo-wrap{flex-shrink:0;width:200px;height:300px;overflow:hidden;background:#1a1a25}
+.pd-top{display:flex;gap:0;border-radius:16px 16px 0 0;max-height:300px}
+.pd-photo-section{display:flex;flex-shrink:0;height:300px}
+.pd-attrs{width:72px;display:flex;flex-direction:column;gap:1px;background:var(--card)}
+.pd-attr{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 4px}
+.pd-attr-val{font-size:.95em;font-weight:800;color:var(--gold);line-height:1.15}
+.pd-attr-label{font-size:.5em;color:var(--text2);margin-top:1px;line-height:1}
+.pd-photo-wrap{width:170px;overflow:hidden;background:#1a1a25}
 .pd-photo-wrap img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
 .pd-no-photo{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4em;font-weight:900;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,.5);opacity:.8}
-.pd-info{flex:1;padding:16px 16px 16px 20px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;max-height:300px}
-.pd-name{font-size:1.5em;font-weight:800;color:var(--gold);line-height:1.2}
+.pd-info{flex:1;padding:16px 16px 16px 12px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;max-height:300px}
+.pd-name{font-size:1.5em;font-weight:800;color:var(--gold);line-height:1.2;display:flex;align-items:center;gap:8px}
+.pd-name-text{flex:1;min-width:0}
+.pd-cards{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pd-card-y{display:inline-flex;align-items:center;gap:3px;font-size:.6em;font-weight:700;color:#e8c547}
+.pd-card-y .pd-card-icon{width:12px;height:16px;background:#e8c547;border-radius:2px}
+.pd-card-r{display:inline-flex;align-items:center;gap:3px;font-size:.6em;font-weight:700;color:#e04040}
+.pd-card-r .pd-card-icon{width:12px;height:16px;background:#e04040;border-radius:2px}
 .pd-en-name{font-size:.85em;color:var(--text2);margin-bottom:4px;word-break:break-word}
 .pd-team-line{display:flex;align-items:center;gap:8px;padding:6px 0}
 .pd-team-line img{height:20px;border-radius:2px;object-fit:contain}
 .pd-team-line .pd-team-cn{font-weight:700;font-size:1em}
 .pd-team-line .pd-team-en{color:var(--text2);font-size:.8em}
-.pd-attrs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:6px}
-.pd-attr{background:var(--card2);border-radius:8px;padding:10px 12px;text-align:center}
-.pd-attr-val{font-size:1.3em;font-weight:800;color:var(--gold)}
-.pd-attr-label{font-size:.7em;color:var(--text2);margin-top:2px}
 .pd-extra{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
 .pd-extra-row{display:flex;justify-content:space-between;padding:3px 0;font-size:.82em}
 .pd-extra-label{color:var(--text2)}
 .pd-extra-val{color:var(--text);font-weight:600;text-align:right;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pd-stats{padding:6px 0 0;font-size:.85em}
+
 .pd-bio{color:var(--text2);word-break:break-all;display:none}
 .pd-bio-text{padding:4px 20px 12px;text-indent:2em;font-size:.8em;line-height:1.7}
 .pd-section-title{font-size:.9em;font-weight:700;color:var(--gold);padding:10px 20px 4px;letter-spacing:.5px;border-top:1px solid var(--border)}
@@ -144,14 +168,17 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 @media(max-width:500px){
   .pd-overlay{align-items:flex-start;padding-top:0;overscroll-behavior:none}
   .pd-modal{width:100%;max-width:none;height:100vh;max-height:none;border-radius:0;box-shadow:none;touch-action:pan-y}
+  .pd-nav{width:44px;height:70px;font-size:1.8em;opacity:.5}
+  .pd-nav-prev{left:4px}
+  .pd-nav-next{right:4px}
   .pd-top{flex-direction:column;max-height:none}
-  .pd-photo-wrap{width:100%;height:auto;aspect-ratio:2/3;max-height:50vh}
-  .pd-photo-wrap img{height:100%}
-  .pd-info{padding:16px;max-height:none;font-size:1.05em}
-  .pd-attrs{grid-template-columns:repeat(4,1fr);gap:6px}
-  .pd-attr{padding:6px 4px}
-  .pd-attr-val{font-size:1em}
-  .pd-attr-label{font-size:.6em}
+  .pd-photo-section{height:auto;width:100%}
+  .pd-attrs{flex-direction:column;width:64px;height:auto;gap:1px}
+  .pd-attr{padding:4px 2px}
+  .pd-attr-val{font-size:.85em}
+  .pd-attr-label{font-size:.45em}
+  .pd-photo-wrap{width:auto;flex:1;aspect-ratio:auto;max-height:45vh}
+  .pd-info{padding:14px;max-height:none;font-size:1.05em}
 }
 
 /* 回到顶部 */
@@ -236,8 +263,9 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   .overview-item{white-space:nowrap;padding:10px 12px}
   .overview-item .label{font-size:.75em;flex-shrink:0}
   .overview-item .value{font-size:.82em;max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .star-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  nav a{padding:3px 8px;font-size:.7em}
+  .star-card2{width:100px}
+  .sc2-name{font-size:.65em}
+  nav a{padding:5px 10px;font-size:.72em;border-radius:16px;display:inline-flex;align-items:center}
   header h1{font-size:1.1em;letter-spacing:1px}
 }
 .fade-in{animation:fadeIn .4s ease}
@@ -255,8 +283,8 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   <a href="#roster">阵容</a>
 </nav>
 <header>
-  <h1>2026 美加墨世界杯观赛指南</h1>
-  <p>FIFA World Cup 2026™ &mdash; 48队 12组 104场 首次三国联办</p>
+  <img src="/WC26_Logo.png" style="height:80px;margin-bottom:12px" alt="FIFA World Cup 2026">
+  <h1>2026 美加墨世界杯</h1>
 </header>
 
 <!-- 赛事概况 -->
@@ -286,7 +314,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   <div class="gs-ctrl">
     <button onclick="syncScores()" class="bc-btn">同步比分</button>
     <button onclick="GSTAND.reset()" class="bc-btn">重置</button>
-    <span class="bc-note" id="sync-status">点击比分输入，或"同步比分"从FIFA获取</span>
+    <span class="bc-note" id="sync-status">"同步比分"从FIFA获取最新数据</span>
   </div>
   <div class="gs-grid" id="gs-container"></div>
 </section>
@@ -297,7 +325,7 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
   <div class="bc-ctrl">
     <button onclick="syncScores()" class="bc-btn">同步比分</button>
     <button onclick="BRACKET.reset()" class="bc-btn">重置</button>
-    <span class="bc-note" id="bracket-sync-status">点击分数输入比分，自动计算晋级</span>
+    <span class="bc-note" id="bracket-sync-status">"同步比分"从FIFA获取最新数据</span>
   </div>
   <div class="bracket-wrap" id="bracket-scroll"></div>
 </section>
@@ -305,262 +333,509 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 <!-- 焦点球星 -->
 <section id="stars" class="section fade-in">
   <div class="sticky-head" id="starsSticky"><h2>焦点球星</h2></div>
-  <div class="star-grid">
-  <div class="star-card2" style="--team-color:#9CC9F2">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/ARG.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">梅西</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">阿根廷 &middot; 前锋 &middot; 38岁</div>
-      <div class="sc2-club">迈阿密国际</div>
-      <div class="sc2-highlight">6届世界杯，最后一舞，冲击卫冕+历史射手王(13球)</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#FF0000">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/POR.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">C罗</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">葡萄牙 &middot; 前锋 &middot; 41岁</div>
-      <div class="sc2-club">利雅得胜利</div>
-      <div class="sc2-highlight">6届世界杯，连续6届进球纪录保持者，最后一舞</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#00418F">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/FRA.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">姆巴佩</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">法国 &middot; 前锋 &middot; 27岁</div>
-      <div class="sc2-club">皇家马德里</div>
-      <div class="sc2-highlight">2届世界杯12球，冲击克洛泽16球纪录</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#C70000">
+  <div class="star-scroll">
+  <div class="star-card2" style="--team-color:#11457E" data-team="CZE" data-jersey="10">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/NOR/09_Erling%20HAALAND_FW.png" class="sc2-photo" alt="哈兰德" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/NOR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/NOR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">哈兰德</div>
+      <img data-src="/wc-photos/CZE/10_Patrik%20Schick_FW.png" class="sc2-photo" alt="希克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/CZE.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/CZE.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#11457E">FW10</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">挪威 &middot; 前锋 &middot; 25岁</div>
-      <div class="sc2-club">曼城</div>
-      <div class="sc2-highlight">世界杯首秀，与姆巴佩正面对决I组</div>
-    </div>
+    <div class="sc2-name">希克</div>
+    <div class="sc2-club">勒沃库森</div>
   </div>
-  <div class="star-card2" style="--team-color:#FF0000">
-    <div class="sc2-photo-area">
-      <img data-src="/wc-photos/ESP/19_Lamine%20YAMAL_FW.png" class="sc2-photo" alt="亚马尔" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">亚马尔</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">西班牙 &middot; 边锋 &middot; 18岁</div>
-      <div class="sc2-club">巴塞罗那</div>
-      <div class="sc2-highlight">天才少年，2024欧洲杯最佳新人</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#FFCF25">
-    <div class="sc2-photo-area">
-      <img data-src="/wc-photos/BRA/07_VINICIUS%20JUNIOR_FW.png" class="sc2-photo" alt="维尼修斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/BRA.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/BRA.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">维尼修斯</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">巴西 &middot; 边锋 &middot; 25岁</div>
-      <div class="sc2-club">皇家马德里</div>
-      <div class="sc2-highlight">2024金球奖热门，巴西进攻核心</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#CE1124">
-    <div class="sc2-photo-area">
-      <img data-src="/wc-photos/ENG/10_Jude%20BELLINGHAM_MF.png" class="sc2-photo" alt="贝林厄姆" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ENG.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">贝林厄姆</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">英格兰 &middot; 中场 &middot; 22岁</div>
-      <div class="sc2-club">皇家马德里</div>
-      <div class="sc2-highlight">新生代全能中场，英格兰核心</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#880029">
-    <div class="sc2-photo-area">
-      <img data-src="/wc-photos/BEL/07_Kevin%20DE%20BRUYNE_MF.png" class="sc2-photo" alt="德布劳内" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/BEL.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/BEL.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">德布劳内</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">比利时 &middot; 中场 &middot; 34岁</div>
-      <div class="sc2-club">曼城</div>
-      <div class="sc2-highlight">黄金一代最后机会，中场大师</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#FF0000">
-    <div class="sc2-photo-area">
-      <img data-src="/wc-photos/ESP/20_PEDRI_MF.png" class="sc2-photo" alt="佩德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">佩德里</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">西班牙 &middot; 中场 &middot; 23岁</div>
-      <div class="sc2-club">巴塞罗那</div>
-      <div class="sc2-highlight">传控核心，接班哈维伊涅斯塔</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#00418F">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/FRA.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">奥利赛</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">法国 &middot; 中场 &middot; 23岁</div>
-      <div class="sc2-club">拜仁慕尼黑</div>
-      <div class="sc2-highlight">德甲最佳球员，法国队新核</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#F30A0A">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/CRO.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">莫德里奇</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">克罗地亚 &middot; 中场 &middot; 40岁</div>
-      <div class="sc2-club">皇家马德里</div>
-      <div class="sc2-highlight">6届世界杯，2018金球先生告别</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#FF253A">
+  <div class="star-card2" style="--team-color:#CD2E3A" data-team="KOR" data-jersey="7">
     <div class="sc2-photo-area">
       <img data-src="/wc-photos/KOR/07_SON%20Heungmin_FW.png" class="sc2-photo" alt="孙兴慜" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/KOR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/KOR.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/KOR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">孙兴慜</div>
+      <div class="sc2-pos-badge" style="background:#CD2E3A">FW7</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">韩国 &middot; 前锋 &middot; 33岁</div>
-      <div class="sc2-club">热刺</div>
-      <div class="sc2-highlight">亚洲一哥，韩国精神领袖</div>
-    </div>
+    <div class="sc2-name">孙兴慜</div>
+    <div class="sc2-club">热刺</div>
   </div>
-  <div class="star-card2" style="--team-color:#F1051F">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/EGY.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">萨拉赫</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">埃及 &middot; 前锋 &middot; 33岁</div>
-      <div class="sc2-club">利物浦</div>
-      <div class="sc2-highlight">非洲天王，埃及法老</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#00418F">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/FRA.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">登贝莱</div>
-    </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">法国 &middot; 前锋 &middot; 29岁</div>
-      <div class="sc2-club">巴黎圣日耳曼</div>
-      <div class="sc2-highlight">2025金球先生，法国双核之一</div>
-    </div>
-  </div>
-  <div class="star-card2" style="--team-color:#CE1124">
+  <div class="star-card2" style="--team-color:#006847" data-team="MEX" data-jersey="9">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/ENG/09_Harry%20KANE_FW.png" class="sc2-photo" alt="凯恩" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ENG.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">凯恩</div>
+      <img data-src="/wc-photos/MEX/09_Raul%20JIMENEZ_FW.png" class="sc2-photo" alt="吉梅内斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/MEX.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/MEX.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#006847">FW9</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">英格兰 &middot; 前锋 &middot; 32岁</div>
-      <div class="sc2-club">拜仁慕尼黑</div>
-      <div class="sc2-highlight">英格兰队长，顶级射手</div>
-    </div>
+    <div class="sc2-name">吉梅内斯</div>
+    <div class="sc2-club">富勒姆</div>
   </div>
-  <div class="star-card2" style="--team-color:#FF7A00">
+  <div class="star-card2" style="--team-color:#007A4D" data-team="RSA" data-jersey="4">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/NED/04_Virgil%20VAN%20DIJK_DF.png" class="sc2-photo" alt="范迪克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/NED.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/NED.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">范迪克</div>
+      <img data-src="/wc-photos/RSA/04_Teboho%20MOKOENA_MF.png" class="sc2-photo" alt="马库阿纳" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/RSA.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/RSA.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#007A4D">MF4</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">荷兰 &middot; 后卫 &middot; 34岁</div>
-      <div class="sc2-club">利物浦</div>
-      <div class="sc2-highlight">世界第一中卫，荷兰领袖</div>
-    </div>
+    <div class="sc2-name">马库阿纳</div>
+    <div class="sc2-club">马梅洛迪日落</div>
   </div>
-  <div class="star-card2" style="--team-color:#E40000">
+  <div class="star-card2" style="--team-color:#002F6C" data-team="BIH" data-jersey="9">
     <div class="sc2-photo-area">
-      <img data-src="/wc-photos/MAR/02_Achraf%20HAKIMI_DF.png" class="sc2-photo" alt="阿什拉夫" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/MAR.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
-      <img src="/wc-flags/MAR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">阿什拉夫</div>
+      <img data-src="/wc-photos/BIH/09_Samed%20BAZDAR_FW.png" class="sc2-photo" alt="德米罗维奇" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/BIH.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/BIH.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#002F6C">FW9</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">摩洛哥 &middot; 后卫 &middot; 27岁</div>
-      <div class="sc2-club">巴黎圣日耳曼</div>
-      <div class="sc2-highlight">2022四强功臣，攻守兼备</div>
-    </div>
+    <div class="sc2-name">德米罗维奇</div>
+    <div class="sc2-club">奥格斯堡</div>
   </div>
-  <div class="star-card2" style="--team-color:#D52B1E">
+  <div class="star-card2" style="--team-color:#FF0000" data-team="CAN" data-jersey="19">
     <div class="sc2-photo-area">
       <img data-src="/wc-photos/CAN/19_Alphonso%20DAVIES_DF.png" class="sc2-photo" alt="阿方索·戴维斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/CAN.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/CAN.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/CAN.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">阿方索·戴维斯</div>
+      <div class="sc2-pos-badge" style="background:#FF0000">DF19</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">加拿大 &middot; 后卫 &middot; 25岁</div>
-      <div class="sc2-club">拜仁慕尼黑</div>
-      <div class="sc2-highlight">加拿大头牌，速度型边卫</div>
-    </div>
+    <div class="sc2-name">阿方索·戴维斯</div>
+    <div class="sc2-club">拜仁慕尼黑</div>
   </div>
-  <div class="star-card2" style="--team-color:#FF0000">
+  <div class="star-card2" style="--team-color:#8A1538" data-team="QAT" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/QAT/10_HASSAN%20ALHAYDOS_FW.png" class="sc2-photo" alt="哈桑·海多斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/QAT.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/QAT.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#8A1538">FW10</div>
+    </div>
+    <div class="sc2-name">哈桑·海多斯</div>
+    <div class="sc2-club"></div>
+  </div>
+  <div class="star-card2" style="--team-color:#FF0000" data-team="SUI" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/SUI/10_Granit%20XHAKA_MF.png" class="sc2-photo" alt="扎卡" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/SUI.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/SUI.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FF0000">MF10</div>
+    </div>
+    <div class="sc2-name">扎卡</div>
+    <div class="sc2-club">勒沃库森</div>
+  </div>
+  <div class="star-card2" style="--team-color:#009B3A" data-team="BRA" data-jersey="7">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/BRA/07_VINICIUS%20JUNIOR_FW.png" class="sc2-photo" alt="维尼修斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/BRA.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/BRA.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#009B3A">FW7</div>
+    </div>
+    <div class="sc2-name">维尼修斯</div>
+    <div class="sc2-club">皇家马德里</div>
+  </div>
+  <div class="star-card2" style="--team-color:#00209F" data-team="HAI" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/HAI/10_Jean-Ricner%20Bellegarde_MF.png" class="sc2-photo" alt="贝勒加德" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/HAI.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/HAI.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#00209F">MF10</div>
+    </div>
+    <div class="sc2-name">贝勒加德</div>
+    <div class="sc2-club"></div>
+  </div>
+  <div class="star-card2" style="--team-color:#C1272D" data-team="MAR" data-jersey="2">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/MAR/02_Achraf%20HAKIMI_DF.png" class="sc2-photo" alt="阿什拉夫" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/MAR.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/MAR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#C1272D">DF2</div>
+    </div>
+    <div class="sc2-name">阿什拉夫</div>
+    <div class="sc2-club">巴黎圣日耳曼</div>
+  </div>
+  <div class="star-card2" style="--team-color:#003087" data-team="SCO" data-jersey="4">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/SCO/04_Scott%20McTominay_MF.png" class="sc2-photo" alt="麦克托米奈" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/SCO.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/SCO.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#003087">MF4</div>
+    </div>
+    <div class="sc2-name">麦克托米奈</div>
+    <div class="sc2-club">那不勒斯</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FFCD00" data-team="AUS" data-jersey="7">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/AUS/07_Mathew%20LECKIE_FW.png" class="sc2-photo" alt="莱基" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/AUS.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/AUS.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FFCD00">FW7</div>
+    </div>
+    <div class="sc2-name">莱基</div>
+    <div class="sc2-club">墨尔本城</div>
+  </div>
+  <div class="star-card2" style="--team-color:#D52B1E" data-team="PAR" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/PAR/09_Antonio%20SANABRIA_FW.png" class="sc2-photo" alt="萨纳布里亚" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/PAR.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/PAR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#D52B1E">FW9</div>
+    </div>
+    <div class="sc2-name">萨纳布里亚</div>
+    <div class="sc2-club">都灵</div>
+  </div>
+  <div class="star-card2" style="--team-color:#E30A17" data-team="TUR" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/TUR/10_Hakan%20CALHANOGLU_MF.png" class="sc2-photo" alt="恰尔汗奥卢" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/TUR.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/TUR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#E30A17">MF10</div>
+    </div>
+    <div class="sc2-name">恰尔汗奥卢</div>
+    <div class="sc2-club">国际米兰</div>
+  </div>
+  <div class="star-card2" style="--team-color:#002868" data-team="USA" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/USA/10_Christian%20PULISIC_FW.png" class="sc2-photo" alt="普利西奇" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/USA.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/USA.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#002868">FW10</div>
+    </div>
+    <div class="sc2-name">普利西奇</div>
+    <div class="sc2-club">AC米兰</div>
+  </div>
+  <div class="star-card2" style="--team-color:#F77F00" data-team="CIV" data-jersey="19">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/CIV/19_Nicolas%20PEPE_FW.png" class="sc2-photo" alt="佩佩" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/CIV.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/CIV.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#F77F00">FW19</div>
+    </div>
+    <div class="sc2-name">佩佩</div>
+    <div class="sc2-club">特拉布宗体育</div>
+  </div>
+  <div class="star-card2" style="--team-color:#002B7F" data-team="CUW" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/CUW/09_Juergen%20LOCADIA_FW.png" class="sc2-photo" alt="纳伊廷格尔" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/CUW.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/CUW.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#002B7F">FW9</div>
+    </div>
+    <div class="sc2-name">纳伊廷格尔</div>
+    <div class="sc2-club">乌得勒支</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FFD100" data-team="ECU" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/ECU/09_John%20YEBOAH_FW.png" class="sc2-photo" alt="瓦伦西亚" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ECU.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/ECU.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FFD100">FW9</div>
+    </div>
+    <div class="sc2-name">瓦伦西亚</div>
+    <div class="sc2-club">帕丘卡</div>
+  </div>
+  <div class="star-card2" style="--team-color:#000000" data-team="GER" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/GER/10_Jamal%20MUSIALA_MF.png" class="sc2-photo" alt="穆西亚拉" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/GER.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/GER.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#000000">MF10</div>
+    </div>
+    <div class="sc2-name">穆西亚拉</div>
+    <div class="sc2-club">拜仁慕尼黑</div>
+  </div>
+  <div class="star-card2" style="--team-color:#000000" data-team="GER" data-jersey="17">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/GER/17_Florian%20WIRTZ_MF.png" class="sc2-photo" alt="维尔茨" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/GER.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/GER.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#000000">MF17</div>
+    </div>
+    <div class="sc2-name">维尔茨</div>
+    <div class="sc2-club">勒沃库森</div>
+  </div>
+  <div class="star-card2" style="--team-color:#BC002D" data-team="JPN" data-jersey="20">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/JPN/20_Ayumu%20SEKO_DF.png" class="sc2-photo" alt="久保建英" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/JPN.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/JPN.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#BC002D">MF20</div>
+    </div>
+    <div class="sc2-name">久保建英</div>
+    <div class="sc2-club">皇家社会</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FF6600" data-team="NED" data-jersey="4">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/NED/04_Virgil%20VAN%20DIJK_DF.png" class="sc2-photo" alt="范迪克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/NED.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/NED.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FF6600">DF4</div>
+    </div>
+    <div class="sc2-name">范迪克</div>
+    <div class="sc2-club">利物浦</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FECC02" data-team="SWE" data-jersey="11">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/SWE/11_Anthony%20ELANGA_FW.png" class="sc2-photo" alt="伊萨克" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/SWE.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/SWE.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FECC02">FW11</div>
+    </div>
+    <div class="sc2-name">伊萨克</div>
+    <div class="sc2-club">纽卡斯尔</div>
+  </div>
+  <div class="star-card2" style="--team-color:#E70013" data-team="TUN" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/TUN/09_Hazem%20MASTOURI_FW.png" class="sc2-photo" alt="斯利蒂" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/TUN.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/TUN.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#E70013">FW9</div>
+    </div>
+    <div class="sc2-name">斯利蒂</div>
+    <div class="sc2-club">卡塞里体育</div>
+  </div>
+  <div class="star-card2" style="--team-color:#ED2939" data-team="BEL" data-jersey="7">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/BEL/07_Kevin%20DE%20BRUYNE_MF.png" class="sc2-photo" alt="德布劳内" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/BEL.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/BEL.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#ED2939">MF7</div>
+    </div>
+    <div class="sc2-name">德布劳内</div>
+    <div class="sc2-club">曼城</div>
+  </div>
+  <div class="star-card2" style="--team-color:#C8102E" data-team="EGY" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/EGY.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#C8102E;position:absolute;top:4px;left:4px">FW10</div>
+    </div>
+    <div class="sc2-name">萨拉赫</div>
+    <div class="sc2-club">利物浦</div>
+  </div>
+  <div class="star-card2" style="--team-color:#239F40" data-team="IRN" data-jersey="20">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/IRN.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#239F40;position:absolute;top:4px;left:4px">FW20</div>
+    </div>
+    <div class="sc2-name">阿兹蒙</div>
+    <div class="sc2-club">罗马</div>
+  </div>
+  <div class="star-card2" style="--team-color:#000000" data-team="NZL" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/NZL/09_Chris%20WOOD_FW.png" class="sc2-photo" alt="伍德" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/NZL.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/NZL.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#000000">FW9</div>
+    </div>
+    <div class="sc2-name">伍德</div>
+    <div class="sc2-club">诺丁汉森林</div>
+  </div>
+  <div class="star-card2" style="--team-color:#003893" data-team="CPV" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/CPV/10_JAMIRO%20MONTEIRO_MF.png" class="sc2-photo" alt="雅米罗·蒙泰罗" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/CPV.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/CPV.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#003893">MF10</div>
+    </div>
+    <div class="sc2-name">雅米罗·蒙泰罗</div>
+    <div class="sc2-club"></div>
+  </div>
+  <div class="star-card2" style="--team-color:#AA151B" data-team="ESP" data-jersey="19">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/ESP/19_Lamine%20YAMAL_FW.png" class="sc2-photo" alt="亚马尔" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ESP.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#AA151B">FW19</div>
+    </div>
+    <div class="sc2-name">亚马尔</div>
+    <div class="sc2-club">巴塞罗那</div>
+  </div>
+  <div class="star-card2" style="--team-color:#AA151B" data-team="ESP" data-jersey="16">
     <div class="sc2-photo-area">
       <img data-src="/wc-photos/ESP/16_RODRI_MF.png" class="sc2-photo" alt="罗德里" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="sc2-photo-fallback" style="display:none"><img src="/wc-flags/ESP.png" style="width:64px;height:43px;border-radius:6px;object-fit:contain" onerror="this.style.display='none'"></div>
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ESP.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
       <img src="/wc-flags/ESP.png" class="sc2-flag-badge" onerror="this.style.display='none'">
-      <div class="sc2-photo-overlay"></div>
-      <div class="sc2-name-on-photo">罗德里</div>
+      <div class="sc2-pos-badge" style="background:#AA151B">MF16</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">西班牙 &middot; 后腰 &middot; 29岁</div>
-      <div class="sc2-club">曼城</div>
-      <div class="sc2-highlight">2024金球奖，中场定海神针</div>
-    </div>
+    <div class="sc2-name">罗德里</div>
+    <div class="sc2-club">曼城</div>
   </div>
-  <div class="star-card2" style="--team-color:#7EC1FF">
-    <div class="sc2-no-photo-area">
-      <img src="/wc-flags/URU.png" class="sc2-flag-big" onerror="this.style.display='none'">
-      <div class="sc2-name-on-flag">努涅斯</div>
+  <div class="star-card2" style="--team-color:#006C35" data-team="KSA" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/KSA.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#006C35;position:absolute;top:4px;left:4px">MF10</div>
     </div>
-    <div class="sc2-info">
-      <div class="sc2-meta">乌拉圭 &middot; 前锋 &middot; 26岁</div>
-      <div class="sc2-club">利物浦</div>
-      <div class="sc2-highlight">南美神锋，终结能力</div>
+    <div class="sc2-name">达瓦萨里</div>
+    <div class="sc2-club">利雅得新月</div>
+  </div>
+  <div class="star-card2" style="--team-color:#5CBEFF" data-team="URU" data-jersey="27">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/URU.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#5CBEFF;position:absolute;top:4px;left:4px">FW27</div>
     </div>
+    <div class="sc2-name">努涅斯</div>
+    <div class="sc2-club">利物浦</div>
+  </div>
+  <div class="star-card2" style="--team-color:#002395" data-team="FRA" data-jersey="7">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/FRA.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#002395;position:absolute;top:4px;left:4px">FW7</div>
+    </div>
+    <div class="sc2-name">姆巴佩</div>
+    <div class="sc2-club">皇家马德里</div>
+  </div>
+  <div class="star-card2" style="--team-color:#002395" data-team="FRA" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/FRA.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#002395;position:absolute;top:4px;left:4px">FW10</div>
+    </div>
+    <div class="sc2-name">登贝莱</div>
+    <div class="sc2-club">巴黎圣日耳曼</div>
+  </div>
+  <div class="star-card2" style="--team-color:#CE1126" data-team="IRQ" data-jersey="9">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/IRQ.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#CE1126;position:absolute;top:4px;left:4px">FW9</div>
+    </div>
+    <div class="sc2-name">侯赛因</div>
+    <div class="sc2-club">铝拉马迪</div>
+  </div>
+  <div class="star-card2" style="--team-color:#BA0C2F" data-team="NOR" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/NOR/09_Erling%20HAALAND_FW.png" class="sc2-photo" alt="哈兰德" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/NOR.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/NOR.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#BA0C2F">FW9</div>
+    </div>
+    <div class="sc2-name">哈兰德</div>
+    <div class="sc2-club">曼城</div>
+  </div>
+  <div class="star-card2" style="--team-color:#00853F" data-team="SEN" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/SEN.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#00853F;position:absolute;top:4px;left:4px">FW10</div>
+    </div>
+    <div class="sc2-name">马内</div>
+    <div class="sc2-club">利雅得胜利</div>
+  </div>
+  <div class="star-card2" style="--team-color:#006233" data-team="ALG" data-jersey="7">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/ALG/07_Riyad%20Mahrez_FW.png" class="sc2-photo" alt="马赫雷斯" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ALG.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/ALG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#006233">FW7</div>
+    </div>
+    <div class="sc2-name">马赫雷斯</div>
+    <div class="sc2-club">吉达联合</div>
+  </div>
+  <div class="star-card2" style="--team-color:#74ACDF" data-team="ARG" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/ARG.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#74ACDF;position:absolute;top:4px;left:4px">FW10</div>
+    </div>
+    <div class="sc2-name">梅西</div>
+    <div class="sc2-club">迈阿密国际</div>
+  </div>
+  <div class="star-card2" style="--team-color:#ED2939" data-team="AUT" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/AUT/09_Marcel%20SABITZER_MF.png" class="sc2-photo" alt="萨比策" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/AUT.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/AUT.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#ED2939">MF9</div>
+    </div>
+    <div class="sc2-name">萨比策</div>
+    <div class="sc2-club">多特蒙德</div>
+  </div>
+  <div class="star-card2" style="--team-color:#CE1126" data-team="JOR" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/JOR.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#CE1126;position:absolute;top:4px;left:4px">FW10</div>
+    </div>
+    <div class="sc2-name">穆萨·塔马里</div>
+    <div class="sc2-club"></div>
+  </div>
+  <div class="star-card2" style="--team-color:#007FFF" data-team="COD" data-jersey="9">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/COD.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#007FFF;position:absolute;top:4px;left:4px">FW9</div>
+    </div>
+    <div class="sc2-name">巴坎布</div>
+    <div class="sc2-club">加拉法</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FCD116" data-team="COL" data-jersey="7">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/COL.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FCD116;position:absolute;top:4px;left:4px">FW7</div>
+    </div>
+    <div class="sc2-name">迪亚斯</div>
+    <div class="sc2-club">利物浦</div>
+  </div>
+  <div class="star-card2" style="--team-color:#006600" data-team="POR" data-jersey="7">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/POR.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#006600;position:absolute;top:4px;left:4px">FW7</div>
+    </div>
+    <div class="sc2-name">C罗</div>
+    <div class="sc2-club">利雅得胜利</div>
+  </div>
+  <div class="star-card2" style="--team-color:#1EB53A" data-team="UZB" data-jersey="9">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/UZB.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#1EB53A;position:absolute;top:4px;left:4px">FW9</div>
+    </div>
+    <div class="sc2-name">肖穆罗多夫</div>
+    <div class="sc2-club">卡利亚里</div>
+  </div>
+  <div class="star-card2" style="--team-color:#FF0000" data-team="CRO" data-jersey="10">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/CRO.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#FF0000;position:absolute;top:4px;left:4px">MF10</div>
+    </div>
+    <div class="sc2-name">莫德里奇</div>
+    <div class="sc2-club">皇家马德里</div>
+  </div>
+  <div class="star-card2" style="--team-color:#666" data-team="ENG" data-jersey="10">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/ENG/10_Jude%20BELLINGHAM_MF.png" class="sc2-photo" alt="贝林厄姆" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ENG.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#666">MF10</div>
+    </div>
+    <div class="sc2-name">贝林厄姆</div>
+    <div class="sc2-club">皇家马德里</div>
+  </div>
+  <div class="star-card2" style="--team-color:#666" data-team="ENG" data-jersey="9">
+    <div class="sc2-photo-area">
+      <img data-src="/wc-photos/ENG/09_Harry%20KANE_FW.png" class="sc2-photo" alt="凯恩" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="sc2-silhouette-area" style="display:none;position:absolute;inset:0;background:#f0f0f0"><img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'"><img src="/wc-flags/ENG.png" class="sc2-sflag" onerror="this.style.display='none'"></div>
+      <img src="/wc-flags/ENG.png" class="sc2-flag-badge" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#666">FW9</div>
+    </div>
+    <div class="sc2-name">凯恩</div>
+    <div class="sc2-club">拜仁慕尼黑</div>
+  </div>
+  <div class="star-card2" style="--team-color:#CFB53B" data-team="GHA" data-jersey="20">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/GHA.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#CFB53B;position:absolute;top:4px;left:4px">MF20</div>
+    </div>
+    <div class="sc2-name">库杜斯</div>
+    <div class="sc2-club">西汉姆联</div>
+  </div>
+  <div class="star-card2" style="--team-color:#005293" data-team="PAN" data-jersey="9">
+    <div class="sc2-silhouette-area" style="background:linear-gradient(135deg,#eee,#f8f8f8)">
+      <img src="/球员.svg" class="sc2-sil" onerror="this.style.display='none'">
+      <img src="/wc-flags/PAN.png" class="sc2-sflag" onerror="this.style.display='none'">
+      <div class="sc2-pos-badge" style="background:#005293;position:absolute;top:4px;left:4px">FW9</div>
+    </div>
+    <div class="sc2-name">迪亚斯</div>
+    <div class="sc2-club">马赛</div>
   </div>
   </div>
 </section>
@@ -611,17 +886,20 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 <div class="pd-overlay" id="pdOverlay" onclick="if(event.target===this)closePlayerDetail()">
   <div class="pd-modal">
     <button class="pd-close" onclick="closePlayerDetail()">&times;</button>
+    <button class="pd-nav pd-nav-prev" id="pdPrev" onclick="navPlayer(-1)">&#8249;</button>
+    <button class="pd-nav pd-nav-next" id="pdNext" onclick="navPlayer(1)">&#8250;</button>
     <div class="pd-top">
-      <div class="pd-photo-wrap" id="pdPhotoWrap"></div>
+      <div class="pd-photo-section">
+        <div class="pd-attrs" id="pdAttrs"></div>
+        <div class="pd-photo-wrap" id="pdPhotoWrap"></div>
+      </div>
       <div class="pd-info">
-        <div class="pd-name" id="pdName"></div>
+        <div class="pd-name"><span class="pd-name-text" id="pdName"></span><span class="pd-cards" id="pdCards"></span></div>
         <div class="pd-en-name" id="pdEnName"></div>
         <div class="pd-team-line" id="pdTeamLine"></div>
-        <div class="pd-attrs" id="pdAttrs"></div>
         <div class="pd-extra" id="pdExtra"></div>
       </div>
     </div>
-    <div class="pd-matches" id="pdMatches"></div>
     <div class="pd-bio" id="pdBio"></div>
     <div class="pd-honors" id="pdHonors"></div>
   </div>
@@ -635,35 +913,65 @@ h2{color:var(--gold);font-size:1.6em;margin:0 0 16px;padding-bottom:8px;border-b
 function openPlayerDetail(teamCode, jerseyNum) {
   if(_pdClosing) return; // 刚关闭详情卡，忽略误触
   if (typeof WC_TEAMS === 'undefined') return;
-  const team = WC_TEAMS.find(t => t.code === teamCode);
+  var team = WC_TEAMS.find(function(t){return t.code===teamCode});
   if (!team) return;
-  const player = team.players.find(p => String(p.jersey) === String(jerseyNum));
-  if (!player) return;
+  var idx = -1;
+  for (var i = 0; i < team.players.length; i++) {
+    if (String(team.players[i].jersey) === String(jerseyNum)) { idx = i; break; }
+  }
+  if (idx < 0) return;
+  _pdTeamCode = teamCode;
+  _pdPlayerIdx = idx;
+  _fillPlayerDetail(teamCode, team.players[idx]);
+
+  document.getElementById('pdOverlay').classList.add('open');
+  _pdScrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.style.top = '-' + _pdScrollY + 'px';
+  document.body.style.overflow = 'hidden';
+}
+
+function _fillPlayerDetail(teamCode, player) {
+  if (typeof WC_TEAMS === 'undefined') return;
+  var team = WC_TEAMS.find(function(t){return t.code===teamCode});
+  if (!team) return;
 
   // Extra detail from PLAYER_DETAIL
-  const dKey = teamCode + '-' + jerseyNum;
-  const d = (typeof PLAYER_DETAIL !== 'undefined') ? (PLAYER_DETAIL[dKey] || {}) : {};
+  var dKey = teamCode + '-' + player.jersey;
+  var d = (typeof PLAYER_DETAIL !== 'undefined') ? (PLAYER_DETAIL[dKey] || {}) : {};
 
   // 7m full data (keyed by cn_name)
   const p7m = (typeof PLAYER_7M !== 'undefined') ? (PLAYER_7M[player.cn_name || player.name] || {}) : {};
   const i7m = p7m.info || {};
 
   // Photo: prefer existing photo, fallback to 7m
-  const photoWrap = document.getElementById('pdPhotoWrap');
+  var photoWrap = document.getElementById('pdPhotoWrap');
+  var noPhotoHtml = '<div class="pd-no-photo" style="background:linear-gradient(135deg,'+team.color+','+team.color2+')">' + String(player.jersey).padStart(2,'0') + '</div>';
   if (player.photo) {
-    photoWrap.innerHTML = '<img src="' + player.photo + '" alt="' + (player.cn_name||player.name) + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'pd-no-photo\\\' style=\\\'background:linear-gradient(135deg,'+team.color+','+team.color2+')\\\'>' + String(player.jersey).padStart(2,'0') + '</div>\'">';
+    photoWrap.innerHTML = '<img src="' + player.photo + '" alt="' + (player.cn_name||player.name) + '" onerror="this.parentElement.innerHTML=\''+noPhotoHtml.replace(/'/g,"\\'")+'\'">';
   } else if (p7m.photo7m) {
-    photoWrap.innerHTML = '<img src="' + p7m.photo7m + '" alt="' + (player.cn_name||player.name) + '" style="width:140px;height:160px;object-fit:cover" onerror="this.parentElement.innerHTML=\'<div class=\\\'pd-no-photo\\\' style=\\\'background:linear-gradient(135deg,'+team.color+','+team.color2+')\\\'>' + String(player.jersey).padStart(2,'0') + '</div>\'">';
+    photoWrap.innerHTML = '<img src="' + p7m.photo7m + '" alt="' + (player.cn_name||player.name) + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\''+noPhotoHtml.replace(/'/g,"\\'")+'\'">';
   } else {
-    photoWrap.innerHTML = '<div class="pd-no-photo" style="background:linear-gradient(135deg,'+team.color+','+team.color2+')">' + String(player.jersey).padStart(2,'0') + '</div>';
+    photoWrap.innerHTML = noPhotoHtml;
   }
 
   // Name
   document.getElementById('pdName').textContent = player.cn_name || player.name;
   document.getElementById('pdEnName').textContent = player.name;
 
+  // Red/yellow cards after name - use getEffectiveCards (FIFA clearing rules)
+  var cardsEl = document.getElementById('pdCards');
+  if (cardsEl) {
+    var ec = getEffectiveCards(team.code + '-' + player.jersey);
+    var cardsHtml = '';
+    if (ec.y) cardsHtml += '<span class="pd-card-y"><span class="pd-card-icon"></span>' + ec.y + '</span>';
+    if (ec.r) cardsHtml += '<span class="pd-card-r"><span class="pd-card-icon"></span>' + ec.r + '</span>';
+    cardsEl.innerHTML = cardsHtml;
+  }
+
   // Team line
-  document.getElementById('pdTeamLine').innerHTML = '<img src="/wc-flags/' + team.code + '.png" onerror="this.style.display=\'none\'"><span class="pd-team-cn">' + team.cn + '</span><span class="pd-team-en">' + team.en + ' · ' + team.group + '组</span>' + (team.tag ? '<span class="rw-tag">' + team.tag + '</span>' : '');
+  document.getElementById('pdTeamLine').innerHTML = '<img src="/wc-flags/' + team.code + '.png" onerror="this.style.display=\'none\'"><span class="pd-team-cn">' + team.cn + '</span><span style="color:var(--text2);font-size:.8em;margin-left:4px">' + team.code + '</span><span class="pd-team-en">' + team.en + ' · ' + team.group + '组</span>' + (team.tag ? '<span class="rw-tag">' + team.tag + '</span>' : '');
 
   // Attributes grid - use 7m data where available (more accurate/complete)
   const posColor = typeof POS_COLORS !== 'undefined' ? (POS_COLORS[player.pos]||'#666') : '#666';
@@ -702,10 +1010,8 @@ function openPlayerDetail(teamCode, jerseyNum) {
   if (prevClub) extra += '<div class="pd-extra-row"><span class="pd-extra-label">前度效力球队</span><span class="pd-extra-val">' + prevClub + '</span></div>';
   var pastClubs = i7m['曾经效力球队'] || '';
   if (pastClubs) extra += '<div class="pd-extra-row"><span class="pd-extra-label">曾经效力球队</span><span class="pd-extra-val" title="' + pastClubs.replace(/"/g, '&quot;') + '">' + pastClubs + '</span></div>';
-  var statsRow = '';
-  if (d.y || d.r) statsRow = '<div class="pd-stats"><span style="color:#e8c547">🟨 ' + (d.y||0) + '</span><span style="color:#e04040;margin-left:12px">🟥 ' + (d.r||0) + '</span></div>';
   var extraEl = document.getElementById('pdExtra');
-  if (extraEl) extraEl.innerHTML = extra + statsRow;
+  if (extraEl) extraEl.innerHTML = extra;
 
   // Bio section - prefer 7m bio (more up-to-date), fallback to WC_PLAYER_BIO
   var bioEl = document.getElementById('pdBio');
@@ -713,26 +1019,6 @@ function openPlayerDetail(teamCode, jerseyNum) {
     var bioText = p7m.bio || '';
     bioEl.style.display = bioText ? 'block' : 'none';
     bioEl.innerHTML = bioText ? ('<div class="pd-section-title">球员简介</div><div class="pd-bio-text">' + bioText + '</div>') : '';
-  }
-
-  // Recent matches section
-  var matchesEl = document.getElementById('pdMatches');
-  if (matchesEl) {
-    var matches = p7m.matches || [];
-    if (matches.length > 0) {
-      var mhtml = '<div class="pd-section-title">近期比赛</div><table class="pd-match-table"><colgroup><col style="width:18%"><col style="width:14%"><col style="width:44%"><col style="width:12%"><col style="width:12%"></colgroup><tr><th>赛事</th><th>时间</th><th class="pd-match-vs">对阵</th><th>进球</th><th>黄牌</th></tr>';
-      for (var mi = 0; mi < matches.length; mi++) {
-        var m = matches[mi];
-        var vs = m['主队'] + ' ' + m['比分'] + ' ' + m['客队'];
-        mhtml += '<tr><td>' + (m['赛事']||'') + '</td><td>' + (m['时间']||'').substring(5) + '</td><td class="pd-match-vs">' + vs + '</td><td>' + (m['进球']||'0') + '</td><td>' + (m['黄牌']||'0') + '</td></tr>';
-      }
-      mhtml += '</table>';
-      matchesEl.innerHTML = mhtml;
-      matchesEl.style.display = '';
-    } else {
-      matchesEl.innerHTML = '';
-      matchesEl.style.display = 'none';
-    }
   }
 
   // Honors section
@@ -790,17 +1076,39 @@ function openPlayerDetail(teamCode, jerseyNum) {
     }
   }
 
-  document.getElementById('pdOverlay').classList.add('open');
-  _pdScrollY = window.scrollY;
-  // 用 fixed 锁死背景滚动
-  document.body.style.position = 'fixed';
-  document.body.style.width = '100%';
-  document.body.style.top = '-' + _pdScrollY + 'px';
-  document.body.style.overflow = 'hidden';
+  // Scroll modal to top
+  var modal = document.querySelector('.pd-modal');
+  if (modal) modal.scrollTop = 0;
+
+  _updateNavButtons();
 }
 
 var _pdScrollY=0;
 var _pdClosing=false; /* 关闭后1000ms内禁止再打开，防止滚动误触 */
+var _pdTeamCode='';
+var _pdPlayerIdx=0;
+
+function _pdPlayerList() {
+  var team = WC_TEAMS.find(function(t){return t.code===_pdTeamCode});
+  return team ? team.players : [];
+}
+
+function navPlayer(dir) {
+  var list = _pdPlayerList();
+  if (!list.length) return;
+  var newIdx = _pdPlayerIdx + dir;
+  if (newIdx < 0 || newIdx >= list.length) return;
+  _pdPlayerIdx = newIdx;
+  _fillPlayerDetail(_pdTeamCode, list[_pdPlayerIdx]);
+}
+
+function _updateNavButtons() {
+  var list = _pdPlayerList();
+  var prev = document.getElementById('pdPrev');
+  var next = document.getElementById('pdNext');
+  if (prev) prev.style.display = _pdPlayerIdx > 0 ? '' : 'none';
+  if (next) next.style.display = _pdPlayerIdx < list.length - 1 ? '' : 'none';
+}
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
   // 恢复背景滚动（还原 fixed 锁）
@@ -808,14 +1116,18 @@ function closePlayerDetail() {
   document.body.style.position = '';
   document.body.style.width = '';
   document.body.style.top = '';
+  document.body.style.overflow = '';
+  // 临时关闭平滑滚动，避免关闭时页面从顶部"滚"过来
+  document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0, sy);
+  document.documentElement.style.scrollBehavior = '';
   // 注意：不调用 scrollIntoView，和点X按钮行为完全一致
   // 防误触：关闭后1000ms内禁止再打开详情卡
   _pdClosing = true;
   setTimeout(function(){ _pdClosing = false; }, 1000);
 }
 
-// 右滑关闭球员详情（从左边向右滑动）
+// 触摸滑动：左滑→下一个球员，右滑→上一个球员
 // 注意：passive:false 才能在 touchmove 里 preventDefault，阻止浏览器后退手势
 (function(){
   var modal=document.querySelector('.pd-modal');
@@ -827,32 +1139,41 @@ function closePlayerDetail() {
     if(!swiping)return;
     var cx=e.touches[0].clientX, cy=e.touches[0].clientY;
     dx=cx-startX; var dy=cy-startY;
-    // 一锤定音：一旦判断为横向，后续不再改变 isHoriz
     if(!isHoriz && Math.abs(dx)>Math.abs(dy)){
       isHoriz=true;
     }
     if(isHoriz){
       e.preventDefault();
-      if(dx>0){
-        modal.style.transform='translateX('+dx+'px)';
-        var ratio=Math.min(dx/180,1);
-        modal.style.opacity = 1 - ratio * 0.7;
+      var list=_pdPlayerList();
+      if(dx>0 && _pdPlayerIdx>0){
+        modal.style.transform='translateX('+Math.min(dx,60)+'px)';
+        modal.style.transition='none';
+      } else if(dx<0 && _pdPlayerIdx<list.length-1){
+        modal.style.transform='translateX('+Math.max(dx,-60)+'px)';
+        modal.style.transition='none';
       } else {
         modal.style.transform='';
-        modal.style.opacity='';
       }
     } else {
-      swiping=false; modal.style.transform=''; modal.style.opacity='';
+      swiping=false; modal.style.transform='';
     }
   },{passive:false});
   modal.addEventListener('touchend',function(){
-    if(isHoriz && dx>20) closePlayerDetail();
-    modal.style.transform='';
-    swiping=false;dx=0;isHoriz=false;
+    if(isHoriz){
+      var list=_pdPlayerList();
+      if(dx>60 && _pdPlayerIdx>0) navPlayer(-1);
+      else if(dx<-60 && _pdPlayerIdx<list.length-1) navPlayer(1);
+    }
+    modal.style.transform=''; modal.style.transition='';
+    swiping=false; dx=0; isHoriz=false;
   },{passive:false});
 })();
 
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePlayerDetail() });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePlayerDetail();
+  if (e.key === 'ArrowLeft') navPlayer(-1);
+  if (e.key === 'ArrowRight') navPlayer(1);
+});
 
 function photoFallback(img) {
   try {
@@ -931,15 +1252,20 @@ function renderRoster(filter) {
       }
     });
     
-    const tagHtml = team.tag ? `<span class="rw-tag">${team.tag}</span>` : '';
-    
+    // Count effective cards for this team (FIFA clearing rules applied)
+    let teamY=0, teamR=0;
+    team.players.forEach(p=>{
+      const ec=getEffectiveCards(team.code+'-'+p.jersey);
+      teamY+=ec.y; teamR+=ec.r;
+    });
+    const cardInner=(teamY||teamR)?`<span class="rw-tc-y" onclick="event.stopPropagation();toggleCardDrop(this,'${team.code}','y')"></span>${teamY}<span class="rw-tc-r" onclick="event.stopPropagation();toggleCardDrop(this,'${team.code}','r')"></span>${teamR}`:'';
     html += `<div class="rw-team">
-      <div class="rw-team-head" id="rh-${team.code}" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+      <div class="rw-team-head" id="rh-${team.code}" onclick="this.classList.toggle('open');this.parentElement.querySelector('.rw-scroll').classList.toggle('open')">
         <span class="rw-team-bar" style="background:${team.color}"></span>
         <img src="/wc-flags/${team.code}.png" class="rw-team-flag" onerror="this.style.display='none'">
-        <strong>${team.cn}</strong>${tagHtml}
-        <span class="rw-team-sub">${team.group}组 · #${team.rank} · ${team.players.length}人</span>
+        <strong>${team.cn}</strong><span style="color:var(--text2);font-size:.85em;margin-left:4px">${team.code}</span><span class="rw-team-cards">${cardInner}
       </div>
+      <div class="rw-card-drop" id="cd-${team.code}"></div>
       <div class="rw-scroll">${playerCards}</div>
     </div>`;
   });
@@ -959,6 +1285,62 @@ function filterRoster(filter) {
   renderRoster(filter);
 }
 
+// Toggle card dropdown: show players with yellow/red cards
+function toggleCardDrop(el, teamCode, type) {
+  var drop = document.getElementById('cd-' + teamCode);
+  if (!drop) return;
+  // Close if already open for same type
+  if (drop.classList.contains('open') && drop.dataset.type === type) {
+    drop.classList.remove('open');
+    drop.innerHTML = '';
+    return;
+  }
+  // Close all other drops
+  document.querySelectorAll('.rw-card-drop.open').forEach(function(d) {
+    d.classList.remove('open'); d.innerHTML = '';
+  });
+  // Find team
+  var team = WC_TEAMS.find(function(t) { return t.code === teamCode; });
+  if (!team) return;
+  // Filter players by card type
+  var carded = [];
+  team.players.forEach(function(p) {
+    var ec = getEffectiveCards(teamCode + '-' + p.jersey);
+    if (type === 'y' && ec.y > 0) carded.push({player: p, count: ec.y, cardType: 'y'});
+    if (type === 'r' && ec.r > 0) carded.push({player: p, count: ec.r, cardType: 'r'});
+  });
+  if (!carded.length) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
+  var label = type === 'y' ? '黄牌' : '红牌';
+  var h = '<div class="rw-cd-label">' + label + ' (' + carded.length + '人)</div><div class="rw-cd-list">';
+  carded.forEach(function(item) {
+    var p = item.player;
+    var jerseyStr = p.jersey ? String(p.jersey).padStart(2, '0') : '--';
+    var cnName = (p.cn_name || p.name).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    var posColor = POS_COLORS[p.pos] || '#666';
+    var cardIcon = item.cardType === 'y' ? '<span class="rw-cd-card rw-cd-card-y"></span>' : '<span class="rw-cd-card rw-cd-card-r"></span>';
+    var countLabel = item.count > 1 ? '<span class="rw-cd-count">x' + item.count + '</span>' : '';
+    h += '<div class="rw-cd-player" onclick="openPlayerDetail(\'' + teamCode + '\',' + p.jersey + ')">';
+    h += '<span class="rw-cd-pos" style="background:' + posColor + '">' + p.pos + '</span>';
+    h += '<span class="rw-cd-jersey" style="background:linear-gradient(135deg,' + team.color + ',' + team.color2 + ')">' + jerseyStr + '</span>';
+    h += '<span class="rw-cd-name">' + cnName + '</span>';
+    h += cardIcon + countLabel;
+    h += '</div>';
+  });
+  h += '</div>';
+  drop.innerHTML = h;
+  drop.dataset.type = type;
+  drop.classList.add('open');
+}
+
+// Close card drops on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.rw-tc-y') && !e.target.closest('.rw-tc-r') && !e.target.closest('.rw-card-drop')) {
+    document.querySelectorAll('.rw-card-drop.open').forEach(function(d) {
+      d.classList.remove('open'); d.innerHTML = '';
+    });
+  }
+});
+
 // 跳转到阵容区并展开指定球队
 function goToRoster(teamCode) {
   var head = document.getElementById('rh-' + teamCode);
@@ -969,7 +1351,7 @@ function goToRoster(teamCode) {
   if (!head) return;
   if (!head.classList.contains('open')) {
     head.classList.add('open');
-    head.nextElementSibling.classList.add('open');
+    head.parentElement.querySelector('.rw-scroll').classList.add('open');
   }
   head.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
@@ -993,14 +1375,12 @@ document.addEventListener('click', function(e) {
       if (team) { goToRoster(team.code); return; }
     }
   }
-  // 焦点球星卡
+  // 焦点球星卡 - 打开球员详情
   var starCard = e.target.closest('.star-card2');
   if (starCard) {
-    var flagImg = starCard.querySelector('img[src*="/wc-flags/"]');
-    if (flagImg) {
-      var m = flagImg.src.match(/wc-flags\/([A-Z]+)\.png/);
-      if (m) { goToRoster(m[1]); return; }
-    }
+    var tc = starCard.getAttribute('data-team');
+    var jn = starCard.getAttribute('data-jersey');
+    if (tc && jn) { openPlayerDetail(tc, jn); return; }
   }
   // 淘汰赛区 - 队名或国旗
   var bMatch = e.target.closest('.b-team');
@@ -1372,10 +1752,46 @@ var SCORE_SYNC={
   autoLoaded:false,
   lastSync:null
 };
+var WC_CARDS={};  // tournament card data from FIFA: "TEAM-JERSEY" -> {y_group:N, r_group:N, y_ko:N, r_ko:N}
+var WC_STAGES={group_finished:false,qf_finished:false};  // stage flags for card clearing rules
+
+// Compute effective cards based on FIFA clearing rules:
+// - After group stage: group yellows cleared (reds remain)
+// - After QF: knockout yellows cleared (reds remain)
+function getEffectiveCards(cardKey){
+  var c=WC_CARDS[cardKey];
+  if(!c) return {y:0,r:0};
+  var yg=c.y_group||0, rg=c.r_group||0, yk=c.y_ko||0, rk=c.r_ko||0;
+  // Backward compat: old format had y/r without stage split
+  if(yg===undefined){return {y:(c.y||0),r:(c.r||0)}}
+  var ey=0, er=0;
+  if(!WC_STAGES.group_finished){
+    // Group stage still active: show all
+    ey=yg+yk; er=rg+rk;
+  }else if(!WC_STAGES.qf_finished){
+    // Group done, QF not done: group yellows cleared, reds remain; ko cards count
+    ey=yk; er=rg+rk;
+  }else{
+    // QF done: all yellows cleared, only reds remain
+    ey=0; er=rg+rk;
+  }
+  return {y:ey,r:er};
+}
+
+function loadCards(){
+  fetch('/wc-cards.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(data){
+    WC_CARDS=data.cards||{};
+    WC_STAGES=data.stages||{group_finished:false,qf_finished:false};
+    console.log('[Cards] Loaded',Object.keys(WC_CARDS).length,'players with card data, stages:',JSON.stringify(WC_STAGES));
+    renderRoster('all');
+  }).catch(function(e){
+    console.log('[Cards] Failed to load:',e.message);
+  });
+}
 function syncScores(){
   var el=document.getElementById('sync-status');
-  if(el)el.textContent='正在同步...';
-  fetch('/wc-scores.json?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(data){
+  if(el)el.textContent='正在同步(从FIFA获取)...';
+  fetch('/api/sync?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(data){
     var gs=data.group_scores||{};
     var updated=0;
     // Merge into GSTAND (API scores always overwrite - FIFA is source of truth)
@@ -1416,6 +1832,8 @@ function syncScores(){
       bsEl.textContent=bsMsg+' (来源:FIFA '+data.last_updated+')';
     }
     SCORE_SYNC.autoLoaded=true;
+    // Reload card data and refresh roster display
+    loadCards();
   }).catch(function(e){
     if(el)el.textContent='同步失败: '+e.message;
   });
@@ -1428,6 +1846,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('#stars img[data-src]').forEach(img => photoObserver.observe(img));
   // Auto-sync scores on first load
   syncScores();
+  // Load tournament card data
+  loadCards();
 });
 </script>
 

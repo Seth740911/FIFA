@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-12T12:15:42Z",
+ "last_updated": "2026-06-13T06:16:18Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -9,6 +9,14 @@
   "A1": {
    "s1": 1,
    "s2": 2
+  },
+  "B1": {
+   "s1": 1,
+   "s2": 1
+  },
+  "D4": {
+   "s1": 1,
+   "s2": 4
   }
  },
  "bracket_scores": {},
@@ -57,15 +65,15 @@
    "away": "BIH",
    "h_cn": "加拿大",
    "a_cn": "波黑",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-12T19:00:00Z",
    "group": "Group B",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "43002",
    "venue": "Toronto Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -76,15 +84,15 @@
    "away": "PAR",
    "h_cn": "美国",
    "a_cn": "巴拉圭",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 4,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-13T01:00:00Z",
    "group": "Group D",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "70492",
    "venue": "Los Angeles Stadium",
    "group_matched": true,
    "bracket_matched": false
