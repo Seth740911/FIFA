@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T19:57:39Z",
+ "last_updated": "2026-06-14T20:43:00Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -37,6 +37,10 @@
   "E4": {
    "s1": 1,
    "s2": 7
+  },
+  "F1": {
+   "s1": 0,
+   "s2": 0
   }
  },
  "bracket_scores": {},
@@ -218,11 +222,11 @@
    "away": "JPN",
    "h_cn": "荷兰",
    "a_cn": "日本",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
+   "score_h": 0,
+   "score_a": 0,
+   "status": 3,
    "finished": false,
-   "live": false,
+   "live": true,
    "date": "2026-06-14T20:00:00Z",
    "group": "Group F",
    "stage": "First Stage",

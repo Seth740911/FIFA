@@ -407,6 +407,8 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .tl-text .tl-assist{color:var(--text2);font-size:.8em}
 .tl-text .tl-sub-off{text-decoration:line-through;color:var(--text2);display:inline-block;margin-top:1px}
 .tl-text .tl-sub-on{color:var(--accent)}
+.tl-pclick{cursor:pointer;transition:color .15s}
+.tl-pclick:hover{color:var(--gold)!important;text-decoration:underline}
 .tl-empty{text-align:center;color:var(--text2);padding:30px 0;font-size:.9em}
 .tl-noevent{text-align:center;color:var(--text2);padding:20px 0;font-size:.85em}
 
@@ -419,7 +421,7 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .tl-pre-vs-text{font-size:1.3em;font-weight:800;color:var(--gold);flex-shrink:0}
 .tl-pre-ball{font-size:2.6em;line-height:1;animation:ballBounce 2s ease-in-out infinite;margin-bottom:14px}
 @keyframes ballBounce{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(180deg)}}
-.tl-pre-info{font-size:.82em;color:var(--text2);text-align:center;line-height:1.8}
+.tl-pre-info{font-size:1em;color:var(--gold);text-align:center;line-height:1.8;font-weight:600}
 .tl-pre-info span{display:inline-block;margin:0 6px}
 .tl-pre-label{display:inline-block;background:rgba(212,168,83,.15);color:var(--gold);font-size:.78em;font-weight:700;padding:4px 14px;border-radius:12px;margin-bottom:16px;letter-spacing:1px}
 @media(max-width:500px){
@@ -465,6 +467,9 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .tl-lu-pname{font-size:.58em;color:#fff;margin-top:2px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.9);text-align:center;line-height:1.15}
 .tl-lu-player.name-above{flex-direction:column-reverse}
 .tl-lu-player.name-above .tl-lu-pname{margin-top:0;margin-bottom:2px}
+.tl-lu-clickable{cursor:pointer!important}
+.tl-lu-clickable:hover .tl-lu-marker{filter:brightness(1.3);box-shadow:0 0 8px rgba(212,168,83,.5)}
+.tl-lu-clickable:hover .tl-lu-pname{color:var(--gold);text-shadow:0 0 6px rgba(212,168,83,.4)}
 
 /* 教练 */
 .tl-lu-coach{position:absolute;bottom:2%;font-size:.6em;color:rgba(255,255,255,.7);font-weight:600;background:rgba(0,0,0,.55);padding:2px 7px;border-radius:3px;z-index:3}
@@ -1234,7 +1239,7 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 
 <script src="/wc-player-7m.js"></script>
 <script>
-function openPlayerDetail(teamCode, jerseyNum) {
+function openPlayerDetail(teamCode, jerseyNum, starMode) {
   if(_pdClosing) return; // 刚关闭详情卡，忽略误触
   if (typeof WC_TEAMS === 'undefined') return;
   var team = WC_TEAMS.find(function(t){return t.code===teamCode});
@@ -1244,8 +1249,30 @@ function openPlayerDetail(teamCode, jerseyNum) {
     if (String(team.players[i].jersey) === String(jerseyNum)) { idx = i; break; }
   }
   if (idx < 0) return;
+
+  // Star mode: build cross-team star list from .star-card2 elements
+  if (starMode) {
+    var starCards = document.querySelectorAll('.star-card2');
+    _pdStarList = [];
+    starCards.forEach(function(card) {
+      var tc = card.getAttribute('data-team');
+      var jn = card.getAttribute('data-jersey');
+      if (tc && jn) _pdStarList.push({teamCode: tc, jerseyNum: jn});
+    });
+    // Find current player index in star list
+    _pdPlayerIdx = -1;
+    for (var si = 0; si < _pdStarList.length; si++) {
+      if (_pdStarList[si].teamCode === teamCode && String(_pdStarList[si].jerseyNum) === String(jerseyNum)) {
+        _pdPlayerIdx = si; break;
+      }
+    }
+    if (_pdPlayerIdx < 0) _pdStarList = null; // fallback to team mode
+  } else {
+    _pdStarList = null;
+  }
+
   _pdTeamCode = teamCode;
-  _pdPlayerIdx = idx;
+  if (!_pdStarList) _pdPlayerIdx = idx;
   _fillPlayerDetail(teamCode, team.players[idx]);
 
   document.getElementById('pdOverlay').classList.add('open');
@@ -1411,8 +1438,19 @@ var _pdScrollY=0;
 var _pdClosing=false; /* 关闭后1000ms内禁止再打开，防止滚动误触 */
 var _pdTeamCode='';
 var _pdPlayerIdx=0;
+var _pdStarList=null;  // star mode: [{teamCode, jerseyNum}, ...] or null (team mode)
 
 function _pdPlayerList() {
+  // Star mode: return list of star players across all teams
+  if (_pdStarList) {
+    return _pdStarList.map(function(s) {
+      var team = WC_TEAMS.find(function(t){return t.code===s.teamCode});
+      if (!team) return null;
+      var p = team.players.find(function(pl){return String(pl.jersey)===String(s.jerseyNum)});
+      return p ? {player: p, teamCode: s.teamCode} : null;
+    }).filter(Boolean);
+  }
+  // Team mode: players within one team
   var team = WC_TEAMS.find(function(t){return t.code===_pdTeamCode});
   return team ? team.players : [];
 }
@@ -1423,7 +1461,13 @@ function navPlayer(dir) {
   var newIdx = _pdPlayerIdx + dir;
   if (newIdx < 0 || newIdx >= list.length) return;
   _pdPlayerIdx = newIdx;
-  _fillPlayerDetail(_pdTeamCode, list[_pdPlayerIdx]);
+  if (_pdStarList) {
+    var item = list[_pdPlayerIdx];
+    _pdTeamCode = item.teamCode;
+    _fillPlayerDetail(item.teamCode, item.player);
+  } else {
+    _fillPlayerDetail(_pdTeamCode, list[_pdPlayerIdx]);
+  }
 }
 
 function _updateNavButtons() {
@@ -1435,13 +1479,20 @@ function _updateNavButtons() {
 }
 function closePlayerDetail() {
   document.getElementById('pdOverlay').classList.remove('open');
-  // 恢复背景滚动（还原 fixed 锁）
-  var sy = _pdScrollY;
+  // Always unlock body scroll (was locked by openPlayerDetail)
   document.body.style.position = '';
   document.body.style.width = '';
   document.body.style.top = '';
   document.body.style.overflow = '';
+  // Restore timeline if we came from one (skip page scroll restore)
+  if (_tlReturnFifaId) {
+    var fid = _tlReturnFifaId;
+    _tlReturnFifaId = null;
+    setTimeout(function(){ _pdClosing = false; openTimeline(fid); }, 120);
+    return;
+  }
   // 临时关闭平滑滚动，避免关闭时页面从顶部"滚"过来
+  var sy = _pdScrollY;
   document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0, sy);
   document.documentElement.style.scrollBehavior = '';
@@ -1721,14 +1772,16 @@ document.addEventListener('click', function(e) {
   var schRow = e.target.closest('tr[data-fifa]');
   if (schRow) {
     var fifa = schRow.getAttribute('data-fifa');
-    if (fifa) { openTimeline(fifa); return; }
+    var schDate = schRow.getAttribute('data-schdate') || '';
+    var schTime = schRow.getAttribute('data-schtime') || '';
+    if (fifa) { openTimeline(fifa, schDate, schTime); return; }
   }
   // 焦点球星卡 - 打开球员详情
   var starCard = e.target.closest('.star-card2');
   if (starCard) {
     var tc = starCard.getAttribute('data-team');
     var jn = starCard.getAttribute('data-jersey');
-    if (tc && jn) { openPlayerDetail(tc, jn); return; }
+    if (tc && jn) { openPlayerDetail(tc, jn, true); return; }
   }
   // 淘汰赛区 - 队名或国旗
   var bMatch = e.target.closest('.b-team');
@@ -1917,7 +1970,7 @@ function render(){
            var isToday=m.d&&new RegExp('^'+_today+'[(\\s]').test(m.d);
            if(isToday) trCls=(trCls?trCls+' ':'')+'gs-sch-today';
            var trAt=trCls?' class="'+trCls+'"':'';
-           if(rawDataFifa) trAt+=' data-fifa="'+rawDataFifa+'"';
+            if(rawDataFifa) trAt+=' data-fifa="'+rawDataFifa+'" data-schdate="'+(m.d||'')+'" data-schtime="'+(m.t||'')+'"';
            h+='<tr'+trAt+'><td class="gs-sch-date">'+m.d+'</td><td class="gs-sch-time">'+m.t+'</td>'+matchHtml+'</tr>';
       });
       h+='</tbody></table></div>';
@@ -2376,7 +2429,30 @@ function _tlPlayerName(idPlayer) {
   return idPlayer;
 }
 
-function openTimeline(fifaId) {
+// Find teamCode + jersey by FIFA IdPlayer, then open player detail
+var _tlReturnFifaId = null;  // remember timeline to restore after closing player detail
+function _tlOpenPlayer(idPlayer) {
+  if (!idPlayer || !idPlayer.length) return;
+  if (typeof WC_TEAMS === 'undefined') return;
+  for (var i = 0; i < WC_TEAMS.length; i++) {
+    var players = WC_TEAMS[i].players || [];
+    for (var j = 0; j < players.length; j++) {
+      if (String(players[j].id) === String(idPlayer)) {
+        _tlReturnFifaId = _tlCurrentFifaId;
+        closeTimeline();
+        openPlayerDetail(WC_TEAMS[i].code, players[j].jersey);
+        return;
+      }
+    }
+  }
+}
+
+// Find teamCode + jersey by lineup player object, then open player detail
+function _luOpenPlayer(teamCode, jerseyNum) {
+  openPlayerDetail(teamCode, jerseyNum);
+}
+
+function openTimeline(fifaId, schDate, schTime) {
   _tlCurrentFifaId = fifaId;
   _tlLineupData = null;
   document.getElementById('tlEvents').innerHTML = '';
@@ -2405,10 +2481,13 @@ function openTimeline(fifaId) {
       preHtml += '</div>';
       preHtml += '<div class="tl-pre-ball">⚽</div>';
       var infoParts = [];
-      if (info.date) infoParts.push(info.date);
-      if (info.time) infoParts.push(info.time + ' 北京时间');
-      if (info.venue) infoParts.push(info.venue);
-      if (info.city) infoParts.push(info.city);
+      // Prefer schedule bar time (already Beijing time) over FIFA_MATCH_INFO
+      var showDate = schDate || info.date || '';
+      var showTime = schTime || (info.time ? info.time + ' 北京时间' : '');
+      if (showDate) infoParts.push(showDate);
+      if (showTime) infoParts.push(showTime);
+      if (!schDate && info.venue) infoParts.push(info.venue);
+      if (!schTime && info.city) infoParts.push(info.city);
       if (infoParts.length) {
         preHtml += '<div class="tl-pre-info">' + infoParts.join('<span>·</span>') + '</div>';
       }
@@ -2835,21 +2914,27 @@ function _renderAxisEvent(e, isHome) {
   if (e.type === 'goal') {
     icon = '<span class="tl-icon goal">&#9917;</span>';
     var scorer = _tlPlayerName(e.id_player);
-    text = '<strong>' + scorer + '</strong>';
+    var scorerClick = e.id_player ? ' class="tl-pclick" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_player+'\')"' : '';
+    text = '<strong'+scorerClick+'>' + scorer + '</strong>';
     if (e.id_assist) {
-      text += ' <span class="tl-assist">(助:' + _tlPlayerName(e.id_assist) + ')</span>';
+      var assistClick = ' class="tl-pclick" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_assist+'\')"';
+      text += ' <span class="tl-assist">(助:<span'+assistClick+'>' + _tlPlayerName(e.id_assist) + '</span>)</span>';
     }
   } else if (e.type === 'yellow') {
     icon = '<span class="tl-icon yellow">&nbsp;</span>';
-    text = _tlPlayerName(e.id_player);
+    var yClick = e.id_player ? ' class="tl-pclick" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_player+'\')"' : '';
+    text = '<span'+yClick+'>' + _tlPlayerName(e.id_player) + '</span>';
   } else if (e.type === 'red') {
     icon = '<span class="tl-icon red">&nbsp;</span>';
-    text = _tlPlayerName(e.id_player);
+    var rClick = e.id_player ? ' class="tl-pclick" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_player+'\')"' : '';
+    text = '<span'+rClick+'>' + _tlPlayerName(e.id_player) + '</span>';
   } else if (e.type === 'sub') {
     var on = _tlPlayerName(e.id_on);
     var off = _tlPlayerName(e.id_off);
+    var onClick = e.id_on ? ' class="tl-pclick tl-sub-on" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_on+'\')"' : ' class="tl-sub-on"';
+    var offClick = e.id_off ? ' class="tl-pclick tl-sub-off" onclick="event.stopPropagation();_tlOpenPlayer(\''+e.id_off+'\')"' : ' class="tl-sub-off"';
     icon = '<span class="tl-icon sub">&#8644;</span>';
-    text = '<span class="tl-sub-on">' + on + '</span><br><span class="tl-sub-off">' + off + '</span>';
+    text = '<span'+onClick+'>' + on + '</span><br><span'+offClick+'>' + off + '</span>';
   } else {
     return {name: '', icon: ''};
   }
@@ -3052,7 +3137,8 @@ function _renderLineup(data) {
     var isGk = p.pos === 0;
     var nameAbove = p._nameAbove ? true : false;
     var cnName = findPlayerCn(p.id) || p.name || '';
-    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + '" style="left:' + p.x + '%;top:' + p.y + '%">';
+    var clickAttr = p.id ? ' onclick="event.stopPropagation();_tlOpenPlayer(\''+p.id+'\')"' : '';
+    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + ' tl-lu-clickable" style="left:' + p.x + '%;top:' + p.y + '%"' + clickAttr + '>';
     html += '<div class="tl-lu-marker home' + (isGk ? ' gk' : '') + '">';
     html += (p.jersey || '?');
     if (p.captain) html += '<span class="tl-lu-captain"></span>';
@@ -3066,7 +3152,8 @@ function _renderLineup(data) {
     var isGk = p.pos === 0;
     var nameAbove = p._nameAbove ? true : false;
     var cnName = findPlayerCn(p.id) || p.name || '';
-    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + '" style="left:' + p.x + '%;top:' + p.y + '%">';
+    var clickAttr = p.id ? ' onclick="event.stopPropagation();_tlOpenPlayer(\''+p.id+'\')"' : '';
+    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + ' tl-lu-clickable" style="left:' + p.x + '%;top:' + p.y + '%"' + clickAttr + '>';
     html += '<div class="tl-lu-marker away' + (isGk ? ' gk' : '') + '">';
     html += (p.jersey || '?');
     if (p.captain) html += '<span class="tl-lu-captain"></span>';

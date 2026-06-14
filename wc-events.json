@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T19:57:39Z",
+ "last_updated": "2026-06-14T20:43:00Z",
  "events": {
   "400021443": {
    "home": "MEX",
@@ -1028,6 +1028,15 @@
      "side": "home"
     }
    ]
+  },
+  "400021470": {
+   "home": "NED",
+   "away": "JPN",
+   "h_cn": "荷兰",
+   "a_cn": "日本",
+   "score_h": 0,
+   "score_a": 0,
+   "timeline": []
   },
   "__processed__": [
    "400021441",
