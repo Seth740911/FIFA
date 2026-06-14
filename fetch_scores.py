@@ -584,6 +584,8 @@ def fetch_and_aggregate_cards(match_details, pid_map):
                     player_key_map[fifa_pid] = f"{info['code']}-{info['jersey']}"
 
         # Process Bookings for cards
+        # Collect per-player first, then deduplicate 2-yellow-to-red
+        _mb = {}  # key -> [{card, minute}]
         for side in ["HomeTeam", "AwayTeam"]:
             team = live.get(side, {})
             for b in team.get("Bookings", []):
@@ -597,18 +599,30 @@ def fetch_and_aggregate_cards(match_details, pid_map):
                     if info:
                         key = f"{info['code']}-{info['jersey']}"
                 if key:
-                    if key not in existing_cards:
-                        existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
-                    if card_type == 1:
-                        if is_group:
-                            existing_cards[key]["y_group"] += 1
-                        else:
-                            existing_cards[key]["y_ko"] += 1
-                    elif card_type == 2:
-                        if is_group:
-                            existing_cards[key]["r_group"] += 1
-                        else:
-                            existing_cards[key]["r_ko"] += 1
+                    _mb.setdefault(key, []).append({
+                        "card": card_type,
+                        "minute": b.get("Minute", 0)
+                    })
+
+        for key, bk in _mb.items():
+            if key not in existing_cards:
+                existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
+            # Find yellows absorbed by reds (same minute → 2nd yellow turned red)
+            red_mins = [x["minute"] for x in bk if x["card"] == 2]
+            absorbed = 0
+            for rm in red_mins:
+                for x in bk:
+                    if x["card"] == 1 and x["minute"] == rm:
+                        absorbed += 1
+                        break
+            t_y = sum(1 for x in bk if x["card"] == 1) - absorbed
+            t_r = len(red_mins)
+            if is_group:
+                existing_cards[key]["y_group"] += t_y
+                existing_cards[key]["r_group"] += t_r
+            else:
+                existing_cards[key]["y_ko"] += t_y
+                existing_cards[key]["r_ko"] += t_r
 
         # Extract timeline events
         ev_list = []

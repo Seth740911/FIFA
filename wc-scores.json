@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T05:28:57Z",
+ "last_updated": "2026-06-14T08:48:36Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -31,7 +31,7 @@
    "s2": 1
   },
   "D3": {
-   "s1": 1,
+   "s1": 2,
    "s2": 0
   }
  },
@@ -176,11 +176,11 @@
    "away": "TUR",
    "h_cn": "澳大利亚",
    "a_cn": "土耳其",
-   "score_h": 1,
+   "score_h": 2,
    "score_a": 0,
-   "status": 3,
-   "finished": false,
-   "live": true,
+   "status": 0,
+   "finished": true,
+   "live": false,
    "date": "2026-06-14T04:00:00Z",
    "group": "Group D",
    "stage": "First Stage",
