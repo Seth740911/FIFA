@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T15:35:04Z",
+ "last_updated": "2026-06-14T19:57:39Z",
  "events": {
   "400021443": {
    "home": "MEX",
@@ -716,17 +716,329 @@
    "h_cn": "海地",
    "a_cn": "苏格兰",
    "score_h": 0,
-   "score_a": 0,
-   "timeline": []
+   "score_a": 1,
+   "timeline": [
+    {
+     "min": "28'",
+     "type": "goal",
+     "id_player": "401334",
+     "id_assist": "",
+     "side": "away"
+    },
+    {
+     "min": "39'",
+     "type": "yellow",
+     "id_player": "430697",
+     "side": "home"
+    },
+    {
+     "min": "46'",
+     "type": "yellow",
+     "id_player": "442428",
+     "side": "away"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "481027",
+     "id_on": "510757",
+     "side": "home"
+    },
+    {
+     "min": "75'",
+     "type": "sub",
+     "id_off": "405879",
+     "id_on": "485676",
+     "side": "home"
+    },
+    {
+     "min": "75'",
+     "type": "sub",
+     "id_off": "433191",
+     "id_on": "430098",
+     "side": "away"
+    },
+    {
+     "min": "75'",
+     "type": "sub",
+     "id_off": "485131",
+     "id_on": "430097",
+     "side": "away"
+    },
+    {
+     "min": "75'",
+     "type": "sub",
+     "id_off": "442428",
+     "id_on": "433694",
+     "side": "away"
+    },
+    {
+     "min": "82'",
+     "type": "sub",
+     "id_off": "401334",
+     "id_on": "520217",
+     "side": "away"
+    },
+    {
+     "min": "82'",
+     "type": "sub",
+     "id_off": "484045",
+     "id_on": "484051",
+     "side": "away"
+    },
+    {
+     "min": "85'",
+     "type": "sub",
+     "id_off": "485664",
+     "id_on": "506483",
+     "side": "home"
+    },
+    {
+     "min": "90'+1'",
+     "type": "yellow",
+     "id_player": "520217",
+     "side": "away"
+    },
+    {
+     "min": "90'+5'",
+     "type": "yellow",
+     "id_player": "484051",
+     "side": "away"
+    }
+   ]
   },
   "400021463": {
    "home": "AUS",
    "away": "TUR",
    "h_cn": "澳大利亚",
    "a_cn": "土耳其",
-   "score_h": 0,
+   "score_h": 2,
    "score_a": 0,
-   "timeline": []
-  }
+   "timeline": [
+    {
+     "min": "",
+     "type": "sub",
+     "id_off": "484139",
+     "id_on": "484112",
+     "side": "away"
+    },
+    {
+     "min": "27'",
+     "type": "goal",
+     "id_player": "486306",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "61'",
+     "type": "sub",
+     "id_off": "486306",
+     "id_on": "491166",
+     "side": "home"
+    },
+    {
+     "min": "62'",
+     "type": "sub",
+     "id_off": "433118",
+     "id_on": "406231",
+     "side": "away"
+    },
+    {
+     "min": "74'",
+     "type": "sub",
+     "id_off": "498806",
+     "id_on": "518200",
+     "side": "home"
+    },
+    {
+     "min": "74'",
+     "type": "sub",
+     "id_off": "430450",
+     "id_on": "339112",
+     "side": "home"
+    },
+    {
+     "min": "75'",
+     "type": "goal",
+     "id_player": "430452",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "80'",
+     "type": "sub",
+     "id_off": "484092",
+     "id_on": "389907",
+     "side": "away"
+    },
+    {
+     "min": "80'",
+     "type": "sub",
+     "id_off": "433072",
+     "id_on": "430120",
+     "side": "away"
+    },
+    {
+     "min": "83'",
+     "type": "sub",
+     "id_off": "498421",
+     "id_on": "355775",
+     "side": "home"
+    },
+    {
+     "min": "83'",
+     "type": "sub",
+     "id_off": "423522",
+     "id_on": "349342",
+     "side": "home"
+    },
+    {
+     "min": "85'",
+     "type": "sub",
+     "id_off": "441188",
+     "id_on": "495347",
+     "side": "away"
+    },
+    {
+     "min": "86'",
+     "type": "yellow",
+     "id_player": "406231",
+     "side": "away"
+    }
+   ]
+  },
+  "400021464": {
+   "home": "GER",
+   "away": "CUW",
+   "h_cn": "德国",
+   "a_cn": "库拉索",
+   "score_h": 7,
+   "score_a": 1,
+   "timeline": [
+    {
+     "min": "",
+     "type": "sub",
+     "id_off": "424056",
+     "id_on": "424047",
+     "side": "away"
+    },
+    {
+     "min": "6'",
+     "type": "goal",
+     "id_player": "492363",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "21'",
+     "type": "goal",
+     "id_player": "494989",
+     "id_assist": "",
+     "side": "away"
+    },
+    {
+     "min": "38'",
+     "type": "goal",
+     "id_player": "430667",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "45'+5'",
+     "type": "goal",
+     "id_player": "411367",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "47'",
+     "type": "goal",
+     "id_player": "429642",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "64'",
+     "type": "sub",
+     "id_off": "429642",
+     "id_on": "484851",
+     "side": "home"
+    },
+    {
+     "min": "65'",
+     "type": "sub",
+     "id_off": "407680",
+     "id_on": "466363",
+     "side": "away"
+    },
+    {
+     "min": "68'",
+     "type": "goal",
+     "id_player": "511015",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "72'",
+     "type": "sub",
+     "id_off": "492363",
+     "id_on": "379953",
+     "side": "home"
+    },
+    {
+     "min": "72'",
+     "type": "sub",
+     "id_off": "401378",
+     "id_on": "379955",
+     "side": "home"
+    },
+    {
+     "min": "72'",
+     "type": "sub",
+     "id_off": "511015",
+     "id_on": "430657",
+     "side": "home"
+    },
+    {
+     "min": "78'",
+     "type": "goal",
+     "id_player": "484851",
+     "id_assist": "",
+     "side": "home"
+    },
+    {
+     "min": "82'",
+     "type": "sub",
+     "id_off": "485347",
+     "id_on": "466372",
+     "side": "away"
+    },
+    {
+     "min": "83'",
+     "type": "sub",
+     "id_off": "386413",
+     "id_on": "430658",
+     "side": "home"
+    },
+    {
+     "min": "88'",
+     "type": "goal",
+     "id_player": "411367",
+     "id_assist": "",
+     "side": "home"
+    }
+   ]
+  },
+  "__processed__": [
+   "400021441",
+   "400021443",
+   "400021447",
+   "400021449",
+   "400021453",
+   "400021456",
+   "400021458",
+   "400021463",
+   "400021464"
+  ]
  }
 }

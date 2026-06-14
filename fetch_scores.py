@@ -518,11 +518,15 @@ def fetch_and_aggregate_cards(match_details, pid_map):
 
     # Load existing events
     existing_events = {}
+    _event_meta = {}  # metadata keys like __processed__
     if os.path.exists(EVENTS_FILE):
         try:
             with open(EVENTS_FILE, "r", encoding="utf-8") as f:
                 old = json.load(f)
-            existing_events = old.get("events", {})
+            raw_events = old.get("events", {})
+            # Separate metadata keys (prefixed __) from match data
+            existing_events = {k: v for k, v in raw_events.items() if not k.startswith("__")}
+            _event_meta = {k: v for k, v in raw_events.items() if k.startswith("__")}
         except Exception:
             pass
 
@@ -545,9 +549,31 @@ def fetch_and_aggregate_cards(match_details, pid_map):
         if (m.get("finished") or m.get("live")) and mid:
             all_finished.append(mid)
 
-    # Delta: only fetch matches not already processed for cards
-    new_ids = [mid for mid in all_finished if mid not in processed_match_ids]
-    print(f"[INFO] Events: {len(existing_events)} cached, Cards: {len(processed_match_ids)} processed, {len(new_ids)} new to fetch")
+    # --- Separate delta logic for cards vs events ---
+    # Cards: incremental, skip already-processed matches
+    new_card_ids = [mid for mid in all_finished if mid not in processed_match_ids]
+
+    # Events: own processed list; a match is "event-done" only if finished AND events are complete
+    # (has substitution = full-time data). Mid-game snapshots get re-fetched until complete.
+    event_processed = set(_event_meta.get("__processed__", []))
+    event_fetch_ids = []
+    for m in match_details:
+        mid = m.get("fifa_id", "")
+        if not mid:
+            continue
+        if m.get("live") and mid:
+            # Live match: fetch if not already in events (avoid hammering live API)
+            if mid not in existing_events or mid in event_processed:
+                event_fetch_ids.append(mid)
+        elif m.get("finished") and mid not in event_processed:
+            # Finished match not yet event-done → always fetch
+            event_fetch_ids.append(mid)
+
+    # Combine: fetch union of card-new + event-needed, but card processing only for new_card_ids
+    fetch_ids = list(dict.fromkeys(new_card_ids + event_fetch_ids))
+    print(f"[INFO] Cards: {len(processed_match_ids)} processed, {len(new_card_ids)} new | "
+          f"Events: {len(event_processed)} done, {len(event_fetch_ids)} to fetch | "
+          f"Total API calls: {len(fetch_ids)}")
 
     if not all_finished:
         stage_info = _compute_stage_flags(match_details)
@@ -561,9 +587,10 @@ def fetch_and_aggregate_cards(match_details, pid_map):
         match_stage[mid] = m.get("stage", "")
         match_info[mid] = m
 
-    # Only fetch new matches
+    # Fetch matches (union of card-new + event-needed)
     fetched = 0
-    for mid in new_ids:
+    for mid in fetch_ids:
+        need_cards = mid in new_card_ids
         live = fetch_live_match(mid)
         if not live:
             continue
@@ -583,46 +610,47 @@ def fetch_and_aggregate_cards(match_details, pid_map):
                     info = pid_map[fifa_pid]
                     player_key_map[fifa_pid] = f"{info['code']}-{info['jersey']}"
 
-        # Process Bookings for cards
-        # Collect per-player first, then deduplicate 2-yellow-to-red
-        _mb = {}  # key -> [{card, minute}]
-        for side in ["HomeTeam", "AwayTeam"]:
-            team = live.get(side, {})
-            for b in team.get("Bookings", []):
-                fifa_pid = str(b.get("IdPlayer", ""))
-                card_type = b.get("Card", 0)
-                if not fifa_pid or card_type not in (1, 2):
-                    continue
-                key = player_key_map.get(fifa_pid)
-                if not key:
-                    info = pid_map.get(fifa_pid)
-                    if info:
-                        key = f"{info['code']}-{info['jersey']}"
-                if key:
-                    _mb.setdefault(key, []).append({
-                        "card": card_type,
-                        "minute": b.get("Minute", 0)
-                    })
+        # Process Bookings for cards (only for new matches to avoid double-counting)
+        if need_cards:
+            # Collect per-player first, then deduplicate 2-yellow-to-red
+            _mb = {}  # key -> [{card, minute}]
+            for side in ["HomeTeam", "AwayTeam"]:
+                team = live.get(side, {})
+                for b in team.get("Bookings", []):
+                    fifa_pid = str(b.get("IdPlayer", ""))
+                    card_type = b.get("Card", 0)
+                    if not fifa_pid or card_type not in (1, 2):
+                        continue
+                    key = player_key_map.get(fifa_pid)
+                    if not key:
+                        info = pid_map.get(fifa_pid)
+                        if info:
+                            key = f"{info['code']}-{info['jersey']}"
+                    if key:
+                        _mb.setdefault(key, []).append({
+                            "card": card_type,
+                            "minute": b.get("Minute", 0)
+                        })
 
-        for key, bk in _mb.items():
-            if key not in existing_cards:
-                existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
-            # Find yellows absorbed by reds (same minute → 2nd yellow turned red)
-            red_mins = [x["minute"] for x in bk if x["card"] == 2]
-            absorbed = 0
-            for rm in red_mins:
-                for x in bk:
-                    if x["card"] == 1 and x["minute"] == rm:
-                        absorbed += 1
-                        break
-            t_y = sum(1 for x in bk if x["card"] == 1) - absorbed
-            t_r = len(red_mins)
-            if is_group:
-                existing_cards[key]["y_group"] += t_y
-                existing_cards[key]["r_group"] += t_r
-            else:
-                existing_cards[key]["y_ko"] += t_y
-                existing_cards[key]["r_ko"] += t_r
+            for key, bk in _mb.items():
+                if key not in existing_cards:
+                    existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
+                # Find yellows absorbed by reds (same minute → 2nd yellow turned red)
+                red_mins = [x["minute"] for x in bk if x["card"] == 2]
+                absorbed = 0
+                for rm in red_mins:
+                    for x in bk:
+                        if x["card"] == 1 and x["minute"] == rm:
+                            absorbed += 1
+                            break
+                t_y = sum(1 for x in bk if x["card"] == 1) - absorbed
+                t_r = len(red_mins)
+                if is_group:
+                    existing_cards[key]["y_group"] += t_y
+                    existing_cards[key]["r_group"] += t_r
+                else:
+                    existing_cards[key]["y_ko"] += t_y
+                    existing_cards[key]["r_ko"] += t_r
 
         # Extract timeline events
         ev_list = []
@@ -694,10 +722,17 @@ def fetch_and_aggregate_cards(match_details, pid_map):
             "timeline": ev_list,
         }
 
+        # Mark event as processed if match is finished and data looks complete
+        # If any event has minute >= 90' (e.g. 90', 90'+1', 90'+5'), it means
+        # we have full-time data. Mid-game snapshots won't have 90' events.
+        if mi.get("finished"):
+            has_90 = any("90" in (e.get("min") or "") for e in ev_list)
+            if has_90:
+                event_processed.add(mid)
+
         time.sleep(0.3)
 
-    if new_ids:
-        print(f"[INFO] Fetched {fetched}/{len(new_ids)} new matches from Live API")
+    print(f"[INFO] Fetched {fetched}/{len(fetch_ids)} matches from Live API")
 
     # Compute stage flags
     stage_info = _compute_stage_flags(match_details)
@@ -721,14 +756,16 @@ def fetch_and_aggregate_cards(match_details, pid_map):
     print(f"     Stages: group={'done' if stage_info['group_finished'] else 'active'}, "
           f"qf={'done' if stage_info['qf_finished'] else 'active'}")
 
-    # Save events
+    # Save events (include __processed__ list so next run knows what's complete)
+    ev_data = dict(existing_events)
+    ev_data["__processed__"] = sorted(event_processed)
     ev_output = {
         "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "events": existing_events,
+        "events": ev_data,
     }
     with open(EVENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(ev_output, f, ensure_ascii=False, indent=1)
-    print(f"[OK] Events: {len(existing_events)} matches with timeline data")
+    print(f"[OK] Events: {len(existing_events)} matches, {len(event_processed)} processed")
 
     return existing_cards, stage_info, existing_events
 

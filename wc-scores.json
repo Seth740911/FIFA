@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T15:35:04Z",
+ "last_updated": "2026-06-14T19:57:39Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -33,6 +33,10 @@
   "D3": {
    "s1": 2,
    "s2": 0
+  },
+  "E4": {
+   "s1": 1,
+   "s2": 7
   }
  },
  "bracket_scores": {},
@@ -195,15 +199,15 @@
    "away": "CUW",
    "h_cn": "德国",
    "a_cn": "库拉索",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 7,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-14T17:00:00Z",
    "group": "Group E",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "68021",
    "venue": "Houston Stadium",
    "group_matched": true,
    "bracket_matched": false

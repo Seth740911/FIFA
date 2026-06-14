@@ -2195,9 +2195,62 @@ function loadCards(){
     console.log('[Cards] Failed:',e.message, cached?'(using cache)':'(no cache)');
   });
 }
+function _rebuildMatchMappings(details) {
+  FIX_TO_FIFA = {};
+  FIFA_MATCH_INFO = {};
+  details.forEach(function(m) {
+    if (m.fifa_id) {
+      FIFA_MATCH_INFO[m.fifa_id] = {h_cn: m.h_cn, a_cn: m.a_cn, h_code: m.home||'', a_code: m.away||'', date: m.date||'', time: m.time||'', venue: m.venue||'', city: m.city||''};
+    }
+  });
+  if (typeof WC_TEAMS !== 'undefined') {
+    var _groups = {};
+    WC_TEAMS.forEach(function(t) {
+      if (!_groups[t.group]) _groups[t.group] = [];
+      _groups[t.group].push(t.cn);
+    });
+    details.forEach(function(m) {
+      if (m.fifa_id && m.h_cn && m.a_cn && m.stage === 'First Stage') {
+        var gk = Object.keys(_groups);
+        for (var gi = 0; gi < gk.length; gi++) {
+          var gt = _groups[gk[gi]];
+          if (gt.length < 4) continue;
+          var fxList = [
+            {id: gk[gi]+'1', t1: gt[0], t2: gt[1]},
+            {id: gk[gi]+'2', t1: gt[2], t2: gt[3]},
+            {id: gk[gi]+'3', t1: gt[0], t2: gt[2]},
+            {id: gk[gi]+'4', t1: gt[1], t2: gt[3]},
+            {id: gk[gi]+'5', t1: gt[0], t2: gt[3]},
+            {id: gk[gi]+'6', t1: gt[1], t2: gt[2]},
+          ];
+          for (var fi = 0; fi < fxList.length; fi++) {
+            var f = fxList[fi];
+            if ((f.t1===m.h_cn && f.t2===m.a_cn) || (f.t1===m.a_cn && f.t2===m.h_cn)) {
+              FIX_TO_FIFA[f.id] = m.fifa_id;
+              break;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
 function syncScores(){
+  // 改动1: 先用缓存数据渲染页面，让用户秒看到内容
   var el=document.getElementById('sync-status');
-  if(el)el.textContent='正在同步(从FIFA获取)...';
+  var cached = _cacheGet('sync');
+  if (cached && !SCORE_SYNC.autoLoaded) {
+    var gs0=cached.group_scores||{};
+    Object.keys(gs0).forEach(function(fid){ GSTAND.scores[fid]=gs0[fid]; });
+    _rebuildMatchMappings(cached.match_details||[]);
+    GSTAND.render();
+    var bs0=cached.bracket_scores||{};
+    Object.keys(bs0).forEach(function(n){ BRACKET.st[n]=bs0[n]; });
+    requestAnimationFrame(function(){BRACKET.render()});
+    if(el)el.textContent='已加载缓存数据，正在从FIFA增量同步...';
+  }
+  if(el)el.textContent=el.textContent||'正在同步(从FIFA获取)...';
   _fetchWithRetry('/api/sync?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}}, 3).then(function(data){
     var gs=data.group_scores||{};
     var updated=0;
@@ -2210,45 +2263,7 @@ function syncScores(){
       if(!cur||cur.s1!==api.s1||cur.s2!==api.s2) updated++;
     });
     // Build fixture id -> fifa match id mapping for timeline (must be before render)
-    var details=data.match_details||[];
-    FIX_TO_FIFA = {};
-    FIFA_MATCH_INFO = {};
-    details.forEach(function(m) {
-      if (m.fifa_id) {
-        FIFA_MATCH_INFO[m.fifa_id] = {h_cn: m.h_cn, a_cn: m.a_cn, h_code: m.home||'', a_code: m.away||'', date: m.date||'', time: m.time||'', venue: m.venue||'', city: m.city||''};
-      }
-    });
-    if (typeof WC_TEAMS !== 'undefined') {
-      var _groups = {};
-      WC_TEAMS.forEach(function(t) {
-        if (!_groups[t.group]) _groups[t.group] = [];
-        _groups[t.group].push(t.cn);
-      });
-      details.forEach(function(m) {
-        if (m.fifa_id && m.h_cn && m.a_cn && m.stage === 'First Stage') {
-          var gk = Object.keys(_groups);
-          for (var gi = 0; gi < gk.length; gi++) {
-            var gt = _groups[gk[gi]];
-            if (gt.length < 4) continue;
-            var fxList = [
-              {id: gk[gi]+'1', t1: gt[0], t2: gt[1]},
-              {id: gk[gi]+'2', t1: gt[2], t2: gt[3]},
-              {id: gk[gi]+'3', t1: gt[0], t2: gt[2]},
-              {id: gk[gi]+'4', t1: gt[1], t2: gt[3]},
-              {id: gk[gi]+'5', t1: gt[0], t2: gt[3]},
-              {id: gk[gi]+'6', t1: gt[1], t2: gt[2]},
-            ];
-            for (var fi = 0; fi < fxList.length; fi++) {
-              var f = fxList[fi];
-              if ((f.t1===m.h_cn && f.t2===m.a_cn) || (f.t1===m.a_cn && f.t2===m.h_cn)) {
-                FIX_TO_FIFA[f.id] = m.fifa_id;
-                break;
-              }
-            }
-          }
-        }
-      });
-    }
+    _rebuildMatchMappings(data.match_details||[]);
 
     GSTAND.save();GSTAND.render();
     SCORE_SYNC.lastSync=data.last_updated;
@@ -2262,6 +2277,7 @@ function syncScores(){
     });
     BRACKET.save();
     requestAnimationFrame(function(){BRACKET.render()});
+    var details=data.match_details||[];
     var live=details.filter(function(m){return m.live});
     var finished=details.filter(function(m){return m.finished});
     // Group standings sync message
@@ -2286,14 +2302,15 @@ function syncScores(){
   }).catch(function(e){
     _setNetStatus('degraded');
     // Try loading from cache
-    var cached = _cacheGet('sync');
-    if (cached) {
+    var cachedErr = _cacheGet('sync');
+    if (cachedErr) {
       if(el)el.textContent='网络异常，使用缓存数据';
       // Apply cached data same as live data
-      var gs=cached.group_scores||{};
+      var gs=cachedErr.group_scores||{};
       Object.keys(gs).forEach(function(fid){ GSTAND.scores[fid]=gs[fid]; });
+      _rebuildMatchMappings(cachedErr.match_details||[]);
       GSTAND.save(); GSTAND.render();
-      var bs=cached.bracket_scores||{};
+      var bs=cachedErr.bracket_scores||{};
       Object.keys(bs).forEach(function(n){ BRACKET.st[n]=bs[n]; });
       BRACKET.save();
       requestAnimationFrame(function(){BRACKET.render()});
@@ -2313,26 +2330,34 @@ document.addEventListener('DOMContentLoaded', function() {
   syncScores();
   // Load tournament card data
   loadCards();
+  // Preload timeline events data
+  loadTimelineEvents(function(){});
 });
 
 // ===== 比赛时间轴 =====
 var TL_EVENTS = null;  // cached events data
 
 function loadTimelineEvents(callback) {
-  if (TL_EVENTS) { callback(TL_EVENTS); return; }
+  if (TL_EVENTS) { callback(TL_EVENTS, false); return; }
   // Try cache first for instant display
   var cachedEvents = _cacheGet('events');
   fetch('/wc-events.json').then(function(r){return r.json()}).then(function(data){
     TL_EVENTS = data.events || {};
     _cacheSet('events', TL_EVENTS);
-    callback(TL_EVENTS);
+    callback(TL_EVENTS, false);
   }).catch(function(){
     // Use cached events on failure
     if (cachedEvents) {
       TL_EVENTS = cachedEvents;
       _setNetStatus('degraded');
+      if (typeof _tlCacheNotice === 'undefined') {
+        _tlCacheNotice = true;
+        console.log('[Timeline] 加载失败，使用缓存数据（可能非最新）');
+      }
+      callback(TL_EVENTS, true); // true = from cache
+    } else {
+      callback(TL_EVENTS || {}, false);
     }
-    callback(TL_EVENTS || {});
   });
 }
 
@@ -2358,7 +2383,7 @@ function openTimeline(fifaId) {
   document.getElementById('tlLineup').innerHTML = '';
   document.getElementById('tlLineup').classList.remove('show');
 
-  loadTimelineEvents(function(events) {
+  loadTimelineEvents(function(events, fromCache) {
     var ev = events[fifaId];
     if (!ev) {
       var info = FIFA_MATCH_INFO[fifaId] || {};
@@ -2389,6 +2414,12 @@ function openTimeline(fifaId) {
       }
       preHtml += '</div>';
       document.getElementById('tlEvents').innerHTML = preHtml;
+      if (fromCache) {
+        var hint = document.createElement('div');
+        hint.style.cssText = 'text-align:center;color:var(--text2);font-size:.75em;padding:8px 0;opacity:.7';
+        hint.textContent = '⚠ 事件数据来自本地缓存，可能非最新';
+        document.getElementById('tlEvents').appendChild(hint);
+      }
       _setupVideo(null);
       document.getElementById('tlOverlay').classList.add('show');
       return;
@@ -2418,6 +2449,12 @@ function openTimeline(fifaId) {
     var tl = ev.timeline || [];
     if (!tl.length) {
       document.getElementById('tlEvents').innerHTML = '<div class="tl-empty">暂无事件</div>';
+      if (fromCache) {
+        var emptyHint = document.createElement('div');
+        emptyHint.style.cssText = 'text-align:center;color:var(--text2);font-size:.75em;padding:8px 0;opacity:.7';
+        emptyHint.textContent = '⚠ 事件数据来自本地缓存，可能非最新';
+        document.getElementById('tlEvents').appendChild(emptyHint);
+      }
       _setupVideo(ev);
       _loadLineup(fifaId);
       document.getElementById('tlOverlay').classList.add('show');
@@ -2483,6 +2520,12 @@ function openTimeline(fifaId) {
     html += '</div>';
 
     document.getElementById('tlEvents').innerHTML = html;
+    if (fromCache) {
+      var cacheHint = document.createElement('div');
+      cacheHint.style.cssText = 'text-align:center;color:var(--text2);font-size:.75em;padding:8px 0;opacity:.7';
+      cacheHint.textContent = '⚠ 事件数据来自本地缓存，可能非最新';
+      document.getElementById('tlEvents').appendChild(cacheHint);
+    }
     _setupVideo(ev);
     _loadLineup(fifaId);
     document.getElementById('tlOverlay').classList.add('show');
