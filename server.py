@@ -409,7 +409,11 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def log_message(self, format, *args):
-        pass
+        import datetime
+        ts = datetime.datetime.now().strftime("%H:%M:%S")
+        line = f"{ts} {format % args}\n"
+        with open(os.path.join(WEB_DIR, "access.log"), "a", encoding="utf-8") as f:
+            f.write(line)
 
 
 def _run_fetch():
