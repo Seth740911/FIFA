@@ -11,6 +11,7 @@ const WC_TEAMS = [
   "color2": "#E03C31",
   "tag": "",
   "rank": 42,
+   "coach": {"id": "516164", "name": "Miroslav KOUBEK", "cn_name": "库贝克", "photo": "https://digitalhub.fifa.com/transform/748dc03c-d38a-4197-ba8f-c45784bf9545/KOUBEK-Miroslav_516164"},
   "players": [
    {
     "id": "484012",
@@ -257,6 +258,7 @@ const WC_TEAMS = [
   "color2": "#CF3344",
   "tag": "",
   "rank": 23,
+   "coach": {"id": "2188", "name": "HONG Myungbo", "cn_name": "洪明甫", "photo": "https://digitalhub.fifa.com/transform/5d1b329b-f25b-4959-8b62-291e464057b7/HONG-Myungbo_2188"},
   "players": [
    {
     "id": "274281",
@@ -503,6 +505,7 @@ const WC_TEAMS = [
   "color2": "#EA0000",
   "tag": "东道主",
   "rank": 14,
+   "coach": {"id": "45078", "name": "Javier AGUIRRE", "cn_name": "阿吉雷", "photo": "https://digitalhub.fifa.com/transform/b36d8467-71b2-45e2-a681-dfb7e80a9ada/AGUIRRE-Javier_45078"},
   "players": [
    {
     "id": "485070",
@@ -749,6 +752,7 @@ const WC_TEAMS = [
   "color2": "#008751",
   "tag": "",
   "rank": 55,
+   "coach": {"id": "46980", "name": "Hugo BROOS", "cn_name": "布罗斯", "photo": "https://digitalhub.fifa.com/transform/a3a1f2de-d006-4e46-b144-f5b88b685891/BROOS-Hugo_46980"},
   "players": [
    {
     "id": "395986",
@@ -995,6 +999,7 @@ const WC_TEAMS = [
   "color2": "#F9E300",
   "tag": "",
   "rank": 49,
+   "coach": {"id": "179063", "name": "Sergej BARBAREZ", "cn_name": "巴巴雷茨", "photo": "https://digitalhub.fifa.com/transform/7ad9e6c5-c158-4dff-bbe4-63d002ab2767/BARBAREZ-Sergej_179063"},
   "players": [
    {
     "id": "482978",
@@ -1241,6 +1246,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "东道主",
   "rank": 30,
+   "coach": {"id": "187150", "name": "Jesse MARSCH", "cn_name": "马什", "photo": "https://digitalhub.fifa.com/transform/55544e4a-412e-4625-9e7d-325c84601102/MARSCH-Jesse_187150"},
   "players": [
    {
     "id": "441255",
@@ -1487,6 +1493,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 48,
+   "coach": {"id": "77904", "name": "Julen LOPETEGUI", "cn_name": "洛佩特吉", "photo": "https://digitalhub.fifa.com/transform/149ce6d1-4fa8-4a4f-8be3-78fa7bf97c98/LOPETEGUI-Julen_77904"},
   "players": [
    {
     "id": "419459",
@@ -1733,6 +1740,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 16,
+   "coach": {"id": "157842", "name": "Murat YAKIN", "cn_name": "雅金", "photo": "https://digitalhub.fifa.com/transform/0951d425-6260-40aa-8905-0e79111bdf42/YAKIN-Murat_157842"},
   "players": [
    {
     "id": "448107",
@@ -1979,6 +1987,7 @@ const WC_TEAMS = [
   "color2": "#009739",
   "tag": "",
   "rank": 5,
+   "coach": {"id": "174348", "name": "Carlo ANCELOTTI", "cn_name": "安切洛蒂", "photo": "https://digitalhub.fifa.com/transform/a342a34b-9c43-43c3-beca-ad52d167e5c2/ANCELOTTI-Carlo_174348"},
   "players": [
    {
     "id": "308370",
@@ -2225,6 +2234,7 @@ const WC_TEAMS = [
   "color2": "#E4002B",
   "tag": "",
   "rank": 72,
+   "coach": {"id": "402273", "name": "Sebastien MIGNE", "cn_name": "米涅", "photo": "https://digitalhub.fifa.com/transform/b3030eeb-3434-4a10-85bb-1e4f759aab60/MIGNE-Sebastien_402273"},
   "players": [
    {
     "id": "295922",
@@ -2471,6 +2481,7 @@ const WC_TEAMS = [
   "color2": "#006233",
   "tag": "",
   "rank": 12,
+   "coach": {"id": "496329", "name": "Mohamed OUAHBI", "cn_name": "瓦赫比", "photo": "https://digitalhub.fifa.com/transform/188d1519-4897-4692-8417-f59a682d6255/OUAHBI-Mohamed_496329"},
   "players": [
    {
     "id": "356956",
@@ -2717,6 +2728,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 38,
+   "coach": {"id": "47823", "name": "Steve CLARKE", "cn_name": "克拉克", "photo": "https://digitalhub.fifa.com/transform/70f21492-8364-4005-9281-41de50e0c360/CLARKE-Steve_47823"},
   "players": [
    {
     "id": "411301",
@@ -2963,6 +2975,7 @@ const WC_TEAMS = [
   "color2": "#00843D",
   "tag": "",
   "rank": 32,
+   "coach": {"id": "154065", "name": "Tony POPOVIC", "cn_name": "波波维奇", "photo": "https://digitalhub.fifa.com/transform/186370fc-5a39-49f3-b7cd-709e763838d9/POPOVIC-Tony_154065"},
   "players": [
    {
     "id": "339117",
@@ -3209,6 +3222,7 @@ const WC_TEAMS = [
   "color2": "#0038A8",
   "tag": "",
   "rank": 47,
+   "coach": {"id": "428890", "name": "Gustavo ALFARO", "cn_name": "阿尔法罗", "photo": "https://digitalhub.fifa.com/transform/381ae0a7-c8c8-4d29-b437-c26dca406898/ALFARO-Gustavo_428890"},
   "players": [
    {
     "id": "318647",
@@ -3455,6 +3469,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 28,
+   "coach": {"id": "177662", "name": "Vincenzo MONTELLA", "cn_name": "蒙特拉", "photo": "https://digitalhub.fifa.com/transform/25576415-86bd-489a-83d1-bf1b9d5fb43f/MONTELLA-Vincenzo_177662"},
   "players": [
    {
     "id": "360498",
@@ -3701,6 +3716,7 @@ const WC_TEAMS = [
   "color2": "#B22234",
   "tag": "东道主",
   "rank": 13,
+   "coach": {"id": "3075", "name": "Mauricio POCHETTINO", "cn_name": "波切蒂诺", "photo": "https://digitalhub.fifa.com/transform/e2f2629a-987f-459a-a461-89e1d38d8884/POCHETTINO-Mauricio_3075"},
   "players": [
    {
     "id": "448217",
@@ -3947,6 +3963,7 @@ const WC_TEAMS = [
   "color2": "#009E49",
   "tag": "",
   "rank": 36,
+   "coach": {"id": "183878", "name": "Emerse FAE", "cn_name": "法耶", "photo": "https://digitalhub.fifa.com/transform/c1651222-08e5-4c29-b181-6e999ff538d7/FAE-Emerse_183878"},
   "players": [
    {
     "id": "405873",
@@ -4193,6 +4210,7 @@ const WC_TEAMS = [
   "color2": "#FFD700",
   "tag": "",
   "rank": 80,
+   "coach": {"id": "76931", "name": "Dick ADVOCAAT", "cn_name": "艾德沃卡特", "photo": "https://digitalhub.fifa.com/transform/3f1e45c9-6acd-43eb-ab80-8382d2700128/ADVOCAAT-Dick_76931"},
   "players": [
    {
     "id": "390650",
@@ -4439,6 +4457,7 @@ const WC_TEAMS = [
   "color2": "#0033A0",
   "tag": "",
   "rank": 25,
+   "coach": {"id": "376388", "name": "Sebastian BECCACECE", "cn_name": "贝卡塞切", "photo": "https://digitalhub.fifa.com/transform/d840ced2-6ca5-4e5a-93f1-8c0141e80e4f/BECCACECE-Sebastian_376388"},
   "players": [
    {
     "id": "441236",
@@ -4685,6 +4704,7 @@ const WC_TEAMS = [
   "color2": "#DD0000",
   "tag": "",
   "rank": 9,
+   "coach": {"id": "474269", "name": "Julian NAGELSMANN", "cn_name": "纳格尔斯曼", "photo": "https://digitalhub.fifa.com/transform/92f092b8-6e7d-4081-b73c-b1dade148650/NAGELSMANN-Julian_474269"},
   "players": [
    {
     "id": "228912",
@@ -4931,6 +4951,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 15,
+   "coach": {"id": "94396", "name": "Hajime MORIYASU", "cn_name": "森保一", "photo": "https://digitalhub.fifa.com/transform/119d3d32-610e-4365-ac77-e711ea712971/MORIYASU-Hajime_94396"},
   "players": [
    {
     "id": "405530",
@@ -5177,6 +5198,7 @@ const WC_TEAMS = [
   "color2": "#AE1C28",
   "tag": "",
   "rank": 6,
+   "coach": {"id": "174671", "name": "Ronald KOEMAN", "cn_name": "科曼", "photo": "https://digitalhub.fifa.com/transform/967ef7df-1538-4d8a-b3b7-d050c0d0a565/KOEMAN-Ronald_174671"},
   "players": [
    {
     "id": "424081",
@@ -5423,6 +5445,7 @@ const WC_TEAMS = [
   "color2": "#FECC02",
   "tag": "",
   "rank": 21,
+   "coach": {"id": "277650", "name": "Graham POTTER", "cn_name": "波特", "photo": "https://digitalhub.fifa.com/transform/d1a2b34e-b091-483b-a7fc-22ce9e0cf6e2/POTTER-Graham_277650"},
   "players": [
    {
     "id": "489685",
@@ -5669,6 +5692,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 37,
+   "coach": {"id": "170706", "name": "Sabri LAMOUCHI", "cn_name": "拉穆奇", "photo": "https://digitalhub.fifa.com/transform/cbf892da-b9a3-4a15-8b02-cce550136231/LAMOUCHI-Sabri_170706"},
   "players": [
    {
     "id": "520245",
@@ -5915,6 +5939,7 @@ const WC_TEAMS = [
   "color2": "#FAE04C",
   "tag": "",
   "rank": 4,
+   "coach": {"id": "344378", "name": "Rudi GARCIA", "cn_name": "加西亚", "photo": "https://digitalhub.fifa.com/transform/e398c483-fb03-440a-bf59-d785e9bda878/GARCIA-Rudi_344378"},
   "players": [
    {
     "id": "358106",
@@ -6161,6 +6186,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 31,
+   "coach": {"id": "174595", "name": "HOSSAM HASSAN", "cn_name": "哈桑", "photo": "https://digitalhub.fifa.com/transform/e036e0e7-027f-48f6-b318-15a9a702573a/2281251591"},
   "players": [
    {
     "id": "408948",
@@ -6407,6 +6433,7 @@ const WC_TEAMS = [
   "color2": "#DA0000",
   "tag": "",
   "rank": 20,
+   "coach": {"id": "94493", "name": "Amir GHALEHNOY", "cn_name": "加勒诺伊", "photo": ""},
   "players": [
    {
     "id": "380007",
@@ -6653,6 +6680,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 82,
+   "coach": {"id": "289159", "name": "Darren BAZELEY", "cn_name": "巴兹利", "photo": "https://digitalhub.fifa.com/transform/04354138-7998-4b3a-b52a-c899cef05d04/BAZELEY-Darren_289159"},
   "players": [
    {
     "id": "368535",
@@ -6899,6 +6927,7 @@ const WC_TEAMS = [
   "color2": "#CF202D",
   "tag": "",
   "rank": 64,
+   "coach": {"id": "214785", "name": "BUBISTA", "cn_name": "布比斯塔", "photo": "https://digitalhub.fifa.com/transform/a07d23c4-385e-4fee-8659-6209001b857d/BUBISTA_214785"},
   "players": [
    {
     "id": "364752",
@@ -7145,6 +7174,7 @@ const WC_TEAMS = [
   "color2": "#FFC400",
   "tag": "",
   "rank": 2,
+   "coach": {"id": "430724", "name": "Luis DE LA FUENTE", "cn_name": "德拉富恩特", "photo": "https://digitalhub.fifa.com/transform/d91efb8f-281e-466c-beb0-a543a3a8c9ec/DE-LA-FUENTE-Luis_430724"},
   "players": [
    {
     "id": "447853",
@@ -7391,6 +7421,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 50,
+   "coach": {"id": "76301", "name": "Georgios DONIS", "cn_name": "多尼斯", "photo": "https://digitalhub.fifa.com/transform/98829d26-d026-4d5a-8def-e5c4111840f5/DONIS-Georgios_76301"},
   "players": [
    {
     "id": "419287",
@@ -7637,6 +7668,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 10,
+   "coach": {"id": "178143", "name": "Marcelo BIELSA", "cn_name": "贝尔萨", "photo": ""},
   "players": [
    {
     "id": "368664",
@@ -7883,6 +7915,7 @@ const WC_TEAMS = [
   "color2": "#ED2939",
   "tag": "上届亚军",
   "rank": 1,
+   "coach": {"id": "48455", "name": "Didier DESCHAMPS", "cn_name": "德尚", "photo": "https://digitalhub.fifa.com/transform/8430ec52-9ec4-4ae8-810d-ee3f3c3bbebd/DIDIER-DESCHAMPS_48455_Front"},
   "players": [
    {
     "id": "483471",
@@ -8129,6 +8162,7 @@ const WC_TEAMS = [
   "color2": "#CE1126",
   "tag": "",
   "rank": 56,
+   "coach": {"id": "175731", "name": "Graham ARNOLD", "cn_name": "阿诺德", "photo": ""},
   "players": [
    {
     "id": "368744",
@@ -8375,6 +8409,7 @@ const WC_TEAMS = [
   "color2": "#002868",
   "tag": "",
   "rank": 39,
+   "coach": {"id": "157000", "name": "Stale SOLBAKKEN", "cn_name": "索尔巴肯", "photo": "https://digitalhub.fifa.com/transform/8d00c35f-86f6-42e8-9b11-74b94609fd11/SOLBAKKEN-Stale_157000"},
   "players": [
    {
     "id": "373235",
@@ -8621,6 +8656,7 @@ const WC_TEAMS = [
   "color2": "#00853F",
   "tag": "",
   "rank": 18,
+   "coach": {"id": "182160", "name": "Pape THIAW", "cn_name": "蒂亚乌", "photo": ""},
   "players": [
    {
     "id": "494277",
@@ -8867,6 +8903,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 34,
+   "coach": {"id": "377066", "name": "Vladimir PETKOVIC", "cn_name": "佩特科维奇", "photo": "https://digitalhub.fifa.com/transform/c9398a63-4014-4ade-8074-b7a713bce872/PETKOVIC-Vladimir_377066"},
   "players": [
    {
     "id": "520070",
@@ -9113,6 +9150,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "卫冕冠军",
   "rank": 1,
+   "coach": {"id": "183380", "name": "Lionel SCALONI", "cn_name": "斯卡洛尼", "photo": "https://digitalhub.fifa.com/transform/a0d01595-ffa3-4268-9df8-e4164d5a5fda/LIONEL-SCALONI_183380_Front"},
   "players": [
    {
     "id": "430624",
@@ -9120,7 +9158,7 @@ const WC_TEAMS = [
     "jersey": 1,
     "pos": "GK",
     "pos_zh": "门将",
-    "photo": "",
+    "photo": "/wc-photos/ARG/01_JUAN MUSSO_GK.png",
     "cn_name": "胡安·穆索"
    },
    {
@@ -9129,7 +9167,7 @@ const WC_TEAMS = [
     "jersey": 12,
     "pos": "GK",
     "pos_zh": "门将",
-    "photo": "",
+    "photo": "/wc-photos/ARG/12_GERONIMO RULLI_GK.png",
     "cn_name": "鲁利"
    },
    {
@@ -9156,7 +9194,7 @@ const WC_TEAMS = [
     "jersey": 3,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/03_NICOLAS TAGLIAFICO_DF.png",
     "cn_name": "塔里亚菲科"
    },
    {
@@ -9165,7 +9203,7 @@ const WC_TEAMS = [
     "jersey": 4,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/04_GONZALO MONTIEL_DF.png",
     "cn_name": "蒙铁尔"
    },
    {
@@ -9174,7 +9212,7 @@ const WC_TEAMS = [
     "jersey": 6,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/06_LISANDRO MARTINEZ_DF.png",
     "cn_name": "利桑德罗·马丁内斯"
    },
    {
@@ -9183,7 +9221,7 @@ const WC_TEAMS = [
     "jersey": 13,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/13_CRISTIAN ROMERO_DF.png",
     "cn_name": "罗梅罗"
    },
    {
@@ -9192,7 +9230,7 @@ const WC_TEAMS = [
     "jersey": 19,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/19_NICOLAS OTAMENDI_DF.png",
     "cn_name": "奥塔门迪"
    },
    {
@@ -9201,7 +9239,7 @@ const WC_TEAMS = [
     "jersey": 25,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/25_FACUNDO MEDINA_DF.png",
     "cn_name": "梅迪纳"
    },
    {
@@ -9210,7 +9248,7 @@ const WC_TEAMS = [
     "jersey": 26,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/ARG/26_Nahuel MOLINA_DF.png",
     "cn_name": "莫利纳"
    },
    {
@@ -9219,7 +9257,7 @@ const WC_TEAMS = [
     "jersey": 5,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/05_LEANDRO PAREDES_MF.png",
     "cn_name": "帕雷德斯"
    },
    {
@@ -9228,7 +9266,7 @@ const WC_TEAMS = [
     "jersey": 7,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/07_RODRIGO DE PAUL_MF.png",
     "cn_name": "德保罗"
    },
    {
@@ -9237,7 +9275,7 @@ const WC_TEAMS = [
     "jersey": 8,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/08_VALENTIN BARCO_MF.png",
     "cn_name": "瓦伦丁·巴科"
    },
    {
@@ -9246,7 +9284,7 @@ const WC_TEAMS = [
     "jersey": 11,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/11_GIOVANI LO CELSO_MF.png",
     "cn_name": "洛塞尔索"
    },
    {
@@ -9255,7 +9293,7 @@ const WC_TEAMS = [
     "jersey": 14,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/14_EXEQUIEL PALACIOS_MF.png",
     "cn_name": "帕拉西奥斯"
    },
    {
@@ -9264,7 +9302,7 @@ const WC_TEAMS = [
     "jersey": 15,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/15_NICO GONZALEZ_MF.png",
     "cn_name": "尼克拉斯·冈萨雷斯"
    },
    {
@@ -9273,7 +9311,7 @@ const WC_TEAMS = [
     "jersey": 20,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/20_ALEXIS MAC ALLISTER_MF.png",
     "cn_name": "麦卡利斯特"
    },
    {
@@ -9282,7 +9320,7 @@ const WC_TEAMS = [
     "jersey": 24,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/ARG/24_ENZO FERNANDEZ_MF.png",
     "cn_name": "恩佐·费尔南德斯"
    },
    {
@@ -9291,7 +9329,7 @@ const WC_TEAMS = [
     "jersey": 9,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/09_JULIAN ALVAREZ_FW.png",
     "cn_name": "阿尔瓦雷斯"
    },
    {
@@ -9300,7 +9338,7 @@ const WC_TEAMS = [
     "jersey": 10,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/10_LIONEL MESSI_FW.png",
     "cn_name": "梅西"
    },
    {
@@ -9309,7 +9347,7 @@ const WC_TEAMS = [
     "jersey": 16,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/16_THIAGO ALMADA_FW.png",
     "cn_name": "阿尔马达"
    },
    {
@@ -9318,7 +9356,7 @@ const WC_TEAMS = [
     "jersey": 17,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/17_GIULIANO SIMEONE_FW.png",
     "cn_name": "朱利亚诺·西蒙尼"
    },
    {
@@ -9327,7 +9365,7 @@ const WC_TEAMS = [
     "jersey": 18,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/18_NICO PAZ_FW.png",
     "cn_name": "尼科·帕斯"
    },
    {
@@ -9336,7 +9374,7 @@ const WC_TEAMS = [
     "jersey": 21,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/21_JOSE MANUEL LOPEZ_FW.png",
     "cn_name": "何塞·洛佩斯"
    },
    {
@@ -9345,7 +9383,7 @@ const WC_TEAMS = [
     "jersey": 22,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/ARG/22_LAUTARO MARTINEZ_FW.png",
     "cn_name": "劳塔罗·马丁内斯"
    }
   ]
@@ -9359,6 +9397,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 22,
+   "coach": {"id": "442093", "name": "Ralf RANGNICK", "cn_name": "朗尼克", "photo": "https://digitalhub.fifa.com/transform/329483e5-377d-49b4-a583-4ab882c7de2c/RANGNICK-Ralf_442093"},
   "players": [
    {
     "id": "371739",
@@ -9605,6 +9644,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 63,
+   "coach": {"id": "156752", "name": "Jamal SELLAMI", "cn_name": "塞拉米", "photo": ""},
   "players": [
    {
     "id": "397894",
@@ -9851,6 +9891,7 @@ const WC_TEAMS = [
   "color2": "#F10D2C",
   "tag": "",
   "rank": 59,
+   "coach": {"id": "414225", "name": "Sebastien DESABRE", "cn_name": "德萨布尔", "photo": ""},
   "players": [
    {
     "id": "441313",
@@ -10097,6 +10138,7 @@ const WC_TEAMS = [
   "color2": "#003893",
   "tag": "",
   "rank": 11,
+   "coach": {"id": "44325", "name": "Nestor LORENZO", "cn_name": "洛伦佐", "photo": ""},
   "players": [
    {
     "id": "228686",
@@ -10343,6 +10385,7 @@ const WC_TEAMS = [
   "color2": "#006600",
   "tag": "",
   "rank": 7,
+   "coach": {"id": "396423", "name": "Roberto MARTINEZ", "cn_name": "罗伯托·马丁内斯", "photo": ""},
   "players": [
    {
     "id": "403001",
@@ -10589,6 +10632,7 @@ const WC_TEAMS = [
   "color2": "#00B7E4",
   "tag": "",
   "rank": 53,
+   "coach": {"id": "155957", "name": "Fabio CANNAVARO", "cn_name": "卡纳瓦罗", "photo": "https://digitalhub.fifa.com/transform/cae88b6d-7bc0-4c88-bd1f-f310a51d4d3d/FABIO-CANNAVARO_155957_Front"},
   "players": [
    {
     "id": "479077",
@@ -10596,7 +10640,7 @@ const WC_TEAMS = [
     "jersey": 1,
     "pos": "GK",
     "pos_zh": "门将",
-    "photo": "",
+    "photo": "/wc-photos/UZB/01_UTKIR YUSUPOV_GK.png",
     "cn_name": "乌特基尔·尤斯波夫"
    },
    {
@@ -10605,7 +10649,7 @@ const WC_TEAMS = [
     "jersey": 12,
     "pos": "GK",
     "pos_zh": "门将",
-    "photo": "",
+    "photo": "/wc-photos/UZB/12_ABDUVOHID NEMATOV_GK.png",
     "cn_name": "阿杜瓦希德·内马托夫"
    },
    {
@@ -10614,7 +10658,7 @@ const WC_TEAMS = [
     "jersey": 16,
     "pos": "GK",
     "pos_zh": "门将",
-    "photo": "",
+    "photo": "/wc-photos/UZB/16_BOTIRALI ERGASHEV_GK.png",
     "cn_name": "叶尔加舍夫"
    },
    {
@@ -10632,7 +10676,7 @@ const WC_TEAMS = [
     "jersey": 3,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/03_KHOJIAKBAR ALIJONOV_DF.png",
     "cn_name": "霍吉阿克巴尔·阿里若诺夫"
    },
    {
@@ -10641,7 +10685,7 @@ const WC_TEAMS = [
     "jersey": 4,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/04_FARRUKH SAYFIEV_DF.png",
     "cn_name": "赛义费耶夫"
    },
    {
@@ -10650,7 +10694,7 @@ const WC_TEAMS = [
     "jersey": 5,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/05_RUSTAM ASHURMATOV_DF.png",
     "cn_name": "阿舒尔马托夫"
    },
    {
@@ -10659,7 +10703,7 @@ const WC_TEAMS = [
     "jersey": 13,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/13_SHERZOD NASRULLAEV_DF.png",
     "cn_name": "纳斯鲁拉耶夫"
    },
    {
@@ -10668,7 +10712,7 @@ const WC_TEAMS = [
     "jersey": 15,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/15_UMAR ESHMURODOV_DF.png",
     "cn_name": "埃斯姆拉多夫"
    },
    {
@@ -10677,7 +10721,7 @@ const WC_TEAMS = [
     "jersey": 18,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/18_ABDULLA ABDULLAEV_DF.png",
     "cn_name": "阿卜杜拉耶夫"
    },
    {
@@ -10686,7 +10730,7 @@ const WC_TEAMS = [
     "jersey": 24,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/24_BEHRUZJON KARIMOV_DF.png",
     "cn_name": "卡里莫夫"
    },
    {
@@ -10695,7 +10739,7 @@ const WC_TEAMS = [
     "jersey": 25,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/25_AVAZBEK ULMASALIYEV_DF.png",
     "cn_name": "乌尔马萨列夫"
    },
    {
@@ -10704,7 +10748,7 @@ const WC_TEAMS = [
     "jersey": 26,
     "pos": "DF",
     "pos_zh": "后卫",
-    "photo": "",
+    "photo": "/wc-photos/UZB/26_JAKHONGIR UROZOV_DF.png",
     "cn_name": "贾汉吉尔·乌罗佐夫"
    },
    {
@@ -10713,7 +10757,7 @@ const WC_TEAMS = [
     "jersey": 6,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/06_AKMAL MOZGOVOY_MF.png",
     "cn_name": "莫兹戈沃伊"
    },
    {
@@ -10722,7 +10766,7 @@ const WC_TEAMS = [
     "jersey": 7,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/07_OTABEK SHUKUROV_MF.png",
     "cn_name": "舒库罗夫"
    },
    {
@@ -10731,7 +10775,7 @@ const WC_TEAMS = [
     "jersey": 8,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/08_JAMSHID ISKANDEROV_MF.png",
     "cn_name": "伊斯坎德罗夫"
    },
    {
@@ -10740,7 +10784,7 @@ const WC_TEAMS = [
     "jersey": 9,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/09_ODILJON XAMROBEKOV_MF.png",
     "cn_name": "哈姆罗贝科夫"
    },
    {
@@ -10749,7 +10793,7 @@ const WC_TEAMS = [
     "jersey": 10,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/10_JALOLIDDIN MASHARIPOV_MF.png",
     "cn_name": "马沙里波夫"
    },
    {
@@ -10758,7 +10802,7 @@ const WC_TEAMS = [
     "jersey": 11,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/11_OSTON URUNOV_MF.png",
     "cn_name": "奥斯顿·乌鲁诺夫"
    },
    {
@@ -10767,7 +10811,7 @@ const WC_TEAMS = [
     "jersey": 17,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/17_DOSTONBEK KHAMDAMOV_MF.png",
     "cn_name": "哈姆达莫夫"
    },
    {
@@ -10776,7 +10820,7 @@ const WC_TEAMS = [
     "jersey": 19,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/19_AZIZJON GANIEV_MF.png",
     "cn_name": "阿齐兹琼·加涅夫"
    },
    {
@@ -10785,7 +10829,7 @@ const WC_TEAMS = [
     "jersey": 22,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/22_ABBOSBEK FAYZULLAEV_MF.png",
     "cn_name": "法伊祖拉耶夫"
    },
    {
@@ -10794,7 +10838,7 @@ const WC_TEAMS = [
     "jersey": 23,
     "pos": "MF",
     "pos_zh": "中场",
-    "photo": "",
+    "photo": "/wc-photos/UZB/23_SHERZOD ESANOV_MF.png",
     "cn_name": "谢尔佐德·伊萨诺夫"
    },
    {
@@ -10803,7 +10847,7 @@ const WC_TEAMS = [
     "jersey": 14,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/UZB/14_ELDOR SHOMURODOV_FW.png",
     "cn_name": "肖穆罗多夫"
    },
    {
@@ -10812,7 +10856,7 @@ const WC_TEAMS = [
     "jersey": 20,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/UZB/20_AZIZBEK AMONOV_FW.png",
     "cn_name": "阿齐兹贝克·阿莫诺夫"
    },
    {
@@ -10821,7 +10865,7 @@ const WC_TEAMS = [
     "jersey": 21,
     "pos": "FW",
     "pos_zh": "前锋",
-    "photo": "",
+    "photo": "/wc-photos/UZB/21_IGOR SERGEEV_FW.png",
     "cn_name": "谢尔盖耶夫"
    }
   ]
@@ -10835,6 +10879,7 @@ const WC_TEAMS = [
   "color2": "#FF0000",
   "tag": "",
   "rank": 8,
+   "coach": {"id": "400769", "name": "Zlatko DALIC", "cn_name": "达利奇", "photo": ""},
   "players": [
    {
     "id": "369029",
@@ -11081,6 +11126,7 @@ const WC_TEAMS = [
   "color2": "#FFFFFF",
   "tag": "",
   "rank": 3,
+   "coach": {"id": "165190", "name": "Thomas TUCHEL", "cn_name": "图赫尔", "photo": "https://digitalhub.fifa.com/transform/fc649bf3-486d-4ca8-aa84-d30c87cea7e5/TUCHEL-Thomas_165190"},
   "players": [
    {
     "id": "336022",
@@ -11327,6 +11373,7 @@ const WC_TEAMS = [
   "color2": "#006B3F",
   "tag": "",
   "rank": 27,
+   "coach": {"id": "34969", "name": "CARLOS QUEIROZ", "cn_name": "奎罗斯", "photo": ""},
   "players": [
    {
     "id": "386473",
@@ -11573,6 +11620,7 @@ const WC_TEAMS = [
   "color2": "#0057A8",
   "tag": "",
   "rank": 44,
+   "coach": {"id": "77891", "name": "Thomas CHRISTIANSEN", "cn_name": "克里斯蒂安森", "photo": "https://digitalhub.fifa.com/transform/3555ba68-81a3-4e55-9ad5-4a10528a5497/CHRISTIANSEN-Thomas_77891"},
   "players": [
    {
     "id": "267702",

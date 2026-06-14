@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FIFA 2026 下载</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:16px;padding:32px 24px;max-width:320px;width:100%;text-align:center}
+.icon{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#2d5a1e,#1a3a0e);display:flex;align-items:center;justify-content:center;font-size:2em;margin:0 auto 16px}
+.card h1{font-size:1.2em;color:#fff;margin-bottom:6px}
+.card p{font-size:.82em;color:#888;line-height:1.5;margin-bottom:20px}
+.btn{display:inline-block;background:#d4a04a;color:#000;border:none;border-radius:10px;padding:14px 40px;font-size:1em;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn:hover{opacity:.9}
+.btn:active{transform:scale(.96)}
+.hint{font-size:.7em;color:#555;margin-top:16px}
+
+/* 下载中 */
+.downloading .btn{pointer-events:none;opacity:.6}
+.downloading .btn::after{content:'下载中...';position:absolute;left:0;right:0}
+
+/* 下载完成后的引导 */
+.guide{display:none;margin-top:20px;text-align:left;background:#111827;border-radius:10px;padding:16px;border:1px solid #2a2a4a}
+.guide.show{display:block}
+.guide h3{color:#d4a04a;font-size:.9em;margin-bottom:10px}
+.guide ol{padding-left:20px;font-size:.8em;line-height:2;color:#ccc}
+.guide ol b{color:#fff}
+.guide .tip{margin-top:10px;padding-top:10px;border-top:1px solid #2a2a4a;font-size:.72em;color:#666;line-height:1.5}
+
+.wx-guide{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:flex-end;padding:20px 24px}
+.wx-guide.show{display:flex}
+.wx-guide .arrow{font-size:3em;color:#fff;margin-right:20px;animation:bounce 1s infinite}
+.wx-guide .text{color:#fff;font-size:1.1em;line-height:1.8;text-align:center;margin-top:60px;padding:0 20px}
+.wx-guide .text b{color:#d4a04a}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div class="icon">⚽</div>
+  <h1>FIFA 2026</h1>
+  <p>世界杯观赛指南<br>赛程 / 比分 / 时间轴 / 视频集锦</p>
+  <button class="btn" onclick="startDownload()">下载安装</button>
+  <div class="hint">仅限 Android · 需开启"允许未知来源"</div>
+  <div class="guide" id="guide">
+    <h3>下载完成，如何安装？</h3>
+    <ol>
+      <li>拉下<b>通知栏</b>，点击已下载的 fifa.apk</li>
+      <li>或在浏览器菜单点 <b>下载</b>（↓图标），点击文件</li>
+      <li>系统提示是否安装 → 点击<b>安装</b></li>
+      <li>安装完成 → 点击<b>打开</b></li>
+    </ol>
+    <div class="tip">如果提示"禁止安装"，请到手机设置中开启"允许安装未知来源应用"</div>
+  </div>
+</div>
+
+<div class="wx-guide" id="wxGuide" onclick="this.classList.remove('show')">
+  <div class="arrow">右上角 ↗</div>
+  <div class="text">
+    请先点击右上角 <b>···</b><br>
+    选择 <b>在浏览器中打开</b><br>
+    即可下载并安装
+  </div>
+</div>
+
+<script>
+function startDownload(){
+  if(/MicroMessenger/i.test(navigator.userAgent)){
+    document.getElementById('wxGuide').classList.add('show');
+    return;
+  }
+  // 触发下载
+  var a=document.createElement('a');
+  a.href='/apk/fifa.apk';
+  a.download='fifa.apk';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // 显示安装引导
+  document.getElementById('card').classList.add('downloading');
+  setTimeout(function(){
+    document.getElementById('guide').classList.add('show');
+    document.getElementById('card').classList.remove('downloading');
+  },3000);
+}
+</script>
+</body>
+</html>

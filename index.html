@@ -283,10 +283,16 @@ h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 .gs-sch-pending{color:var(--text2)}
 .gs-sch-vs{color:var(--text2)}
 .gs-sch-t1:hover,.gs-sch-t2:hover{background:none}
+.gs-sch-today{background:rgba(212,184,200,.18)}
+.gs-sch-today .gs-sch-date{color:#d4b8c8;font-weight:700}
+.gs-sch-today .gs-sch-time{color:#d4b8c8;font-weight:600}
 .gs-sch-row{cursor:pointer}
 .gs-sch-row:hover{background:rgba(212,168,83,.08)}
 .gs-sch-hint{font-size:.65em;color:var(--text2);opacity:.6;margin-left:4px;white-space:nowrap}
 .gs-sch-row:hover .gs-sch-hint{opacity:1;color:var(--gold)}
+tr[data-fifa]{cursor:pointer}
+tr[data-fifa]:hover{background:rgba(212,168,83,.08)}
+tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .gs-team-hint{font-size:.6em;color:var(--gold);opacity:.5;margin-left:2px}
 .gs-team:hover .gs-team-hint{opacity:1}
 
@@ -391,12 +397,92 @@ h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 .tl-text .tl-sub-on{color:var(--accent)}
 .tl-empty{text-align:center;color:var(--text2);padding:30px 0;font-size:.9em}
 .tl-noevent{text-align:center;color:var(--text2);padding:20px 0;font-size:.85em}
+
+/* 未开赛 */
+.tl-pre{display:flex;flex-direction:column;align-items:center;padding:28px 20px 24px}
+.tl-pre-vs{display:flex;align-items:center;gap:16px;margin-bottom:20px;width:100%}
+.tl-pre-side{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tl-pre-flag{width:56px;height:38px;object-fit:contain;border-radius:4px}
+.tl-pre-name{font-size:1.05em;font-weight:700;color:var(--text);white-space:nowrap}
+.tl-pre-vs-text{font-size:1.3em;font-weight:800;color:var(--gold);flex-shrink:0}
+.tl-pre-ball{font-size:2.6em;line-height:1;animation:ballBounce 2s ease-in-out infinite;margin-bottom:14px}
+@keyframes ballBounce{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(180deg)}}
+.tl-pre-info{font-size:.82em;color:var(--text2);text-align:center;line-height:1.8}
+.tl-pre-info span{display:inline-block;margin:0 6px}
+.tl-pre-label{display:inline-block;background:rgba(212,168,83,.15);color:var(--gold);font-size:.78em;font-weight:700;padding:4px 14px;border-radius:12px;margin-bottom:16px;letter-spacing:1px}
 @media(max-width:500px){
   .tl-modal{max-width:none;border-radius:0;max-height:100vh;height:100vh}
   .tl-overlay{padding:0}
   .tl-ev{font-size:.78em}
   .tl-name-l,.tl-name-r{font-size:.78em;padding:2px 3px}
   .tl-mn{width:28px;font-size:.7em;padding-right:4px}
+}
+
+/* 阵型容器 */
+#tlLineup{padding:12px 12px 8px;display:none}
+#tlLineup.show{display:block}
+.tl-lu-loading{text-align:center;color:var(--text2);padding:40px 0;font-size:.9em}
+.tl-lu-title{color:var(--text2);font-size:.78em;font-weight:600;letter-spacing:.5px;padding:8px 0 4px;border-top:1px solid var(--border);margin-top:12px}
+
+/* 球场（横向，左主右客） */
+.tl-pitch{position:relative;width:100%;padding-bottom:55%;background:linear-gradient(180deg,#1a4a2a 0%,#1d5230 50%,#1a4a2a 100%);border-radius:6px;overflow:hidden;border:1px solid #2a5a3a}
+.tl-pitch-c{position:absolute;border:1px solid rgba(255,255,255,.18);border-radius:0;pointer-events:none}
+.tl-pitch-midline{top:0;bottom:0;left:50%;width:0;border-left:1px solid rgba(255,255,255,.18);border-right:none;border-top:none;border-bottom:none}
+.tl-pitch-circle{top:50%;left:50%;width:16%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(255,255,255,.18);border-top-color:rgba(255,255,255,.18)}
+.tl-pitch-box-l{top:18%;bottom:18%;left:0;width:14%;border-right:1px solid rgba(255,255,255,.18);border-left:none;border-top:none;border-bottom:none}
+.tl-pitch-box-r{top:18%;bottom:18%;right:0;width:14%;border-left:1px solid rgba(255,255,255,.18);border-right:none;border-top:none;border-bottom:none}
+.tl-pitch-ga-l{top:30%;bottom:30%;left:0;width:5%;border-right:1px solid rgba(255,255,255,.18);border-left:none;border-top:none;border-bottom:none}
+.tl-pitch-ga-r{top:30%;bottom:30%;right:0;width:5%;border-left:1px solid rgba(255,255,255,.18);border-right:none;border-top:none;border-bottom:none}
+.tl-pitch-spot{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.25);border:none;pointer-events:none}
+.tl-pitch-center-dot{top:50%;left:50%;transform:translate(-50%,-50%)}
+.tl-pitch-pen-l{top:50%;left:10%;transform:translate(-50%,-50%)}
+.tl-pitch-pen-r{top:50%;right:10%;transform:translate(50%,-50%)}
+
+/* 阵型标签 */
+.tl-lu-form{position:absolute;top:2%;font-size:.65em;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.5px;z-index:3}
+.tl-lu-form.home{left:2%}
+.tl-lu-form.away{right:2%}
+
+/* 球员标记 */
+.tl-lu-player{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);z-index:2}
+.tl-lu-marker{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78em;font-weight:700;color:#fff;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tl-lu-marker.gk{border-radius:7px}
+.tl-lu-marker.home{background:rgba(100,160,235,.92)}
+.tl-lu-marker.away{background:rgba(225,85,55,.92)}
+.tl-lu-captain{position:absolute;top:-2px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:1px solid rgba(0,0,0,.3)}
+.tl-lu-pname{font-size:.58em;color:#fff;margin-top:2px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.9);text-align:center;line-height:1.15}
+.tl-lu-player.name-above{flex-direction:column-reverse}
+.tl-lu-player.name-above .tl-lu-pname{margin-top:0;margin-bottom:2px}
+
+/* 教练 */
+.tl-lu-coach{position:absolute;bottom:2%;font-size:.6em;color:rgba(255,255,255,.7);font-weight:600;background:rgba(0,0,0,.55);padding:2px 7px;border-radius:3px;z-index:3}
+.tl-lu-coach.home{left:2%}
+.tl-lu-coach.away{right:2%}
+
+@media(max-width:500px){
+  .tl-lu-marker{width:26px;height:26px;font-size:.66em}
+  .tl-lu-pname{font-size:.5em;max-width:50px}
+  .tl-lu-coach{font-size:.52em}
+  .tl-pitch{padding-bottom:65%}
+}
+
+/* 手机横屏：球场拉宽拉扁，充分利用宽度 */
+@media(max-height:500px) and (orientation:landscape){
+  .tl-modal{max-width:none;max-height:100vh;border-radius:0}
+  .tl-overlay{padding:0}
+  .tl-head{padding:6px 12px 4px}
+  .tl-head-m{font-size:1em}
+  .tl-flag{width:22px;height:14px}
+  .tl-team{font-size:.82em}
+  #tlLineup{padding:6px 8px 4px}
+  .tl-pitch{padding-bottom:38%}
+  .tl-lu-marker{width:32px;height:32px;font-size:.78em}
+  .tl-lu-pname{font-size:.56em;max-width:72px}
+  .tl-lu-title{font-size:.68em;margin-top:6px}
+  .tl-lu-form{font-size:.58em}
+  .tl-lu-coach{font-size:.54em;bottom:1%}
+  .tl-pitch-box-l,.tl-pitch-box-r{top:12%;bottom:12%}
+  .tl-pitch-ga-l,.tl-pitch-ga-r{top:25%;bottom:25%}
 }
 </style>
 </head>
@@ -1018,7 +1104,10 @@ h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
     <div class="tl-video" id="tlVideo" style="display:none">
       <video id="tlPlayer" controls playsinline style="width:100%;max-height:40vh;background:#000"></video>
     </div>
-    <div class="tl-body" id="tlBody"></div>
+    <div class="tl-body" id="tlBody">
+      <div id="tlEvents"></div>
+      <div id="tlLineup"></div>
+    </div>
   </div>
 </div>
 
@@ -1362,6 +1451,32 @@ function renderRoster(filter) {
     totalWithPhoto += photoCount;
     
     let playerCards = '';
+    // Coach card (first card)
+    if (team.coach) {
+      var coachCnName = (team.coach.cn_name || team.coach.name || '').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      var coachPhoto = team.coach.photo;
+      if (coachPhoto) {
+        playerCards += '<div class="rw-card has-photo">'
+          + '<div class="rw-photo-area">'
+          + '<img data-src="' + coachPhoto + '" class="rw-photo" alt="' + coachCnName + '" onerror="this.onerror=null;this.src=\'/教练.svg\'">'
+          + '<img src="/wc-flags/' + team.code + '.png" class="rw-flag" onerror="this.style.display=\'none\'">'
+          + '<div class="rw-pos" style="background:#7c3aed">教练</div>'
+          + '</div>'
+          + '<div class="rw-name">' + coachCnName + '</div>'
+          + '<div class="rw-num">C</div>'
+          + '</div>';
+      } else {
+        playerCards += '<div class="rw-card">'
+          + '<div class="rw-no-photo" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)">'
+          + '<span class="rw-jersey">C</span>'
+          + '<img src="/wc-flags/' + team.code + '.png" class="rw-flag" onerror="this.style.display=\'none\'">'
+          + '<div class="rw-pos" style="background:#7c3aed">教练</div>'
+          + '</div>'
+          + '<div class="rw-name">' + coachCnName + '</div>'
+          + '<div class="rw-num">C</div>'
+          + '</div>';
+      }
+    }
     team.players.forEach(p => {
       const posColor = POS_COLORS[p.pos] || '#666';
       const jerseyStr = p.jersey ? String(p.jersey).padStart(2, '0') : '--';
@@ -1507,8 +1622,8 @@ document.addEventListener('click', function(e) {
       if (code) { goToRoster(code); return; }
     }
   }
-  // 赛程表行 - 打开时间轴
-  var schRow = e.target.closest('.gs-sch-row');
+  // 赛程表行 - 打开时间轴（含未开赛的vs行）
+  var schRow = e.target.closest('tr[data-fifa]');
   if (schRow) {
     var fifa = schRow.getAttribute('data-fifa');
     if (fifa) { openTimeline(fifa); return; }
@@ -1542,6 +1657,15 @@ document.addEventListener('click', function(e) {
     '<li><span class="guide-icon">⚽</span>点击<b>比分条</b>（详情）→ 查看赛事时间轴和视频集锦</li>'+
     '<li><span class="guide-icon">👤</span>点击<b>队名</b>（›）→ 跳转到该队球员阵容墙</li>'+
     '<li><span class="guide-icon">🏆</span>点击<b>淘汰赛队名</b> → 同样跳转到球员阵容</li>'+
+    '<li><span class="guide-icon">🃏</span>点击<b>球星卡</b> → 查看球员详细资料</li>'+
+    '<li><span class="guide-icon">📋</span>点击<b>球员照片墙</b>中任意球员 → 弹出详情卡</li>'+
+    '<li><span class="guide-icon">◀▶</span>详情卡中<b>左右箭头</b> → 切换同队上/下一位球员</li>'+
+    '<li><span class="guide-icon">🔄</span>点击<b>同步比分</b>按钮 → 从FIFA官网拉取最新赛果</li>'+
+    '<li><span class="guide-icon">✏️</span>点击淘汰赛<b>比分数字</b> → 可手动输入预测比分</li>'+
+    '<li><span class="guide-icon">🎬</span>点击<b>视频集锦</b> → 播放比赛精彩回放</li>'+
+    '<li><span class="guide-icon">🏟️</span>点击<b>首发阵型</b> → 查看双方出场阵容</li>'+
+    '<li><span class="guide-icon">📱</span>手机可<b>左右滑动</b>球星卡和阵容墙查看更多</li>'+
+    '<li><span class="guide-icon">⬆️</span>右下角<b>回到顶部</b>按钮 → 快速返回页面顶部</li>'+
     '</ul><button class="guide-btn" onclick="this.closest(\'.guide-overlay\').remove()">知道了</button></div>';
   document.body.appendChild(d);
 })();
@@ -1566,6 +1690,7 @@ window.addEventListener('scroll',function(){ if(window.scrollX!==0)window.scroll
 
 // 初始化
 var FIX_TO_FIFA = {};  // fixture id -> fifa match id (for timeline)
+var FIFA_MATCH_INFO = {};  // fifa_id -> {h_cn, a_cn, h_code, a_code, date, time, venue, city}
 /* ====== 小组积分 ====== */
 var GSTAND=(function(){
 var SKEY='wc2026_group_scores';
@@ -1673,15 +1798,32 @@ function render(){
              if(fid){
                var fifaId2=FIX_TO_FIFA[fid]||'';
                var trAttr2=fifaId2?' class="gs-sch-row" data-fifa="'+fifaId2+'"':'';
-               matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending">vs</td><td class="gs-sch-t2">'+t2cn+'</td>';
-             }else{
-               var trAttr2='';
-               matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending">vs</td><td class="gs-sch-t2">'+t2cn+'</td>';
+                matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending">vs'+(fifaId2?'<span class="gs-sch-hint">详情</span>':'')+'</td><td class="gs-sch-t2">'+t2cn+'</td>';
+              }else{
+                var trAttr2='';
+                matchHtml='<td class="gs-sch-t1">'+t1cn+'</td><td class="gs-sch-sc gs-sch-pending">vs</td><td class="gs-sch-t2">'+t2cn+'</td>';
              }
            }
          }
-         var trCls=trAttr||trAttr2||'';
-         h+='<tr'+trCls+'><td class="gs-sch-date">'+m.d+'</td><td class="gs-sch-time">'+m.t+'</td>'+matchHtml+'</tr>';
+           var trCls='';
+           // 从 trAttr/trAttr2 提取 class 和 data-fifa
+           var rawDataFifa='';
+           if(trAttr){
+             var m1=trAttr.match(/data-fifa="([^"]*)"/);if(m1)rawDataFifa=m1[1];
+             var m2=trAttr.match(/class="([^"]*)"/);if(m2)trCls=m2[1];
+           }
+           if(!rawDataFifa && trAttr2){
+             var m3=trAttr2.match(/data-fifa="([^"]*)"/);if(m3)rawDataFifa=m3[1];
+             var m4=trAttr2.match(/class="([^"]*)"/);if(m4){trCls=trCls?(trCls+' '+m4[1]):m4[1];}
+           }
+           // 今日比赛高亮
+           var _now=new Date();
+           var _today=_now.getMonth()+1+'/'+_now.getDate();
+           var isToday=m.d&&new RegExp('^'+_today+'[(\\s]').test(m.d);
+           if(isToday) trCls=(trCls?trCls+' ':'')+'gs-sch-today';
+           var trAt=trCls?' class="'+trCls+'"':'';
+           if(rawDataFifa) trAt+=' data-fifa="'+rawDataFifa+'"';
+           h+='<tr'+trAt+'><td class="gs-sch-date">'+m.d+'</td><td class="gs-sch-time">'+m.t+'</td>'+matchHtml+'</tr>';
       });
       h+='</tbody></table></div>';
     }
@@ -1975,6 +2117,12 @@ function syncScores(){
     // Build fixture id -> fifa match id mapping for timeline (must be before render)
     var details=data.match_details||[];
     FIX_TO_FIFA = {};
+    FIFA_MATCH_INFO = {};
+    details.forEach(function(m) {
+      if (m.fifa_id) {
+        FIFA_MATCH_INFO[m.fifa_id] = {h_cn: m.h_cn, a_cn: m.a_cn, h_code: m.home||'', a_code: m.away||'', date: m.date||'', time: m.time||'', venue: m.venue||'', city: m.city||''};
+      }
+    });
     if (typeof WC_TEAMS !== 'undefined') {
       var _groups = {};
       WC_TEAMS.forEach(function(t) {
@@ -2109,11 +2257,43 @@ function _tlPlayerName(idPlayer) {
 }
 
 function openTimeline(fifaId) {
+  _tlCurrentFifaId = fifaId;
+  _tlLineupData = null;
+  document.getElementById('tlEvents').innerHTML = '';
+  document.getElementById('tlLineup').innerHTML = '';
+  document.getElementById('tlLineup').classList.remove('show');
+
   loadTimelineEvents(function(events) {
     var ev = events[fifaId];
     if (!ev) {
-      document.getElementById('tlHead').innerHTML = '';
-      document.getElementById('tlBody').innerHTML = '<div class="tl-noevent">暂无比赛事件数据</div>';
+      var info = FIFA_MATCH_INFO[fifaId] || {};
+      var hCn2 = info.h_cn || '', aCn2 = info.a_cn || '';
+      var hCode2 = info.h_code || '', aCode2 = info.a_code || '';
+      var hFlag2 = hCode2 ? '/wc-flags/' + hCode2.toLowerCase() + '.png' : '';
+      var aFlag2 = aCode2 ? '/wc-flags/' + aCode2.toLowerCase() + '.png' : '';
+      // Header
+      document.getElementById('tlHead').innerHTML =
+        '<button class="tl-close" onclick="closeTimeline()">&times;</button>' +
+        (hCn2 ? '<div class="tl-head-l"><img class="tl-flag" src="'+hFlag2+'" onerror="this.style.display=\'none\'"><span class="tl-team">'+hCn2+'</span><b>-</b></div><div class="tl-head-m">:</div><div class="tl-head-r"><b>-</b><span class="tl-team">'+aCn2+'</span><img class="tl-flag" src="'+aFlag2+'" onerror="this.style.display=\'none\'"></div>' : '');
+      // Body: 未开赛卡片
+      var preHtml = '<div class="tl-pre">';
+      preHtml += '<div class="tl-pre-label">尚未开球</div>';
+      preHtml += '<div class="tl-pre-vs">';
+      preHtml += '<div class="tl-pre-side">' + (hFlag2 ? '<img class="tl-pre-flag" src="'+hFlag2+'" onerror="this.style.display=\'none\'">' : '') + '<div class="tl-pre-name">'+hCn2+'</div></div>';
+      preHtml += '<div class="tl-pre-vs-text">VS</div>';
+      preHtml += '<div class="tl-pre-side">' + (aFlag2 ? '<img class="tl-pre-flag" src="'+aFlag2+'" onerror="this.style.display=\'none\'">' : '') + '<div class="tl-pre-name">'+aCn2+'</div></div>';
+      preHtml += '</div>';
+      preHtml += '<div class="tl-pre-ball">⚽</div>';
+      var infoParts = [];
+      if (info.date) infoParts.push(info.date);
+      if (info.time) infoParts.push(info.time + ' 北京时间');
+      if (info.venue) infoParts.push(info.venue);
+      if (info.city) infoParts.push(info.city);
+      if (infoParts.length) {
+        preHtml += '<div class="tl-pre-info">' + infoParts.join('<span>·</span>') + '</div>';
+      }
+      preHtml += '</div>';
+      document.getElementById('tlEvents').innerHTML = preHtml;
       _setupVideo(null);
       document.getElementById('tlOverlay').classList.add('show');
       return;
@@ -2142,8 +2322,9 @@ function openTimeline(fifaId) {
 
     var tl = ev.timeline || [];
     if (!tl.length) {
-      document.getElementById('tlBody').innerHTML = '<div class="tl-empty">暂无事件</div>';
+      document.getElementById('tlEvents').innerHTML = '<div class="tl-empty">暂无事件</div>';
       _setupVideo(ev);
+      _loadLineup(fifaId);
       document.getElementById('tlOverlay').classList.add('show');
       return;
     }
@@ -2206,15 +2387,147 @@ function openTimeline(fifaId) {
     }
     html += '</div>';
 
-    document.getElementById('tlBody').innerHTML = html;
+    document.getElementById('tlEvents').innerHTML = html;
     _setupVideo(ev);
+    _loadLineup(fifaId);
     document.getElementById('tlOverlay').classList.add('show');
   });
 }
 
-// 视频系统：通过 /api/video 动态获取 m3u8 播放地址
+// 视频系统：IndexedDB 本地缓存 + HLS 播放
 var _hlsInstance = null;
-var _videoCache = {};  // fifaId -> {url, poster, duration} or null
+var _videoCache = {};  // 内存缓存: fifaId -> {url, poster, duration} or null
+var _vdb = null;       // IndexedDB 实例
+
+// 初始化 IndexedDB
+function _initVideoDB() {
+  if (_vdb) return Promise.resolve(_vdb);
+  return new Promise(function(resolve, reject) {
+    var req = indexedDB.open('fifa_video_cache', 2);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('videos')) {
+        db.createObjectStore('videos', {keyPath: 'fifaId'});
+      }
+    };
+    req.onsuccess = function(e) { _vdb = e.target.result; resolve(_vdb); };
+    req.onerror = function(e) { console.warn('[VDB] IndexedDB不可用'); resolve(null); };
+  });
+}
+
+// 存储视频到 IndexedDB
+function _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, title) {
+  return _initVideoDB().then(function(db) {
+    if (!db) return;
+    var totalSize = m3u8Text.length;
+    segBlobs.forEach(function(b) { totalSize += b.size; });
+    try {
+      var tx = db.transaction('videos', 'readwrite');
+      var store = tx.objectStore('videos');
+      store.put({
+        fifaId: fifaId,
+        m3u8Text: m3u8Text,
+        segBlobs: segBlobs,
+        baseUrl: baseUrl,
+        viaProxy: viaProxy,
+        entryId: entryId || '',
+        title: title || '',
+        size: totalSize,
+        time: Date.now()
+      });
+    } catch(e) { console.warn('[VDB] 保存失败:', e); }
+  });
+}
+
+// 从 IndexedDB 读取视频
+function _loadVideoFromDB(fifaId) {
+  return _initVideoDB().then(function(db) {
+    if (!db) return null;
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction('videos', 'readonly');
+        var store = tx.objectStore('videos');
+        var req = store.get(fifaId);
+        req.onsuccess = function() { resolve(req.result || null); };
+        req.onerror = function() { resolve(null); };
+      } catch(e) { resolve(null); }
+    });
+  });
+}
+
+// 下载 .ts 分段并存 IndexedDB
+function _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, entryId, title) {
+  // 解析 m3u8 提取 .ts URL
+  var lines = m3u8Text.split('\n');
+  var segUrls = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (line && !line.startsWith('#') && (line.endsWith('.ts') || line.indexOf('.ts?') > -1 || line.endsWith('.m4s') || line.indexOf('.m4s?') > -1)) {
+      var segUrl = line.startsWith('http') ? line : baseUrl + line;
+      segUrls.push(segUrl);
+    }
+  }
+  if (!segUrls.length) {
+    console.log('[VCACHE] 无.ts分段，跳过缓存');
+    return;
+  }
+
+  console.log('[VCACHE] 开始下载 ' + segUrls.length + ' 个分段...');
+  var segBlobs = [];
+  var fetchFn = viaProxy
+    ? function(u) { return fetch('/proxy/?url=' + encodeURIComponent(u)).then(function(r) { return r.blob(); }); }
+    : function(u) { return fetch(u).then(function(r) { return r.blob(); }); };
+
+  // 逐段下载
+  var idx = 0;
+  function next() {
+    if (idx >= segUrls.length) {
+      _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, title);
+      console.log('[VCACHE] 完成! ' + segBlobs.length + '段已存IndexedDB');
+      return;
+    }
+    fetchFn(segUrls[idx]).then(function(blob) {
+      segBlobs.push(blob);
+      idx++;
+      next();
+    }).catch(function() {
+      // 单段失败不中断
+      segBlobs.push(new Blob([], {type: 'video/mp2t'}));
+      idx++;
+      next();
+    });
+  }
+  next();
+}
+
+// 从 IndexedDB 缓存构建本地 m3u8 并播放
+function _playFromCache(cacheData) {
+  var m3u8Text = cacheData.m3u8Text;
+  var segBlobs = cacheData.segBlobs;
+  var lines = m3u8Text.split('\n');
+  var newLines = [];
+  var segIdx = 0;
+
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (line && !line.startsWith('#') && (line.endsWith('.ts') || line.indexOf('.ts?') > -1 || line.endsWith('.m4s') || line.indexOf('.m4s?') > -1)) {
+      if (segIdx < segBlobs.length) {
+        var blobUrl = URL.createObjectURL(segBlobs[segIdx]);
+        newLines.push(blobUrl);
+        segIdx++;
+      } else {
+        newLines.push(line);
+      }
+    } else {
+      newLines.push(lines[i]);
+    }
+  }
+
+  var localM3u8Blob = new Blob([newLines.join('\n')], {type: 'application/vnd.apple.mpegurl'});
+  var localM3u8Url = URL.createObjectURL(localM3u8Blob);
+  console.log('[VCACHE] 从本地缓存播放');
+  _playM3u8Direct(localM3u8Url);
+}
 
 function _setupVideo(ev) {
   var videoDiv = document.getElementById('tlVideo');
@@ -2227,46 +2540,53 @@ function _setupVideo(ev) {
 
   var fifaId = ev._fifaId;
 
-  // Check cache
-  if (_videoCache.hasOwnProperty(fifaId)) {
-    var cached = _videoCache[fifaId];
-    if (!cached) return;
-    _playM3u8(cached.url);
-    return;
-  }
+  // 1. 先查本地 IndexedDB 缓存
+  _loadVideoFromDB(fifaId).then(function(cached) {
+    if (cached && cached.segBlobs && cached.segBlobs.length) {
+      _playFromCache(cached);
+      return;
+    }
 
-  // Show loading state (don't destroy video element)
-  videoDiv.style.display = 'block';
-  video.style.display = 'none';
-  var loader = document.createElement('div');
-  loader.id = 'tlVideoLoader';
-  loader.style.cssText = 'color:#aaa;text-align:center;padding:20px;font-size:14px';
-  loader.textContent = '加载视频中...';
-  videoDiv.appendChild(loader);
+    // 2. 查内存缓存
+    if (_videoCache.hasOwnProperty(fifaId)) {
+      var memCached = _videoCache[fifaId];
+      if (!memCached) return;
+      _playM3u8(memCached.url);
+      return;
+    }
 
-  // Fetch m3u8 URL from /api/video
-  fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var ld = document.getElementById('tlVideoLoader');
-      if (ld) ld.remove();
-      if (data.error) {
+    // 3. 从服务器获取 m3u8 地址
+    videoDiv.style.display = 'block';
+    video.style.display = 'none';
+    var loader = document.createElement('div');
+    loader.id = 'tlVideoLoader';
+    loader.style.cssText = 'color:#aaa;text-align:center;padding:20px;font-size:14px';
+    loader.textContent = '加载视频中...';
+    videoDiv.appendChild(loader);
+
+    fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var ld = document.getElementById('tlVideoLoader');
+        if (ld) ld.remove();
+        if (data.error) {
+          _videoCache[fifaId] = null;
+          videoDiv.style.display = 'none';
+          return;
+        }
+        _videoCache[fifaId] = data;
+        _playM3u8(data.url, false, data.entryId, data.title);
+      })
+      .catch(function() {
+        var ld = document.getElementById('tlVideoLoader');
+        if (ld) ld.remove();
         _videoCache[fifaId] = null;
         videoDiv.style.display = 'none';
-        return;
-      }
-      _videoCache[fifaId] = data;
-      _playM3u8(data.url);
-    })
-    .catch(function() {
-      var ld = document.getElementById('tlVideoLoader');
-      if (ld) ld.remove();
-      _videoCache[fifaId] = null;
-      videoDiv.style.display = 'none';
-    });
+      });
+  });
 }
 
-function _playM3u8(m3u8Url, _viaProxy) {
+function _playM3u8(m3u8Url, _viaProxy, _entryId, _title) {
   var videoDiv = document.getElementById('tlVideo');
   var video = document.getElementById('tlPlayer');
   videoDiv.style.display = 'block';
@@ -2274,8 +2594,8 @@ function _playM3u8(m3u8Url, _viaProxy) {
 
   if (Hls.isSupported()) {
     var hlsConfig = {};
-    if (_viaProxy) {
-      // 回退模式：所有请求走服务器代理
+    var viaProxy = _viaProxy || false;
+    if (viaProxy) {
       hlsConfig.xhrSetup = function(xhr, url) {
         if (url.indexOf('/proxy/') !== 0) {
           xhr.open('GET', '/proxy/?url=' + encodeURIComponent(url), true);
@@ -2289,7 +2609,7 @@ function _playM3u8(m3u8Url, _viaProxy) {
       video.play();
     });
     // 直连失败时自动回退到代理
-    if (!_viaProxy) {
+    if (!viaProxy) {
       var _retried = false;
       _hlsInstance.on(Hls.Events.ERROR, function(event, data) {
         if (_retried) return;
@@ -2298,12 +2618,75 @@ function _playM3u8(m3u8Url, _viaProxy) {
           console.warn('[HLS] 直连失败，回退代理');
           _hlsInstance.destroy();
           _hlsInstance = null;
-          _playM3u8(m3u8Url, true);
+          _playM3u8(m3u8Url, true, _entryId, _title);
         }
       });
     }
+
+    // 播放成功后，后台缓存 .ts 分段到 IndexedDB
+    _hlsInstance.on(Hls.Events.MANIFEST_LOADED, function(e, d) {
+      // 获取原始 m3u8 文本并缓存
+      var fifaId = _tlCurrentFifaId;
+      if (!fifaId) return;
+      // 检查是否已缓存
+      _loadVideoFromDB(fifaId).then(function(existing) {
+        if (existing) return; // 已缓存，跳过
+        var m3u8Text = '';
+        var baseUrl = '';
+        try {
+          // 通过 xhr 重新获取 m3u8 文本
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', m3u8Url, false); // 同步
+          xhr.send();
+          if (xhr.status === 200) {
+            m3u8Text = xhr.responseText;
+            // 提取 baseUrl
+            var lastSlash = m3u8Url.lastIndexOf('/');
+            baseUrl = lastSlash > 0 ? m3u8Url.substring(0, lastSlash + 1) : '';
+            // 检查是否是多码率 master playlist，如果是则取第一个 variant
+            var variantMatch = m3u8Text.match(/^[^#].*\.m3u8\s*$/m);
+            if (variantMatch) {
+              var variantUrl = variantMatch[0].trim();
+              if (!variantUrl.startsWith('http')) variantUrl = baseUrl + variantUrl;
+              var xhr2 = new XMLHttpRequest();
+              xhr2.open('GET', variantUrl, false);
+              xhr2.send();
+              if (xhr2.status === 200) {
+                m3u8Text = xhr2.responseText;
+                var vs = variantUrl.lastIndexOf('/');
+                baseUrl = vs > 0 ? variantUrl.substring(0, vs + 1) : '';
+              }
+            }
+            _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, _entryId, _title);
+          }
+        } catch(ex) {
+          console.warn('[VCACHE] 获取m3u8文本失败:', ex);
+        }
+      });
+    });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = _viaProxy ? '/proxy/?url=' + encodeURIComponent(m3u8Url) : m3u8Url;
+    video.play();
+  }
+}
+
+// 直接播放（用于本地缓存回放，不需要代理回退和缓存逻辑）
+function _playM3u8Direct(m3u8Url) {
+  var videoDiv = document.getElementById('tlVideo');
+  var video = document.getElementById('tlPlayer');
+  videoDiv.style.display = 'block';
+  video.style.display = 'block';
+
+  if (Hls.isSupported()) {
+    if (_hlsInstance) { _hlsInstance.destroy(); _hlsInstance = null; }
+    _hlsInstance = new Hls();
+    _hlsInstance.loadSource(m3u8Url);
+    _hlsInstance.attachMedia(video);
+    _hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+      video.play();
+    });
+  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = m3u8Url;
     video.play();
   }
 }
@@ -2342,6 +2725,225 @@ function closeTimeline() {
   if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
   document.getElementById('tlVideo').style.display = 'none';
   document.getElementById('tlOverlay').classList.remove('show');
+  document.getElementById('tlLineup').classList.remove('show');
+  document.getElementById('tlLineup').innerHTML = '';
+  document.getElementById('tlEvents').innerHTML = '';
+  _tlLineupData = null;
+}
+
+// ===== 首发阵型系统 =====
+var _tlCurrentFifaId = null;
+var _tlLineupData = null;
+var _tlCurrentTab = 'events';
+
+
+function _loadLineup(fifaId) {
+  var tlLineup = document.getElementById('tlLineup');
+  tlLineup.innerHTML = '<div class="tl-lu-loading">加载阵容中...</div>';
+  tlLineup.classList.add('show');
+  fetch('/api/lineup?fifaId=' + fifaId)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _tlLineupData = data;
+      _renderLineup(data);
+    })
+    .catch(function() {
+      tlLineup.innerHTML = '';
+      tlLineup.classList.remove('show');
+    });
+}
+
+function _calcLineupPositions(players, formation, side) {
+  if (!formation || !formation.match(/^\d+(-\d+)+$/) || !players.length) return [];
+
+  var lines = formation.split('-').map(Number);
+  var gk = null;
+  var df = [], mf = [], fw = [];
+  players.forEach(function(p) {
+    if (p.pos === 0) { if (!gk) gk = p; return; }
+    if (p.pos === 1) df.push(p);
+    else if (p.pos === 3) fw.push(p);
+    else mf.push(p);
+  });
+
+  var result = [];
+
+  // GK at own goal end
+  if (gk) {
+    result.push({
+      id: gk.id, name: gk.name, pos: gk.pos, jersey: gk.jersey,
+      captain: gk.captain, x: side === 'home' ? 6 : 94, y: 50
+    });
+  }
+
+  // Map formation lines to position groups
+  // lines[0] → DF, lines[1..n-2] → MF, lines[n-1] → FW
+  var totalLines = lines.length;
+  var dfIdx = 0, mfIdx = 0, fwIdx = 0;
+
+  for (var li = 0; li < totalLines; li++) {
+    var count = lines[li];
+    var picked = [];
+
+    // Determine which pool to draw from
+    var posType;
+    if (totalLines <= 3) {
+      posType = li === 0 ? 1 : (li === totalLines - 1 ? 3 : 2);
+    } else {
+      if (li === 0) posType = 1;
+      else if (li === totalLines - 1) posType = 3;
+      else posType = 2;
+    }
+
+    if (posType === 1) {
+      while (picked.length < count && dfIdx < df.length) picked.push(df[dfIdx++]);
+      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
+    } else if (posType === 3) {
+      while (picked.length < count && fwIdx < fw.length) picked.push(fw[fwIdx++]);
+      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
+    } else {
+      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
+      while (picked.length < count && fwIdx < fw.length) picked.push(fw[fwIdx++]);
+      while (picked.length < count && dfIdx < df.length) picked.push(df[dfIdx++]);
+    }
+
+    // Depth fraction: row position from own goal to opponent
+    var depthFrac = (li + 1) / (totalLines + 1);
+    var xPct = side === 'home'
+      ? 6 + depthFrac * 41
+      : 94 - depthFrac * 41;
+
+    // Y spacing — wider range for more players per line
+    var yStart = 8, yEnd = 92;
+    for (var j = 0; j < picked.length; j++) {
+      var yPct;
+      if (picked.length === 1) {
+        yPct = 50;
+      } else {
+        yPct = yStart + (yEnd - yStart) * j / (picked.length - 1);
+      }
+      var p = picked[j];
+      result.push({
+        id: p.id, name: p.name, pos: p.pos, jersey: p.jersey,
+        captain: p.captain, x: xPct, y: yPct, rowLen: picked.length, rowIdx: j
+      });
+    }
+  }
+
+  // Fix player name overlap: stagger names for dense rows
+  // Group result by x (same row)
+  var rowMap = {};
+  result.forEach(function(p) {
+    var key = Math.round(p.x);
+    if (!rowMap[key]) rowMap[key] = [];
+    rowMap[key].push(p);
+  });
+  Object.keys(rowMap).forEach(function(key) {
+    var row = rowMap[key];
+    if (row.length < 4) return;
+    row.sort(function(a, b) { return a.y - b.y; });
+    for (var i = 0; i < row.length; i++) {
+      var gap = i > 0 ? row[i].y - row[i - 1].y : 999;
+      if (gap < 14) {
+        row[i]._nameAbove = (i % 2 === 1);
+      }
+    }
+  });
+
+  return result;
+}
+
+function _renderLineup(data) {
+  var el = document.getElementById('tlLineup');
+  if (!data || !data.home || !data.away) {
+    el.innerHTML = '<div class="tl-lu-loading">暂无阵容数据</div>';
+    el.classList.add('show');
+    return;
+  }
+
+  var hFormation = data.home.formation || '';
+  var aFormation = data.away.formation || '';
+  var hPlayers = _calcLineupPositions(data.home.players, hFormation, 'home');
+  var aPlayers = _calcLineupPositions(data.away.players, aFormation, 'away');
+
+  // Find coach Chinese name from WC_TEAMS
+  function findCoachCn(idCoach) {
+    if (!idCoach || typeof WC_TEAMS === 'undefined') return '';
+    for (var i = 0; i < WC_TEAMS.length; i++) {
+      if (WC_TEAMS[i].coach && String(WC_TEAMS[i].coach.id) === String(idCoach)) {
+        return WC_TEAMS[i].coach.cn_name || WC_TEAMS[i].coach.name;
+      }
+    }
+    return '';
+  }
+
+  var hCoachCn = data.home.coach ? (findCoachCn(data.home.coach.id) || data.home.coach.name) : '';
+  var aCoachCn = data.away.coach ? (findCoachCn(data.away.coach.id) || data.away.coach.name) : '';
+
+  // Find player Chinese name from WC_TEAMS
+  function findPlayerCn(idPlayer) {
+    if (!idPlayer || typeof WC_TEAMS === 'undefined') return '';
+    for (var i = 0; i < WC_TEAMS.length; i++) {
+      for (var j = 0; j < WC_TEAMS[i].players.length; j++) {
+        if (String(WC_TEAMS[i].players[j].id) === String(idPlayer)) {
+          return WC_TEAMS[i].players[j].cn_name || '';
+        }
+      }
+    }
+    return '';
+  }
+
+  var html = '<div class="tl-lu-title">首发阵容 ' + (hFormation||'?') + ' vs ' + (aFormation||'?') + '</div><div class="tl-pitch">';
+  // Pitch markings
+  html += '<div class="tl-pitch-c tl-pitch-midline"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-circle"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-box-l"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-box-r"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-ga-l"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-ga-r"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-spot tl-pitch-center-dot"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-spot tl-pitch-pen-l"></div>';
+  html += '<div class="tl-pitch-c tl-pitch-spot tl-pitch-pen-r"></div>';
+
+  // Formation labels
+  if (hFormation) html += '<div class="tl-lu-form home">' + hFormation + '</div>';
+  if (aFormation) html += '<div class="tl-lu-form away">' + aFormation + '</div>';
+
+  // Home players
+  hPlayers.forEach(function(p) {
+    var isGk = p.pos === 0;
+    var nameAbove = p._nameAbove ? true : false;
+    var cnName = findPlayerCn(p.id) || p.name || '';
+    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + '" style="left:' + p.x + '%;top:' + p.y + '%">';
+    html += '<div class="tl-lu-marker home' + (isGk ? ' gk' : '') + '">';
+    html += (p.jersey || '?');
+    if (p.captain) html += '<span class="tl-lu-captain"></span>';
+    html += '</div>';
+    html += '<div class="tl-lu-pname">' + cnName + '</div>';
+    html += '</div>';
+  });
+
+  // Away players
+  aPlayers.forEach(function(p) {
+    var isGk = p.pos === 0;
+    var nameAbove = p._nameAbove ? true : false;
+    var cnName = findPlayerCn(p.id) || p.name || '';
+    html += '<div class="tl-lu-player' + (nameAbove ? ' name-above' : '') + '" style="left:' + p.x + '%;top:' + p.y + '%">';
+    html += '<div class="tl-lu-marker away' + (isGk ? ' gk' : '') + '">';
+    html += (p.jersey || '?');
+    if (p.captain) html += '<span class="tl-lu-captain"></span>';
+    html += '</div>';
+    html += '<div class="tl-lu-pname">' + cnName + '</div>';
+    html += '</div>';
+  });
+
+  // Coach labels
+  if (hCoachCn) html += '<div class="tl-lu-coach home">' + hCoachCn + '</div>';
+  if (aCoachCn) html += '<div class="tl-lu-coach away">' + aCoachCn + '</div>';
+
+  html += '</div>';
+  el.innerHTML = html;
+  el.classList.add('show');
 }
 </script>
 

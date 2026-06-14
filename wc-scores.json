@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-13T14:07:46Z",
+ "last_updated": "2026-06-14T05:13:33Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -17,6 +17,22 @@
   "D4": {
    "s1": 1,
    "s2": 4
+  },
+  "B2": {
+   "s1": 1,
+   "s2": 1
+  },
+  "C3": {
+   "s1": 1,
+   "s2": 1
+  },
+  "C4": {
+   "s1": 0,
+   "s2": 1
+  },
+  "D3": {
+   "s1": 1,
+   "s2": 0
   }
  },
  "bracket_scores": {},
@@ -103,15 +119,15 @@
    "away": "SUI",
    "h_cn": "卡塔尔",
    "a_cn": "瑞士",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-13T19:00:00Z",
    "group": "Group B",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "67966",
    "venue": "San Francisco Bay Area Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -122,15 +138,15 @@
    "away": "MAR",
    "h_cn": "巴西",
    "a_cn": "摩洛哥",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-13T22:00:00Z",
    "group": "Group C",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "80663",
    "venue": "New York/New Jersey Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -141,15 +157,15 @@
    "away": "SCO",
    "h_cn": "海地",
    "a_cn": "苏格兰",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 0,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-14T01:00:00Z",
    "group": "Group C",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "64146",
    "venue": "Boston Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -160,15 +176,15 @@
    "away": "TUR",
    "h_cn": "澳大利亚",
    "a_cn": "土耳其",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
+   "score_h": 1,
+   "score_a": 0,
+   "status": 3,
    "finished": false,
-   "live": false,
+   "live": true,
    "date": "2026-06-14T04:00:00Z",
    "group": "Group D",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "52497",
    "venue": "BC Place Vancouver",
    "group_matched": true,
    "bracket_matched": false

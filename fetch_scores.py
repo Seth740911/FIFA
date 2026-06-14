@@ -528,11 +528,13 @@ def fetch_and_aggregate_cards(match_details, pid_map):
 
     # Load existing cards
     existing_cards = {}
+    processed_match_ids = set()
     if os.path.exists(CARDS_FILE):
         try:
             with open(CARDS_FILE, "r", encoding="utf-8") as f:
                 old = json.load(f)
             existing_cards = old.get("cards", {})
+            processed_match_ids = set(old.get("processed_matches", []))
         except Exception:
             pass
 
@@ -543,9 +545,9 @@ def fetch_and_aggregate_cards(match_details, pid_map):
         if (m.get("finished") or m.get("live")) and mid:
             all_finished.append(mid)
 
-    # Delta: only fetch matches not already in events
-    new_ids = [mid for mid in all_finished if mid not in existing_events]
-    print(f"[INFO] Events: {len(existing_events)} cached, {len(new_ids)} new to fetch")
+    # Delta: only fetch matches not already processed for cards
+    new_ids = [mid for mid in all_finished if mid not in processed_match_ids]
+    print(f"[INFO] Events: {len(existing_events)} cached, Cards: {len(processed_match_ids)} processed, {len(new_ids)} new to fetch")
 
     if not all_finished:
         stage_info = _compute_stage_flags(match_details)
@@ -767,9 +769,9 @@ def discover_videos():
         return 0
     
     # Also collect from news section (uses /sections/news/ endpoint)
+    # Only use the main highlights feed, NOT the alt-cast/Gamified one
     NEWS_IDS = [
-        "1klF18lgpe12FFtd1IoTSs",  # WC2026 match highlights news
-        "15XcFrdPBpm6UfhP15fuNq",  # WC2026 alt-cast highlights news
+        "1klF18lgpe12FFtd1IoTSs",  # WC2026 match highlights news (standard Highlights only)
     ]
     for nid in NEWS_IDS:
         url = f"{CXM_API}/sections/news/{nid}?locale=en&limit=50"
@@ -820,9 +822,16 @@ def discover_videos():
         if not match_id:
             continue
         
-        # Determine video type: "highlights" for official, title-based for others
-        is_highlights = "Highlights" in title and "Alt Cast" not in title
-        video_type = "highlights" if is_highlights else "alt_cast"
+        # Determine video type: only standard match Highlights are accepted
+        # Exclude: "Gamified Highlights", "International Sign Language (IS)", "Alt Cast"
+        is_standard_highlights = (
+            "Highlights" in title
+            and "Gamified" not in title
+            and "International Sign Language" not in title
+            and "Alt Cast" not in title
+            and "|" in title  # Standard format: "XXX v YYY | Group Z | FIFA World Cup 2026™ | Highlights"
+        )
+        video_type = "highlights" if is_standard_highlights else "other"
         
         # Build entry - support multiple videos per match
         existing = vmap.get(match_id, {})
@@ -833,18 +842,14 @@ def discover_videos():
         if not isinstance(existing, dict):
             existing = {}
         
-        # Always keep "highlights" as primary, only add alt_cast if no highlights yet
+        # Always keep standard "highlights" as primary, skip non-standard videos
         if video_type == "highlights":
             vmap[match_id] = {"entryId": eid, "title": title}
             new_count += 1
             print(f"[video] NEW: {match_id} -> {eid} ({title})")
-        elif not existing.get("entryId"):
-            # No highlights yet, use alt_cast as placeholder
-            vmap[match_id] = {"entryId": eid, "title": title}
-            new_count += 1
-            print(f"[video] NEW (alt): {match_id} -> {eid} ({title})")
         else:
-            print(f"[video] Skip {eid}: alt_cast, highlights already exists for {match_id}")
+            # Skip Gamified Highlights, ISL, Alt Cast, etc.
+            print(f"[video] Skip {eid}: non-standard type (title: {title[:80]})")
     
     # Save updated mapping
     if new_count > 0:

@@ -20,6 +20,7 @@ from http.server import SimpleHTTPRequestHandler
 
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
 FETCH_SCRIPT = os.path.join(WEB_DIR, "fetch_scores.py")
+APK_DIR = r"G:\AI\APK"
 VIDEO_DIR = r"D:\迅雷下载"
 
 
@@ -47,18 +48,29 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         if self.path.split('?')[0] == '/api/sync':
             self._handle_sync()
             return
+        if self.path.split('?')[0] == '/api/lineup':
+            self._handle_api_lineup()
+            return
         if self.path.split('?')[0] == '/api/video':
             self._handle_api_video()
             return
         if self.path.split('?')[0] == '/api/videos':
             self._handle_api_videos()
             return
+        # /dl → 全部下载页 / /fifa → FIFA专用下载页
+        if self.path.split('?')[0] in ('/dl', '/dl/'):
+            self.path = '/download.html'
+        elif self.path.split('?')[0] in ('/fifa', '/fifa/'):
+            self.path = '/fifa-dl.html'
         # /proxy/?url=ENCODED_URL -> 代理该 URL（用于 HLS 代理）
         if self.path.startswith('/proxy/?'):
             self._handle_proxy()
             return
         if self.path.startswith('/video/'):
             self._handle_video()
+            return
+        if self.path.startswith('/apk/'):
+            self._handle_apk()
             return
         super().do_GET()
 
@@ -105,6 +117,28 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.send_header('Content-Type', ct)
             self.send_header('Content-Length', len(data))
             self.send_header('Access-Control-Allow-Origin', '*')
+            super().end_headers()
+            self.wfile.write(data)
+        except Exception as e:
+            self.send_error(500, str(e))
+
+    def _handle_apk(self):
+        """提供APK文件下载，浏览器下载完自动弹出安装提示"""
+        filename = self.path[len('/apk/'):]
+        filename = urllib.parse.unquote(filename)
+        fpath = os.path.normpath(os.path.join(APK_DIR, filename))
+        if not fpath.startswith(os.path.normpath(APK_DIR)):
+            self.send_error(403)
+            return
+        if not os.path.isfile(fpath):
+            self.send_error(404)
+            return
+        try:
+            with open(fpath, 'rb') as f:
+                data = f.read()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/vnd.android.package-archive')
+            self.send_header('Content-Length', len(data))
             super().end_headers()
             self.wfile.write(data)
         except Exception as e:
@@ -180,6 +214,18 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                 self._json_response({'error': 'No Match tag found', 'title': title}, 404)
                 return
 
+            # 过滤：只接受标准 Highlights，排除 Gamified / IS / Alt Cast
+            is_standard = (
+                'Highlights' in title
+                and 'Gamified' not in title
+                and 'International Sign Language' not in title
+                and 'Alt Cast' not in title
+                and '|' in title
+            )
+            if not is_standard:
+                self._json_response({'error': 'Not standard Highlights (Gamified/IS/Alt Cast skipped)', 'title': title}, 400)
+                return
+
             match_id = match_tag.get('id', '')
             video_map_path = os.path.join(WEB_DIR, 'wc-videos.json')
             vmap = {}
@@ -199,6 +245,85 @@ class FIFAHandler(SimpleHTTPRequestHandler):
 
         except Exception as e:
             print(f"  [video] Register error: {e}")
+            self._json_response({'error': str(e)}, 500)
+
+    def _handle_api_lineup(self):
+        """获取首发阵容: /api/lineup?fifaId=400021443"""
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        fifa_id = qs.get('fifaId', [''])[0]
+        if not fifa_id:
+            self._json_response({'error': 'fifaId required'}, 400)
+            return
+        try:
+            # 从赛事ID中提取其他参数（从wc-events.json查找）
+            events_path = os.path.join(WEB_DIR, 'wc-events.json')
+            if not os.path.exists(events_path):
+                self._json_response({'error': 'no events data'}, 404)
+                return
+            with open(events_path, 'r', encoding='utf-8') as f:
+                events = json.load(f).get('events', {})
+            ev = events.get(fifa_id)
+            if not ev:
+                self._json_response({'error': 'match not found'}, 404)
+                return
+            cid = ev.get('cid', '17')
+            sid = ev.get('sid', '285023')
+            stid = ev.get('stid', '289273')
+            # 调用FIFA Live API获取阵容
+            api_url = f'https://api.fifa.com/api/v3/live/football/{fifa_id}?language=en'
+            try:
+                resp = _urlopen(api_url, timeout=10)
+                data = json.loads(resp.read().decode('utf-8'))
+            except Exception:
+                # 回退：用calendar API
+                api_url2 = f'https://api.fifa.com/api/v3/calendar/matches?language=en&idCompetition={cid}&idSeason={sid}&idStage={stid}&idMatch={fifa_id}&count=400'
+                resp = _urlopen(api_url2, timeout=10)
+                cal = json.loads(resp.read().decode('utf-8'))
+                data = cal.get('Results', [{}])[0] if cal.get('Results') else {}
+
+            result = {'home': None, 'away': None}
+            for side, key in [('HomeTeam', 'home'), ('AwayTeam', 'away')]:
+                team = data.get(side, {})
+                if not team:
+                    # calendar API格式
+                    side_key = 'Home' if key == 'home' else 'Away'
+                    team = data.get(side_key, {})
+                players_raw = team.get('Players', [])
+                starters = []
+                for p in players_raw:
+                    pl = p.get('Player', p)  # live API用Players[].Player, calendar可能不同
+                    status = pl.get('Status', p.get('Status', 0))
+                    if status == 1:  # Starting XI
+                        pos_code = pl.get('Position', p.get('Position', 3))
+                        starters.append({
+                            'id': pl.get('IdPlayer', p.get('IdPlayer', '')),
+                            'name': (pl.get('ShortName') or pl.get('PlayerName', [{}]))[0].get('Description', '') if isinstance(pl.get('ShortName') or pl.get('PlayerName'), list) else str(pl.get('ShortName', '')),
+                            'pos': pos_code,
+                            'jersey': pl.get('ShirtNumber', p.get('ShirtNumber', 0)),
+                            'captain': pl.get('Captain', p.get('Captain', False))
+                        })
+                # 提取主教练 (Role=0)
+                coach_info = None
+                coaches_raw = team.get('Coaches', [])
+                for c in coaches_raw:
+                    if c.get('Role') == 0:
+                        nm = c.get('Name', [])
+                        al = c.get('Alias', [])
+                        coach_info = {
+                            'id': c.get('IdCoach', ''),
+                            'name': al[0].get('Description', '') if al else (nm[0].get('Description', '') if nm else ''),
+                            'photo': c.get('PictureUrl') or ''
+                        }
+                        break
+                result[key] = {
+                    'team': team.get('ShortClubName', team.get('TeamName', '')),
+                    'idTeam': str(team.get('IdTeam', '')),
+                    'formation': team.get('Tactics', ''),
+                    'players': starters,
+                    'coach': coach_info
+                }
+            self._json_response(result)
+        except Exception as e:
             self._json_response({'error': str(e)}, 500)
 
     def _handle_api_video(self):
@@ -246,7 +371,7 @@ class FIFAHandler(SimpleHTTPRequestHandler):
 
             # 返回真实 playURL，前端通过 /proxy/ 代理所有 HLS 请求
             print(f"  [video] play_url = {play_url[:100]}")
-            self._json_response({'url': play_url, 'poster': poster, 'duration': duration})
+            self._json_response({'url': play_url, 'poster': poster, 'duration': duration, 'entryId': entry_id, 'title': entry.get('title', '') if isinstance(entry, dict) else ''})
         except Exception as e:
             print(f"  [video] Error: {e}")
             self._json_response({'error': str(e)}, 500)
