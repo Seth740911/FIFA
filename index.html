@@ -82,6 +82,7 @@ nav a:nth-child(3){background:#e74c3c;border-color:#c0392b}
 nav a:nth-child(4){background:#9b59b6;border-color:#8e44ad}
 nav a:nth-child(5){background:#3498db;border-color:#2980b9}
 nav a:nth-child(6){background:#1abc9c;border-color:#16a085}
+nav a:nth-child(7){background:#e84393;border-color:#c2185b}
 nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 #net-indicator{margin-left:auto;font-size:.75em;padding:4px 10px;border-radius:12px;font-weight:600;white-space:nowrap;align-self:center}
 .net-ok{display:none}
@@ -124,6 +125,17 @@ h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 /* 场馆 */
 .venue-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;margin:3px 0;display:flex;justify-content:space-between;align-items:center}
 .venue-card:hover{border-color:var(--gold)}
+
+/* 新规板块 */
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.rule-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px 12px;transition:border-color .2s}
+.rule-card:hover{border-color:var(--gold)}
+.rule-card.rule-highlight{border-left:3px solid var(--gold)}
+.rule-icon{font-size:1.6em;margin-bottom:6px}
+.rule-title{font-size:.92em;font-weight:700;color:var(--text1);margin-bottom:6px}
+.rule-body p{font-size:.82em;color:var(--text2);line-height:1.55;margin:0 0 4px}
+.rule-body b{color:var(--text1)}
+@media(max-width:640px){.rules-grid{grid-template-columns:1fr;gap:8px}.rule-card{padding:12px 14px 10px}}
 
 /* 各队阵容 */
 /* 阵容照片墙 */
@@ -494,6 +506,7 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   <a href="#knockout">淘汰赛</a>
   <a href="#stars">球星</a>
   <a href="#venues">场馆</a>
+  <a href="#rules">新规</a>
   <a href="#roster">阵容</a>
   <span id="net-indicator" class="net-ok"></span>
 </nav>
@@ -1079,6 +1092,88 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   <div class="venue-card"><div><strong>Estadio BBVA</strong><br><span style="color:var(--text2)">蒙特雷</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">53,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
 </section>
 
+<!-- 2026新规 -->
+<section id="rules" class="section fade-in">
+  <div class="sticky-head" id="rulesSticky"><h2>2026 新规速览</h2></div>
+  <div class="rules-grid">
+
+    <div class="rule-card rule-highlight">
+      <div class="rule-icon">🏆</div>
+      <div class="rule-title">48队扩军 · 新赛制</div>
+      <div class="rule-body">
+        <p>48队分为<b>12组</b>，每组4队单循环。每组前2名直接出线（24队）+ 成绩最好的<b>8个小组第3</b>，共32队进淘汰赛。总场次64→104场，冠军需打<b>8场</b>（往届7场），新增1/16决赛。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">⏱️</div>
+      <div class="rule-title">5秒反拖延</div>
+      <div class="rule-body">
+        <p><b>球门球/界外球</b>：裁判开启5秒可视倒计时，超时球权转换（球门球→角球，界外球→对方掷球）。</p>
+        <p><b>换人</b>：换人牌举起后，被换下球员必须10秒内离场；故意磨蹭者，替补需等1分钟后下一个死球才能上场。</p>
+        <p><b>门将持球</b>：上限8秒，超时口头警告→出牌。</p>
+        <p><b>受伤治疗</b>：场内治疗后须在场外停留满1分钟才能再进场（门将及脑震荡除外）。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">🚫</div>
+      <div class="rule-title">禁止门将"战术暂停"</div>
+      <div class="rule-body">
+        <p>门将倒地受伤时，所有场上球员<b>必须留在原地或中圈集合</b>，严禁跑向替补席/技术区听战术布置。彻底封杀"借门将受伤全员开会"的漏洞。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">🟥</div>
+      <div class="rule-title">捂嘴冲突 → 直红</div>
+      <div class="rule-body">
+        <p>球员在争执、对抗、冲突中<b>用手/手臂/球衣遮挡嘴部交流</b>，裁判认定为非友好沟通，<b>直接红牌</b>罚下。正常友好聊天不判罚。</p>
+        <p>此外：<b>围堵裁判</b>仅允许队长沟通，多人围堵→黄牌；<b>煽动罢赛</b>→红牌+球队可判0:3告负。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">🟡</div>
+      <div class="rule-title">黄牌两次清零</div>
+      <div class="rule-body">
+        <p>往届仅1/4决赛后清零一次。本届设置<b>两个清零节点</b>：</p>
+        <p><b>① 小组赛结束</b>：所有球员黄牌归零，以"零黄牌"进入淘汰赛。</p>
+        <p><b>② 1/4决赛后</b>：再清零一次，半决赛不会因累积黄牌停赛。</p>
+        <p>注：小组赛累积2黄停赛的球员仍需执行停赛，但清零后从淘汰赛重新计算。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">📺</div>
+      <div class="rule-title">VAR 全面升级</div>
+      <div class="rule-body">
+        <p><b>定位球前置犯规追溯</b>：角球/任意球开出前的拉拽、阻挡，VAR可回看判罚；进球前有犯规→进球取消+追加处罚。</p>
+        <p><b>纠正红黄牌误判</b>：可核查第二张黄牌错发、认错被罚球员、误罚红牌，明显错误可当场更正。</p>
+        <p><b>角球专项纠错</b>：针对角球边线判罚失误进行纠正。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">💧</div>
+      <div class="rule-title">强制补水 · "四节制"</div>
+      <div class="rule-body">
+        <p>上下半场约第22分钟各设<b>3分钟强制补水暂停</b>（不限天气状况，所有场次通用）。补水时间<b>不计入伤停补时</b>，比赛实质变为"四节制"，同时成为教练合法临场布置战术的窗口。</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon">📊</div>
+      <div class="rule-title">小组第3排名规则</div>
+      <div class="rule-body">
+        <p>12个小组第3按以下优先级排序，取前8名晋级：</p>
+        <p>① 积分 → ② 净胜球 → ③ 进球数 → ④ 公平竞赛积分（红黄牌少者列前）→ ⑤ 抽签</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- 各队阵容 -->
 <section id="roster" class="section fade-in">
   <div class="sticky-head" id="rosterSticky"><h2>各队阵容</h2></div>
@@ -1104,9 +1199,9 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
     <div class="tl-video" id="tlVideo" style="display:none">
       <video id="tlPlayer" controls playsinline style="width:100%;max-height:40vh;background:#000"></video>
     </div>
+    <div id="tlLineup"></div>
     <div class="tl-body" id="tlBody">
       <div id="tlEvents"></div>
-      <div id="tlLineup"></div>
     </div>
   </div>
 </div>
