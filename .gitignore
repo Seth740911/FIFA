@@ -1,11 +1,43 @@
-# 排除安装包和临时文件
-*.exe
-*.msi
-.temp/
+# Python
 __pycache__/
-*.xlsx
-*.svg
+*.py[cod]
+*.egg-info/
+*.dist-info/
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统
 Thumbs.db
 .DS_Store
+
+# 构建产物
+releases/
+*.apk
+*.exe
+*.msi
+
+# 临时文件
+.temp/
+*.log
+access.log
+
+# 数据文件（可选，根据实际情况调整）
 wc-photos/
+wc-flags/
+
+# 备份和导出
 backup/
+*.xlsx
+*.svg
+
+# 依赖
+node_modules/

@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-15T03:02:10Z",
+ "last_updated": "2026-06-15T09:52:53Z",
  "processed_matches": [
   "400021441",
   "400021443",
@@ -157,6 +157,54 @@
    "y_ko": 0,
    "r_ko": 0
   },
+  "HAI-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SCO-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SCO-25": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SCO-23": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "TUR-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "NED-24": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "NED-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "NED-15": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
   "CIV-6": {
    "y_group": 1,
    "r_group": 0,
@@ -170,6 +218,18 @@
    "r_ko": 0
   },
   "CIV-17": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "ECU-25": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "TUN-13": {
    "y_group": 1,
    "r_group": 0,
    "y_ko": 0,

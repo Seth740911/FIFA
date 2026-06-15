@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA 2026 - 项目监控面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .port-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .port-tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .port-tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .port-tab.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .port-tab .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .port-tab .status-dot.online {
+            background: #10b981;
+        }
+
+        .port-tab .status-dot.offline {
+            background: #ef4444;
+        }
+
+        .port-content {
+            display: none;
+        }
+
+        .port-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visitor-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .visitor-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s ease;
+        }
+
+        .visitor-item:hover {
+            background: #f8f9ff;
+        }
+
+        .visitor-item:last-child {
+            border-bottom: none;
+        }
+
+        .visitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .visitor-ip {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .visitor-count {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .visitor-details {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .visitor-details strong {
+            color: #333;
+        }
+
+        .apk-list {
+            margin-top: 15px;
+        }
+
+        .apk-item {
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .apk-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .apk-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e8eaff;
+            color: #667eea;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+
+        .badge.mobile {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 200px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 8px 8px 0 0;
+            transition: height 0.5s ease;
+            min-height: 5px;
+        }
+
+        .bar-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .bar-value {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+
+        .port-offline {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .port-offline .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .port-offline h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 项目监控面板</h1>
+            <p>多端口独立统计 - 选择端口查看详情</p>
+        </header>
+
+        <div id="loading" class="loading">
+            ⏳ 正在加载端口数据...
+        </div>
+
+        <div id="content" style="display: none;">
+            <div id="portTabs" class="port-tabs"></div>
+            <div id="portContents"></div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadAllPorts()" title="刷新数据">🔄</button>
+
+    <script>
+        var allPortData = {};
+        var activePort = null;
+
+        async function loadAllPorts() {
+            try {
+                const response = await fetch('/api/all-stats');
+                allPortData = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                renderTabs();
+                renderContents();
+                
+                // 默认选中第一个在线的端口
+                if (!activePort) {
+                    const firstOnline = Object.keys(allPortData.ports).find(p => allPortData.ports[p].status === 'online');
+                    if (firstOnline) switchPort(firstOnline);
+                }
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').innerHTML = '<div>❌ 加载失败，请刷新重试</div>';
+            }
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('portTabs');
+            tabsContainer.innerHTML = '';
+            
+            for (const [port, portData] of Object.entries(allPortData.ports)) {
+                const tab = document.createElement('div');
+                tab.className = 'port-tab';
+                tab.dataset.port = port;
+                tab.innerHTML = `
+                    <span class="status-dot ${portData.status}"></span>
+                    端口 ${port}
+                `;
+                tab.onclick = () => switchPort(port);
+                tabsContainer.appendChild(tab);
+            }
+        }
+
+        function renderContents() {
+            const contentsContainer = document.getElementById('portContents');
+            contentsContainer.innerHTML = '';
+            
+            for (const [port, portData] of Object.entries(allPortData.ports)) {
+                const content = document.createElement('div');
+                content.className = 'port-content';
+                content.id = `port-${port}`;
+                
+                if (portData.status === 'online') {
+                    const stats = portData.data;
+                    content.innerHTML = `
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="icon">📥</div>
+                                <div class="value">${stats.total_downloads}</div>
+                                <div class="label">APK下载次数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">👥</div>
+                                <div class="value">${stats.unique_ips}</div>
+                                <div class="label">独立访问者</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">🟢</div>
+                                <div class="value">${stats.online_users}</div>
+                                <div class="label">当前在线</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="icon">📱</div>
+                                <div class="value">${stats.visitors ? stats.visitors.filter(v => v.is_mobile).length : 0}</div>
+                                <div class="label">移动端访问</div>
+                            </div>
+                        </div>
+
+                        <div class="content-grid">
+                            <div class="panel">
+                                <h2>👥 访问者详情</h2>
+                                <div class="visitor-list">
+                                    ${stats.visitors && stats.visitors.length > 0 ? stats.visitors.map(v => `
+                                        <div class="visitor-item">
+                                            <div class="visitor-header">
+                                                <span class="visitor-ip">🌐 ${v.ip}</span>
+                                                <span class="visitor-count">${v.count} 次</span>
+                                            </div>
+                                            <div class="visitor-details">
+                                                <div><strong>首次访问:</strong> ${v.first_seen}</div>
+                                                <div><strong>最后访问:</strong> ${v.last_seen}</div>
+                                                <div style="margin-top: 8px;">
+                                                    <strong>设备:</strong> 
+                                                    ${v.is_mobile ? '<span class="badge mobile">📱 移动端</span>' : '<span class="badge">💻 桌面端</span>'}
+                                                    ${v.device_types.join(', ')}
+                                                </div>
+                                                ${v.apk_downloads && v.apk_downloads.length > 0 ? `
+                                                    <div style="margin-top: 8px;">
+                                                        <strong>下载APK:</strong> ${v.apk_downloads.map(f => `<span class="badge">${f}</span>`).join(' ')}
+                                                    </div>
+                                                ` : ''}
+                                                ${v.pages_visited && v.pages_visited.length > 0 ? `
+                                                    <div style="margin-top: 8px;">
+                                                        <strong>浏览页面:</strong> ${v.pages_visited.slice(0, 5).map(p => `<span class="badge">${p}</span>`).join(' ')}${v.pages_visited.length > 5 ? '...' : ''}
+                                                    </div>
+                                                ` : ''}
+                                                ${v.videos_watched && v.videos_watched.length > 0 ? `
+                                                    <div style="margin-top: 8px;">
+                                                        <strong>观看视频:</strong> ${v.videos_watched.length} 场
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('') : '<div class="empty-state"><p>暂无访问数据</p></div>'}
+                                </div>
+                            </div>
+
+                            <div class="panel">
+                                <h2>📊 行为统计</h2>
+                                <div class="apk-list">
+                                    <div class="apk-item">
+                                        <span class="apk-name">📄 页面总访问</span>
+                                        <span class="apk-count">${stats.page_views ? stats.page_views.reduce((s, p) => s + p.count, 0) : 0} 次</span>
+                                    </div>
+                                    <div class="apk-item">
+                                        <span class="apk-name">🎬 视频总观看</span>
+                                        <span class="apk-count">${stats.video_watches ? stats.video_watches.reduce((s, v) => s + v.count, 0) : 0} 次</span>
+                                    </div>
+                                    <div class="apk-item">
+                                        <span class="apk-name">📱 APK总下载</span>
+                                        <span class="apk-count">${stats.total_downloads} 次</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-grid">
+                            <div class="panel">
+                                <h2>📱 APK下载排行</h2>
+                                <div class="apk-list">
+                                    ${stats.apk_files && stats.apk_files.length > 0 ? stats.apk_files.map(apk => `
+                                        <div class="apk-item">
+                                            <span class="apk-name">📦 ${apk.file}</span>
+                                            <span class="apk-count">${apk.count} 次下载</span>
+                                        </div>
+                                    `).join('') : '<div class="empty-state"><p>暂无下载数据</p></div>'}
+                                </div>
+                            </div>
+
+                            <div class="panel">
+                                <h2>📄 页面访问TOP10</h2>
+                                <div class="apk-list">
+                                    ${stats.page_views && stats.page_views.length > 0 ? stats.page_views.map(page => `
+                                        <div class="apk-item">
+                                            <span class="apk-name">📄 ${page.page}</span>
+                                            <span class="apk-count">${page.count} 次</span>
+                                        </div>
+                                    `).join('') : '<div class="empty-state"><p>暂无访问数据</p></div>'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <h2>🎬 视频观看TOP10</h2>
+                            <div class="apk-list">
+                                ${stats.video_watches && stats.video_watches.length > 0 ? stats.video_watches.map(video => `
+                                    <div class="apk-item">
+                                        <span class="apk-name">🎬 ${video.title || video.fifa_id}${video.total_duration > 0 ? ` (${Math.round(video.total_duration / 60)}分钟)` : ''}</span>
+                                        <span class="apk-count">${video.count} 次</span>
+                                    </div>
+                                `).join('') : '<div class="empty-state"><p>暂无视频观看数据</p></div>'}
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-top: 20px;">
+                            <h2>📈 每日活动趋势</h2>
+                            <div class="chart-container">
+                                ${stats.daily_stats && stats.daily_stats.length > 0 ? `
+                                    <div class="bar-chart">
+                                        ${stats.daily_stats.map(day => {
+                                            const maxCount = Math.max(...stats.daily_stats.map(d => d.count));
+                                            const height = (day.count / maxCount) * 160;
+                                            return `
+                                                <div class="bar-item">
+                                                    <div class="bar-value">${day.count}</div>
+                                                    <div class="bar" style="height: ${height}px"></div>
+                                                    <div class="bar-label">
+                                                        <div>${day.date.substring(5)}</div>
+                                                        <div style="font-size: 0.65rem; color: #999; margin-top: 2px;">
+                                                            ${day.downloads}↓ ${day.videos}▶
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : '<div class="empty-state"><p>暂无趋势数据</p></div>'}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="port-offline">
+                            <div class="icon">🔌</div>
+                            <h2>端口 ${port} 离线</h2>
+                            <p>该端口未启动或无法访问</p>
+                        </div>
+                    `;
+                }
+                
+                contentsContainer.appendChild(content);
+            }
+        }
+
+        function switchPort(port) {
+            activePort = port;
+            
+            // 更新标签状态
+            document.querySelectorAll('.port-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.port === port);
+            });
+            
+            // 更新内容显示
+            document.querySelectorAll('.port-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            const targetContent = document.getElementById(`port-${port}`);
+            if (targetContent) targetContent.classList.add('active');
+        }
+
+        // 页面加载时获取数据
+        loadAllPorts();
+        
+        // 每30秒自动刷新
+        setInterval(loadAllPorts, 30000);
+    </script>
+</body>
+</html>

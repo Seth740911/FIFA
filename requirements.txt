@@ -1,0 +1,9 @@
+# 2026世界杯观赛指南 - Python 依赖
+
+# 无第三方依赖，仅使用 Python 标准库
+# server.py 和 fetch_scores.py 使用的标准库模块：
+# - os, sys, json, time, threading
+# - socket, socketserver
+# - urllib.request, urllib.error, urllib.parse
+# - http.server
+# - subprocess

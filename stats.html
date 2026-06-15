@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA 2026 - APP访问统计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .stat-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visitor-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .visitor-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s ease;
+        }
+
+        .visitor-item:hover {
+            background: #f8f9ff;
+        }
+
+        .visitor-item:last-child {
+            border-bottom: none;
+        }
+
+        .visitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .visitor-ip {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .visitor-count {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .visitor-details {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .visitor-details strong {
+            color: #333;
+        }
+
+        .apk-list {
+            margin-top: 15px;
+        }
+
+        .apk-item {
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .apk-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .apk-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 200px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 8px 8px 0 0;
+            transition: height 0.5s ease;
+            min-height: 5px;
+        }
+
+        .bar-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .bar-value {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e8eaff;
+            color: #667eea;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 FIFA 2026 APP 访问统计</h1>
+            <p>局域网APK下载访问数据分析面板</p>
+        </header>
+
+        <div id="loading" class="loading">
+            <div>⏳ 加载统计数据中...</div>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon">📥</div>
+                    <div class="value" id="totalDownloads">0</div>
+                    <div class="label">APK下载次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">👥</div>
+                    <div class="value" id="uniqueIPs">0</div>
+                    <div class="label">独立访问者</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">🟢</div>
+                    <div class="value" id="onlineUsers">0</div>
+                    <div class="label">当前在线</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📱</div>
+                    <div class="value" id="mobileUsers">0</div>
+                    <div class="label">移动端访问</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel">
+                    <h2>👥 访问者详情</h2>
+                    <div id="visitorList" class="visitor-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>📊 行为统计</h2>
+                    <div id="behaviorStats"></div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel">
+                    <h2>📱 APK下载排行</h2>
+                    <div id="apkList" class="apk-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>📄 页面访问TOP10</h2>
+                    <div id="pageViews" class="apk-list"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🎬 视频观看TOP10</h2>
+                <div id="videoWatches" class="apk-list"></div>
+            </div>
+
+            <div class="panel" style="margin-top: 20px;">
+                <h2>📈 每日活动趋势</h2>
+                <div id="dailyChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="icon">📭</div>
+            <p>暂无访问数据</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">当有人下载APK后，这里会显示统计信息</p>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadStats()" title="刷新数据">🔄</button>
+
+    <script>
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.total_downloads === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('content').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                // 更新统计卡片
+                document.getElementById('totalDownloads').textContent = data.total_downloads;
+                document.getElementById('uniqueIPs').textContent = data.unique_ips;
+                document.getElementById('onlineUsers').textContent = data.online_users;
+                
+                // 计算移动端用户数
+                const mobileCount = data.visitors.filter(v => v.is_mobile).length;
+                document.getElementById('mobileUsers').textContent = mobileCount;
+                
+                // 更新访问者列表
+                const visitorList = document.getElementById('visitorList');
+                visitorList.innerHTML = '';
+                data.visitors.forEach(visitor => {
+                    const item = document.createElement('div');
+                    item.className = 'visitor-item';
+                    
+                    // 设备类型标签
+                    const deviceBadge = visitor.is_mobile ? 
+                        '<span class="badge" style="background: #ff6b6b; color: white;">📱 移动端</span>' : 
+                        '<span class="badge">💻 桌面端</span>';
+                    
+                    item.innerHTML = `
+                        <div class="visitor-header">
+                            <span class="visitor-ip">🌐 ${visitor.ip}</span>
+                            <span class="visitor-count">${visitor.count} 次</span>
+                        </div>
+                        <div class="visitor-details">
+                            <div><strong>首次访问:</strong> ${visitor.first_seen}</div>
+                            <div><strong>最后访问:</strong> ${visitor.last_seen}</div>
+                            <div style="margin-top: 8px;">
+                                <strong>设备:</strong> ${deviceBadge} ${visitor.device_types.join(', ')}
+                            </div>
+                            ${visitor.apk_downloads.length > 0 ? `
+                                <div style="margin-top: 8px;">
+                                    <strong>下载APK:</strong> ${visitor.apk_downloads.map(f => `<span class="badge">${f}</span>`).join(' ')}
+                                </div>
+                            ` : ''}
+                            ${visitor.pages_visited.length > 0 ? `
+                                <div style="margin-top: 8px;">
+                                    <strong>浏览页面:</strong> ${visitor.pages_visited.slice(0, 5).map(p => `<span class="badge">${p}</span>`).join(' ')}${visitor.pages_visited.length > 5 ? '...' : ''}
+                                </div>
+                            ` : ''}
+                            ${visitor.videos_watched.length > 0 ? `
+                                <div style="margin-top: 8px;">
+                                    <strong>观看视频:</strong> ${visitor.videos_watched.length} 场
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    visitorList.appendChild(item);
+                });
+                
+                // 更新行为统计
+                const behaviorStats = document.getElementById('behaviorStats');
+                const totalPageViews = data.page_views.reduce((sum, p) => sum + p.count, 0);
+                const totalVideos = data.video_watches.reduce((sum, v) => sum + v.count, 0);
+                
+                behaviorStats.innerHTML = `
+                    <div class="apk-item">
+                        <span class="apk-name">📄 页面总访问</span>
+                        <span class="apk-count">${totalPageViews} 次</span>
+                    </div>
+                    <div class="apk-item">
+                        <span class="apk-name">🎬 视频总观看</span>
+                        <span class="apk-count">${totalVideos} 次</span>
+                    </div>
+                    <div class="apk-item">
+                        <span class="apk-name">📱 APK总下载</span>
+                        <span class="apk-count">${data.total_downloads} 次</span>
+                    </div>
+                    <div class="apk-item">
+                        <span class="apk-name">👥 活跃访问者</span>
+                        <span class="apk-count">${data.unique_ips} 人</span>
+                    </div>
+                `;
+                
+                // 更新APK列表
+                const apkList = document.getElementById('apkList');
+                apkList.innerHTML = '';
+                if (data.apk_files.length === 0) {
+                    apkList.innerHTML = '<div class="empty-state"><p>暂无下载数据</p></div>';
+                } else {
+                    data.apk_files.forEach(apk => {
+                        const item = document.createElement('div');
+                        item.className = 'apk-item';
+                        item.innerHTML = `
+                            <span class="apk-name">📦 ${apk.file}</span>
+                            <span class="apk-count">${apk.count} 次下载</span>
+                        `;
+                        apkList.appendChild(item);
+                    });
+                }
+                
+                // 更新页面访问
+                const pageViews = document.getElementById('pageViews');
+                pageViews.innerHTML = '';
+                if (data.page_views.length === 0) {
+                    pageViews.innerHTML = '<div class="empty-state"><p>暂无访问数据</p></div>';
+                } else {
+                    data.page_views.forEach(page => {
+                        const item = document.createElement('div');
+                        item.className = 'apk-item';
+                        item.innerHTML = `
+                            <span class="apk-name">📄 ${page.page}</span>
+                            <span class="apk-count">${page.count} 次</span>
+                        `;
+                        pageViews.appendChild(item);
+                    });
+                }
+                
+                // 更新视频观看
+                const videoWatches = document.getElementById('videoWatches');
+                videoWatches.innerHTML = '';
+                if (data.video_watches.length === 0) {
+                    videoWatches.innerHTML = '<div class="empty-state"><p>暂无视频观看数据</p></div>';
+                } else {
+                    data.video_watches.forEach(video => {
+                        const item = document.createElement('div');
+                        item.className = 'apk-item';
+                        const duration = video.total_duration > 0 ? 
+                            ` (${Math.round(video.total_duration / 60)}分钟)` : '';
+                        item.innerHTML = `
+                            <span class="apk-name">🎬 ${video.title || video.fifa_id}${duration}</span>
+                            <span class="apk-count">${video.count} 次</span>
+                        `;
+                        videoWatches.appendChild(item);
+                    });
+                }
+                
+                // 更新每日图表
+                const dailyChart = document.getElementById('dailyChart');
+                dailyChart.innerHTML = '';
+                
+                if (data.daily_stats.length > 0) {
+                    const maxCount = Math.max(...data.daily_stats.map(d => d.count));
+                    const barContainer = document.createElement('div');
+                    barContainer.className = 'bar-chart';
+                    
+                    data.daily_stats.forEach(day => {
+                        const barItem = document.createElement('div');
+                        barItem.className = 'bar-item';
+                        
+                        const height = (day.count / maxCount) * 160;
+                        barItem.innerHTML = `
+                            <div class="bar-value">${day.count}</div>
+                            <div class="bar" style="height: ${height}px"></div>
+                            <div class="bar-label">
+                                <div>${day.date.substring(5)}</div>
+                                <div style="font-size: 0.65rem; color: #999; margin-top: 2px;">
+                                    ${day.downloads}↓ ${day.videos}▶
+                                </div>
+                            </div>
+                        `;
+                        barContainer.appendChild(barItem);
+                    });
+                    
+                    dailyChart.appendChild(barContainer);
+                }
+                
+            } catch (error) {
+                console.error('加载统计失败:', error);
+                document.getElementById('loading').innerHTML = '<div>❌ 加载失败，请刷新重试</div>';
+            }
+        }
+        
+        // 页面加载时获取数据
+        loadStats();
+        
+        // 每30秒自动刷新
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>

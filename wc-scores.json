@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-15T03:02:10Z",
+ "last_updated": "2026-06-15T09:52:53Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -47,7 +47,7 @@
    "s2": 0
   },
   "F2": {
-   "s1": 2,
+   "s1": 5,
    "s2": 1
   }
  },
@@ -268,15 +268,15 @@
    "away": "TUN",
    "h_cn": "瑞典",
    "a_cn": "突尼斯",
-   "score_h": 2,
+   "score_h": 5,
    "score_a": 1,
-   "status": 3,
-   "finished": false,
-   "live": true,
+   "status": 0,
+   "finished": true,
+   "live": false,
    "date": "2026-06-15T02:00:00Z",
    "group": "Group F",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "50987",
    "venue": "Monterrey Stadium",
    "group_matched": true,
    "bracket_matched": false

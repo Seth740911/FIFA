@@ -551,11 +551,12 @@ def fetch_and_aggregate_cards(match_details, pid_map):
 
     # --- Separate delta logic for cards vs events ---
     # Cards: incremental, skip already-processed matches
-    new_card_ids = [mid for mid in all_finished if mid not in processed_match_ids]
+    # But only process if match events are complete (has 90' data)
+    event_processed = set(_event_meta.get("__processed__", []))
+    new_card_ids = [mid for mid in all_finished if mid not in processed_match_ids and mid in event_processed]
 
     # Events: own processed list; a match is "event-done" only if finished AND events are complete
     # (has substitution = full-time data). Mid-game snapshots get re-fetched until complete.
-    event_processed = set(_event_meta.get("__processed__", []))
     event_fetch_ids = []
     for m in match_details:
         mid = m.get("fifa_id", "")
@@ -610,7 +611,7 @@ def fetch_and_aggregate_cards(match_details, pid_map):
                     info = pid_map[fifa_pid]
                     player_key_map[fifa_pid] = f"{info['code']}-{info['jersey']}"
 
-        # Process Bookings for cards (only for new matches to avoid double-counting)
+        # Process Bookings for cards
         if need_cards:
             # Collect per-player first, then deduplicate 2-yellow-to-red
             _mb = {}  # key -> [{card, minute}]
@@ -635,16 +636,9 @@ def fetch_and_aggregate_cards(match_details, pid_map):
             for key, bk in _mb.items():
                 if key not in existing_cards:
                     existing_cards[key] = {"y_group": 0, "r_group": 0, "y_ko": 0, "r_ko": 0}
-                # Find yellows absorbed by reds (same minute → 2nd yellow turned red)
-                red_mins = [x["minute"] for x in bk if x["card"] == 2]
-                absorbed = 0
-                for rm in red_mins:
-                    for x in bk:
-                        if x["card"] == 1 and x["minute"] == rm:
-                            absorbed += 1
-                            break
-                t_y = sum(1 for x in bk if x["card"] == 1) - absorbed
-                t_r = len(red_mins)
+                # Simple counting: just count yellows and reds per match
+                t_y = sum(1 for x in bk if x["card"] == 1)
+                t_r = sum(1 for x in bk if x["card"] == 2)
                 if is_group:
                     existing_cards[key]["y_group"] += t_y
                     existing_cards[key]["r_group"] += t_r

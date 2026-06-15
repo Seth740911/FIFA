@@ -5234,7 +5234,7 @@ const WC_TEAMS = [
     "pos": "DF",
     "pos_zh": "后卫",
     "photo": "",
-    "cn_name": "海特勒伊达"
+    "cn_name": "海尔特鲁伊达"
    },
    {
     "id": "397786",
@@ -5243,7 +5243,7 @@ const WC_TEAMS = [
     "pos": "DF",
     "pos_zh": "后卫",
     "photo": "/wc-photos/NED/04_Virgil VAN DIJK_DF.png",
-    "cn_name": "范迪克"
+    "cn_name": "范戴克"
    },
    {
     "id": "336088",
@@ -5261,7 +5261,7 @@ const WC_TEAMS = [
     "pos": "DF",
     "pos_zh": "后卫",
     "photo": "/wc-photos/NED/06_Jan Paul VAN HECKE_DF.png",
-    "cn_name": "保罗·范海克"
+    "cn_name": "保罗·范赫克"
    },
    {
     "id": "483481",
