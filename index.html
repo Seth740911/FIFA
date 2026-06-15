@@ -260,7 +260,7 @@ window.addEventListener('offline', function() { _setNetStatus('offline'); });
 <div class="tl-overlay" id="tlOverlay" onclick="if(event.target===this)closeTimeline()">
   <div class="tl-modal">
     <div class="tl-head" id="tlHead"></div>
-    <div class="tl-video" id="tlVideo" style="display:none">
+    <div class="tl-video" id="tlVideo" style="display:none;position:relative;">
       <video id="tlPlayer" controls playsinline style="width:100%;max-height:40vh;background:#000"></video>
     </div>
     <div id="tlLineup"></div>
@@ -1586,6 +1586,34 @@ function switchTab(tabId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // 申请持久化存储（防止手机浏览器自动清缓存）
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().then(function(granted) {
+      console.log('[STORAGE] 持久化存储：' + (granted ? '已授予 ✅' : '未授予 ⚠️'));
+      window._storagePersistent = granted;
+      // 在页面上显示存储状态（仅调试，2秒后消失）
+      if (!granted) {
+        var tip = document.createElement('div');
+        tip.id = 'storageWarn';
+        tip.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff9800;color:#000;font-size:12px;text-align:center;padding:4px;z-index:99999;';
+        tip.textContent = '⚠️ 存储权限未授予，视频缓存可能被自动清除（请在浏览器设置中允许此网站存储数据）';
+        document.body.appendChild(tip);
+        setTimeout(function() { tip.style.display = 'none'; }, 5000);
+      }
+    });
+  }
+
+  // 清除视频缓存（通过 URL ?clearCache=1 触发）
+  if (location.search.indexOf('clearCache=1') > -1) {
+    _clearAllVideoCache().then(function() {
+      alert('✅ 视频缓存已清除，页面将重新加载');
+      location.href = location.pathname;
+    }).catch(function() {
+      location.href = location.pathname;
+    });
+    return; // 清除完再加载页面
+  }
+
   GSTAND.init();
   BRACKET.init();
   renderStars();
@@ -1685,7 +1713,7 @@ function openTimeline(fifaId, schDate, schTime) {
       // Header
       document.getElementById('tlHead').innerHTML =
         '<button class="tl-close" onclick="closeTimeline()">&times;</button>' +
-        (hCn2 ? '<div class="tl-head-l"><img class="tl-flag" src="'+hFlag2+'" onerror="this.style.display=\'none\'"><span class="tl-team">'+hCn2+'</span><b>-</b></div><div class="tl-head-m">:</div><div class="tl-head-r"><b>-</b><span class="tl-team">'+aCn2+'</span><img class="tl-flag" src="'+aFlag2+'" onerror="this.style.display=\'none\'"></div>' : '');
+        (hCn2 ? '<div class="tl-head-l"><span id="tlVideoSrcIcon" onclick="_showCacheInfo()" style="cursor:pointer"></span><img class="tl-flag" src="'+hFlag2+'" onerror="this.style.display=\'none\'"><span class="tl-team">'+hCn2+'</span><b>-</b></div><div class="tl-head-m">:</div><div class="tl-head-r"><b>-</b><span class="tl-team">'+aCn2+'</span><img class="tl-flag" src="'+aFlag2+'" onerror="this.style.display=\'none\'"></div>' : '');
       // Body: 未开赛卡片
       var preHtml = '<div class="tl-pre">';
       preHtml += '<div class="tl-pre-label">尚未开球</div>';
@@ -1729,7 +1757,7 @@ function openTimeline(fifaId, schDate, schTime) {
     document.getElementById('tlHead').innerHTML =
       '<button class="tl-close" onclick="closeTimeline()">&times;</button>' +
       '<div class="tl-head-l">' +
-        '<img class="tl-flag" src="'+hFlag+'" onerror="this.style.display=\'none\'">' +
+        '<span id="tlVideoSrcIcon" onclick="_showCacheInfo()" style="cursor:pointer"></span><img class="tl-flag" src="'+hFlag+'" onerror="this.style.display=\'none\'">' +
         '<span class="tl-team">'+hCn+'</span>' +
         '<b>'+sH+'</b>' +
       '</div>' +
@@ -1862,10 +1890,12 @@ function _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, 
         // 增量更新：合并旧缓存和新分段
         finalSegBlobs = existing.segBlobs.slice();
         
-        // 从 startIndex 位置开始覆盖新分段
+        // 从 startIndex 位置开始覆盖新分段（跳过 null，不覆盖有效数据）
         var start = startIndex || 0;
         for (var i = 0; i < segBlobs.length; i++) {
-          finalSegBlobs[start + i] = segBlobs[i];
+          if (segBlobs[i] != null) {
+            finalSegBlobs[start + i] = segBlobs[i];
+          }
         }
         
         // 重新计算大小
@@ -1895,7 +1925,7 @@ function _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, 
         }
       }
       
-      isComplete = (validSegments >= totalSegments && totalSegments > 0);
+      isComplete = (validSegments >= totalSegments * 0.95 && totalSegments > 0);
       
       try {
         var tx = db.transaction('videos', 'readwrite');
@@ -1910,12 +1940,12 @@ function _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, 
           title: title || '',
           size: finalSize,
           time: Date.now(),
-          complete: isComplete  // 添加完整性标记
+          complete: isComplete
         });
         
         return new Promise(function(resolve) {
           tx.oncomplete = function() {
-            console.log('[VDB] 保存成功：' + finalSegBlobs.length + ' 段（起始索引：' + (startIndex || 0) + '），完整：' + isComplete);
+            console.log('[VDB] 保存成功：' + finalSegBlobs.length + ' 段（起始索引：' + (startIndex || 0) + '），完整：' + isComplete + '，fifaId=' + fifaId);
             resolve();
           };
           tx.onerror = function() {
@@ -1934,19 +1964,68 @@ function _saveVideoToDB(fifaId, m3u8Text, segBlobs, baseUrl, viaProxy, entryId, 
 // 从 IndexedDB 读取视频
 function _loadVideoFromDB(fifaId) {
   return _initVideoDB().then(function(db) {
-    if (!db) return null;
+    if (!db) { console.log('[VDB-READ] DB 未初始化，fifaId=' + fifaId); return null; }
     return new Promise(function(resolve) {
       try {
         var tx = db.transaction('videos', 'readonly');
         var store = tx.objectStore('videos');
         var req = store.get(fifaId);
-        req.onsuccess = function() { resolve(req.result || null); };
-        req.onerror = function() { resolve(null); };
-      } catch(e) { resolve(null); }
+        req.onsuccess = function() {
+          var result = req.result || null;
+          if (result) {
+            console.log('[VDB-READ] ✅ 读到缓存：' + fifaId + '，段数：' + (result.segBlobs ? result.segBlobs.length : 0) + '，complete=' + result.complete);
+          } else {
+            console.log('[VDB-READ] ❌ 未找到缓存：' + fifaId);
+          }
+          resolve(result);
+        };
+        req.onerror = function() { console.log('[VDB-READ] 读取失败：' + fifaId); resolve(null); };
+      } catch(e) { console.log('[VDB-READ] 异常：' + e.message); resolve(null); }
     });
   });
 }
 
+// }
+  
+// 删除指定比赛的视频缓存（用于清理坏缓存）
+function _deleteVideoCache(fifaId) {
+  if (!fifaId) return Promise.resolve();
+  return _initVideoDB().then(function(db) {
+    if (!db) return;
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction('videos', 'readwrite');
+        var store = tx.objectStore('videos');
+        store.delete(fifaId);
+        tx.oncomplete = function() {
+          console.log('[VDB] 已删除缓存：' + fifaId);
+          resolve();
+        };
+        tx.onerror = function() { resolve(); };
+      } catch(e) { resolve(); }
+    });
+  });
+}
+  
+// 清空所有视频缓存
+function _clearAllVideoCache() {
+  return _initVideoDB().then(function(db) {
+    if (!db) return;
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction('videos', 'readwrite');
+        var store = tx.objectStore('videos');
+        store.clear();
+        tx.oncomplete = function() {
+          console.log('[VDB] 已清空所有视频缓存');
+          resolve();
+        };
+        tx.onerror = function() { resolve(); };
+      } catch(e) { resolve(); }
+    });
+  });
+}
+  
 // 下载 .ts 分段并存 IndexedDB（支持断点续传 + 增量更新）
 function _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, entryId, title) {
   // 解析 m3u8 提取 .ts URL
@@ -2009,7 +2088,7 @@ function _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, entry
     var batchBlobs = [];      // 当前批次的新分段
     var batchStartIdx = -1;   // 当前批次的起始索引
     var downloadedCount = 0;
-    var saveInterval = 5;     // 每下载 5 个新段保存一次
+    var saveInterval = 2;     // 每下载 2 个新段保存一次（减少页面关闭时丢失的量）
     
     function processNext() {
       // 检查是否需要保存当前批次
@@ -2049,8 +2128,8 @@ function _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, entry
         downloadedCount++;
         processNext();
       }).catch(function() {
-        // 单段失败不中断，用空 Blob 占位
-        batchBlobs.push(new Blob([], {type: 'video/mp2t'}));
+        // 单段失败不中断，用 null 占位（不存空 Blob）
+        batchBlobs.push(null);
         downloadedCount++;
         processNext();
       });
@@ -2069,33 +2148,39 @@ function _downloadWithoutResume(segUrls, fetchFn, fifaId, m3u8Text, baseUrl, via
   var batchBlobs = [];
   var batchStartIdx = 0;
   var downloadedCount = 0;
-  var saveInterval = 5;
+  var saveInterval = 2;
   
   function next() {
     // 每下载 saveInterval 段保存一次
     if (batchBlobs.length >= saveInterval || downloadedCount >= segUrls.length) {
       if (batchBlobs.length > 0) {
-        _saveVideoToDB(fifaId, m3u8Text, batchBlobs, baseUrl, viaProxy, entryId, title, batchStartIdx);
-        console.log('[VCACHE] 降级模式保存：' + batchBlobs.length + ' 段（起始索引：' + batchStartIdx + '）');
-        
-        batchBlobs = [];
-        batchStartIdx = downloadedCount;
-      }
-      
-      if (downloadedCount >= segUrls.length) {
-        console.log('[VCACHE] 降级模式完成！共下载 ' + downloadedCount + ' 段');
-        return;
+        // 增量保存当前批次，并等待完成
+        _saveVideoToDB(fifaId, m3u8Text, batchBlobs, baseUrl, viaProxy, entryId, title, batchStartIdx).then(function() {
+          console.log('[VCACHE] 降级模式保存：' + batchBlobs.length + ' 段（起始索引：' + batchStartIdx + '）');
+          
+          // 重置批次
+          batchBlobs = [];
+          batchStartIdx = downloadedCount;
+          
+          // 检查是否全部完成
+          if (downloadedCount >= segUrls.length) {
+            console.log('[VCACHE] 降级模式完成！共下载 ' + downloadedCount + ' 段');
+            return;
+          }
+          
+          // 继续处理下一个
+          next();
+        });
+        return; // 等待 Promise 完成
       }
     }
     
     fetchFn(segUrls[downloadedCount]).then(function(blob) {
       batchBlobs.push(blob);
-      downloadedCount++;
-      next();
+      downloadedCount++;next();
     }).catch(function() {
       batchBlobs.push(new Blob([], {type: 'video/mp2t'}));
-      downloadedCount++;
-      next();
+      downloadedCount++;next();
     });
   }
   next();
@@ -2103,23 +2188,73 @@ function _downloadWithoutResume(segUrls, fetchFn, fifaId, m3u8Text, baseUrl, via
 
 // 从 IndexedDB 缓存构建本地 m3u8 并播放
 function _playFromCache(cacheData) {
-  console.log('[VCACHE] 从本地缓存播放，分段数:', cacheData.segBlobs.length);
   var m3u8Text = cacheData.m3u8Text;
-  var segBlobs = cacheData.segBlobs;
-  var lines = m3u8Text.split('\n');
-  var newLines = [];
-  var segIdx = 0;
+  var fifaId = _tlCurrentFifaId;
+  // 安全检查：如果 m3u8Text 是主播放列表（含 #EXT-X-STREAM-INF），无法直接使用，删掉坏缓存降级到网络流
+  if (m3u8Text && m3u8Text.indexOf('#EXT-X-STREAM-INF') > -1) {
+    console.warn('[VCACHE] 缓存的 m3u8 是主播放列表，删除坏缓存，降级到网络流');
+    _deleteVideoCache(fifaId);
+    if (fifaId) {
+      fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d && d.url) _playM3u8(d.url, false, d.entryId, d.title);
+        }).catch(function() {});
+    }
+    return;
+  }
 
+  // 安全检查：检查缓存分段是否完整（段数是否匹配播放列表中的 .ts 行数）
+  var segBlobs = cacheData.segBlobs || [];
+  var lines = m3u8Text ? m3u8Text.split('\n') : [];
+  var totalSegmentsInPlaylist = 0;
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i].trim();
     if (line && !line.startsWith('#') && (line.endsWith('.ts') || line.indexOf('.ts?') > -1 || line.endsWith('.m4s') || line.indexOf('.m4s?') > -1)) {
-      if (segIdx < segBlobs.length) {
+      totalSegmentsInPlaylist++;
+    }
+  }
+  if (segBlobs.length < totalSegmentsInPlaylist) {
+    console.warn('[VCACHE] 缓存分段不完整（' + segBlobs.length + '/' + totalSegmentsInPlaylist + '），删除坏缓存，降级到网络流');
+    _deleteVideoCache(fifaId);
+    if (fifaId) {
+      fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d && d.url) _playM3u8(d.url, false, d.entryId, d.title);
+        }).catch(function() {});
+    }
+    return;
+  }
+
+  console.log('[VCACHE] 从本地缓存播放，分段数:', segBlobs.length);
+  
+  // 检测缺失/空分段，记录日志
+  var missingIndices = [];
+  for (var i = 0; i < segBlobs.length; i++) {
+    if (!segBlobs[i] || segBlobs[i].size === 0) {
+      missingIndices.push(i);
+    }
+  }
+  if (missingIndices.length > 0) {
+    console.warn('[VCACHE] 有 ' + missingIndices.length + ' 段缺失/为空（索引：' + missingIndices.slice(0, 10).join(',') + (missingIndices.length > 10 ? '...' : '') + '），缺失段将走网络流');
+  }
+  
+  var newLines = [];
+  var segIdx = 0;
+  
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (line && !line.startsWith('#') && (line.endsWith('.ts') || line.indexOf('.ts?') > -1 || line.endsWith('.m4s') || line.indexOf('.m4s?') > -1)) {
+      if (segIdx < segBlobs.length && segBlobs[segIdx] && segBlobs[segIdx].size > 0) {
+        // 有有效缓存，用本地 blob URL
         var blobUrl = URL.createObjectURL(segBlobs[segIdx]);
         newLines.push(blobUrl);
-        segIdx++;
       } else {
+        // 缺失或为空，保留原网络 URL（hls.js 会从网络拉）
         newLines.push(line);
       }
+      segIdx++;
     } else {
       newLines.push(lines[i]);
     }
@@ -2128,6 +2263,7 @@ function _playFromCache(cacheData) {
   var localM3u8Blob = new Blob([newLines.join('\n')], {type: 'application/vnd.apple.mpegurl'});
   var localM3u8Url = URL.createObjectURL(localM3u8Blob);
   console.log('[VCACHE] 从本地缓存播放');
+  // 进度条显示已缓存状态
   _playM3u8Direct(localM3u8Url);
 }
 
@@ -2138,23 +2274,28 @@ function _setupVideo(ev) {
   if (_hlsInstance) { _hlsInstance.destroy(); _hlsInstance = null; }
   video.removeAttribute('src'); video.load();
   videoDiv.style.display = 'none';
-  if (!ev || !ev._fifaId) return;
+
+  // 优先用 _tlCurrentFifaId，不依赖 ev._fifaId
+  var fifaId = _tlCurrentFifaId || (ev ? ev._fifaId : null);
+  if (!fifaId) return;
 
   // 保存当前比赛信息供视频追踪使用
   window._currentMatchEvent = ev;
 
-  var fifaId = ev._fifaId;
-
-  // 1. 先查本地 IndexedDB 缓存
+    // 1. 先查本地 IndexedDB 缓存
   _loadVideoFromDB(fifaId).then(function(cached) {
     console.log('[VCACHE] 检查 IndexedDB 缓存:', cached ? '找到 ' + cached.segBlobs.length + ' 段' : '未找到');
-    if (cached && cached.segBlobs && cached.segBlobs.length && cached.complete) {
-      console.log('[VCACHE] 使用完整缓存播放');
+    // 只要有缓存分段就优先用缓存（不再检查 complete 标志）
+    if (cached && cached.segBlobs && cached.segBlobs.length > 0) {
+      console.log('[VCACHE] 使用本地缓存播放（' + cached.segBlobs.length + ' 段）');
+      // 更新图标为 📱
+      var icon = document.getElementById('tlVideoSrcIcon');
+      if (icon) { icon.textContent = '📱'; icon.style.fontSize = '16px'; icon.style.marginRight = '4px'; }
       _playFromCache(cached);
       return;
-    } else if (cached && cached.segBlobs && cached.segBlobs.length && !cached.complete) {
-      console.log('[VCACHE] 缓存不完整，重新从网络下载');
     }
+    // 无缓存或缓存无分段，走网络流
+    console.log('[VCACHE] 无可用缓存，从网络播放');
 
     // 2. 查内存缓存
     if (_videoCache.hasOwnProperty(fifaId)) {
@@ -2237,7 +2378,10 @@ function _playM3u8(m3u8Url, _viaProxy, _entryId, _title) {
   var video = document.getElementById('tlPlayer');
   videoDiv.style.display = 'block';
   video.style.display = 'block';
-
+  // 更新图标为 🌐（网络流）
+  var icon = document.getElementById('tlVideoSrcIcon');
+  if (icon) { icon.textContent = '🌐'; icon.style.fontSize = '16px'; icon.style.marginRight = '4px'; }
+  
   if (Hls.isSupported()) {
     var hlsConfig = {};
     var viaProxy = _viaProxy || false;
@@ -2321,9 +2465,18 @@ function _playM3u8(m3u8Url, _viaProxy, _entryId, _title) {
             var lastSlash = m3u8Url.lastIndexOf('/');
             baseUrl = lastSlash > 0 ? m3u8Url.substring(0, lastSlash + 1) : '';
             // 检查是否是多码率 master playlist，如果是则取第一个 variant
-            var variantMatch = m3u8Text.match(/^[^#].*\.m3u8\s*$/m);
-            if (variantMatch) {
-              var variantUrl = variantMatch[0].trim();
+            // 修复：使用逐行搜索，兼容带 query 参数的 variant URL
+            var _allLines = m3u8Text.split('\n');
+            var _variantLine = null;
+            for (var _li = 0; _li < _allLines.length; _li++) {
+              var _t = _allLines[_li].trim();
+              if (_t && !_t.startsWith('#') && _t.indexOf('.m3u8') > -1) {
+                _variantLine = _t;
+                break;
+              }
+            }
+            if (_variantLine) {
+              var variantUrl = _variantLine.trim();
               if (!variantUrl.startsWith('http')) variantUrl = baseUrl + variantUrl;
               var xhr2 = new XMLHttpRequest();
               xhr2.open('GET', variantUrl, false);
@@ -2365,12 +2518,38 @@ function _playM3u8Direct(m3u8Url) {
       // 追踪视频观看
       _trackVideoWatch();
     });
+    // 缓存播放失败时降级到网络流
+    _hlsInstance.on(Hls.Events.ERROR, function(e, data) {
+      if (data.fatal) {
+        console.warn('[VCACHE] 缓存播放失败，降级到网络流', data);
+        var fifaId = _tlCurrentFifaId;
+        if (fifaId) {
+          fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              if (d && d.url) _playM3u8(d.url, false, d.entryId, d.title);
+            }).catch(function() {});
+        }
+      }
+    });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = m3u8Url;
     video.play();
     // 追踪视频观看
     _trackVideoWatch();
   }
+  // video 元素错误事件也降级
+  video.addEventListener('error', function() {
+    console.warn('[VCACHE] video 元素错误，降级到网络流');
+    var fifaId = _tlCurrentFifaId;
+    if (fifaId) {
+      fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d && d.url) _playM3u8(d.url, false, d.entryId, d.title);
+        }).catch(function() {});
+    }
+  });
 }
 
 // 追踪视频观看行为
@@ -2401,6 +2580,10 @@ function _trackVideoWatch() {
   // 视频停止或页面关闭时发送数据
   function sendWatchData() {
     clearInterval(interval);
+    // 页面关闭前，无条件把当前缓存标为完整（只要看过就认为有价值）
+    if (fifaId) {
+      _markCacheComplete(fifaId);
+    }
     if (watchDuration > 10) { // 至少观看10秒才记录
       fetch('/api/video/watch', {
         method: 'POST',
@@ -2415,8 +2598,38 @@ function _trackVideoWatch() {
   }
   
   video.addEventListener('pause', sendWatchData, {once: true});
-  video.addEventListener('ended', sendWatchData, {once: true});
+  video.addEventListener('ended', function() {
+    // 视频播放完成，强制标记缓存为完整
+    if (fifaId) {
+      _markCacheComplete(fifaId);
+    }
+    sendWatchData();
+  }, {once: true});
   window.addEventListener('beforeunload', sendWatchData);
+  // 手机端 PWA 关闭时 beforeunload 可能不触发，补 pagehide + visibilitychange
+  window.addEventListener('pagehide', sendWatchData);
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') sendWatchData();
+  });
+}
+
+// 强制标记某比赛的视频缓存为完整
+function _markCacheComplete(fifaId) {
+  if (!fifaId) return;
+  _loadVideoFromDB(fifaId).then(function(cached) {
+    if (cached && !cached.complete) {
+      cached.complete = true;
+      _initVideoDB().then(function(db) {
+        if (!db) return;
+        try {
+          var tx = db.transaction('videos', 'readwrite');
+          var store = tx.objectStore('videos');
+          store.put(cached);
+          console.log('[VCACHE] 视频播放完成，强制标记缓存为完整: ' + fifaId);
+        } catch(e) { console.warn('[VCACHE] 标记完成失败:', e); }
+      });
+    }
+  });
 }
 
 function _renderAxisEvent(e, isHome) {
@@ -2458,6 +2671,7 @@ function closeTimeline() {
   var v = document.getElementById('tlPlayer');
   if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
   document.getElementById('tlVideo').style.display = 'none';
+  // 隐藏进度条
   document.getElementById('tlOverlay').classList.remove('show');
   document.getElementById('tlLineup').classList.remove('show');
   document.getElementById('tlLineup').innerHTML = '';
@@ -2465,8 +2679,63 @@ function closeTimeline() {
   _tlLineupData = null;
 }
 
+// 点击视频来源图标时，显示 IndexedDB 缓存详情
+function _showCacheInfo() {
+  var fifaId = _tlCurrentFifaId;
+  if (!fifaId) { alert('当前无比赛'); return; }
+  // 先获取存储配额信息
+  var storageInfo = '';
+  if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(function(estimate) {
+      var usedMB = (estimate.usage / 1024 / 1024).toFixed(1);
+      var quotaMB = (estimate.quota / 1024 / 1024).toFixed(1);
+      var percent = ((estimate.usage / estimate.quota) * 100).toFixed(1);
+      storageInfo = '📦 存储配额：' + usedMB + ' / ' + quotaMB + ' MB（已用 ' + percent + '%）\n';
+      storageInfo += '持久化存储：' + (window._storagePersistent ? '✅ 已授予' : '⚠️ 未授予（缓存可能被自动清除）') + '\n\n';
+      _showCacheInfoInner(fifaId, storageInfo);
+    });
+  } else {
+    _showCacheInfoInner(fifaId, '');
+  }
+}
+function _showCacheInfoInner(fifaId, storageInfo) {
+  _loadVideoFromDB(fifaId).then(function(cached) {
+    if (!cached) {
+      var msg = '📦 缓存详情（' + fifaId + '）\n\n❌ IndexedDB 中无缓存\n视频每次都会从网络播放\n';
+      if (storageInfo) msg += '\n' + storageInfo;
+      if (confirm(msg + '\n是否清除所有视频缓存？')) {
+        location.href = location.pathname + '?clearCache=1';
+      }
+      return;
+    }
+    var total = cached.segBlobs ? cached.segBlobs.length : 0;
+    var valid = 0;
+    if (cached.segBlobs) {
+      for (var i = 0; i < cached.segBlobs.length; i++) {
+        if (cached.segBlobs[i] && cached.segBlobs[i].size > 0) valid++;
+      }
+    }
+    var sizeMB = cached.size ? (cached.size / 1024 / 1024).toFixed(1) : '?';
+    var time = cached.time ? new Date(cached.time).toLocaleString() : '?';
+    var msg = '📦 缓存详情（' + fifaId + '）\n\n'
+      + '✅ 有缓存\n'
+      + '📊 分段：' + valid + ' / ' + total + ' 段有效\n'
+      + '💾 大小：' + sizeMB + ' MB\n'
+      + '⏰ 时间：' + time + '\n'
+      + 'complete：' + (cached.complete ? 'true' : 'false') + '\n';
+    if (storageInfo) msg += '\n' + storageInfo;
+    msg += (valid >= total * 0.95 ? '下次会读本地缓存 ✅' : '缓存不完整，下次仍会从网络播放 ⚠️');
+    if (confirm(msg + '\n\n是否清除当前比赛的缓存并重新下载？')) {
+      _deleteVideoCache(fifaId).then(function() {
+        alert('✅ 已清除当前比赛缓存，请重新打开时间轴');
+      });
+    }
+  });
+}
+
 // ===== 首发阵型系统 =====
 var _tlCurrentFifaId = null;
+var _toastShownForFifaId = ''; // 防止重复弹缓存完成提示
 var _tlLineupData = null;
 var _tlCurrentTab = 'events';
 
@@ -2687,7 +2956,37 @@ function _renderLineup(data) {
   el.innerHTML = html;
   el.classList.add('show');
 }
+// 视频缓存完成 Toast 提示（常驻，点击确定重新打开此页）
+function _showVideoToast(msg) {
+  var el = document.getElementById('cacheToast');
+  if (!el) return;
+  el.textContent = '✅ 缓存已完成，播放（点击确定重新打开此页）';
+  el.style.display = 'block';
+  el.style.opacity = '1';
+  el.style.pointerEvents = 'auto';
+  el.onclick = function() {
+    // 重新打开当前事件页
+    var fifaId = _tlCurrentFifaId;
+    var ev = null;
+    if (TL_EVENTS) {
+      for (var i = 0; i < TL_EVENTS.length; i++) {
+        if (TL_EVENTS[i] && TL_EVENTS[i]._fifaId === fifaId) {
+          ev = TL_EVENTS[i];
+          break;
+        }
+      }
+    }
+    if (typeof _openTimeline === 'function' && fifaId) {
+      _openTimeline(fifaId, ev);
+    }
+    // 关闭提示条
+    el.style.opacity = '0';
+    setTimeout(function() { el.style.display = 'none'; el.onclick = null; }, 300);
+  };
+}
 </script>
+
+<div id="cacheToast" style="display:none;position:fixed;top:0;left:0;right:0;margin:8px 12px 0 12px;background:rgba(0,0,0,0.92);color:#4caf50;padding:10px 22px;border-radius:24px;font-size:14px;z-index:2147483647;opacity:0;transition:opacity 0.3s;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,0.4);cursor:pointer;text-align:center;"></div>
 
 </body>
 <script>

@@ -364,9 +364,9 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 }
 
 /* 阵型容器 */
-#tlLineup{padding:12px 12px 8px;display:none}
+#tlLineup{padding:2px 12px 8px;display:none;margin-top:0}
 #tlLineup.show{display:block}
-.tl-lu-loading{text-align:center;color:var(--text2);padding:40px 0;font-size:.9em}
+.tl-lu-loading{text-align:center;color:var(--text2);padding:4px 0;font-size:.9em}
 .tl-lu-title{color:var(--text2);font-size:.78em;font-weight:600;letter-spacing:.5px;padding:8px 0 4px;border-top:1px solid var(--border);margin-top:12px}
 
 /* 球场（横向，左主右客） */
@@ -433,4 +433,11 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   .tl-lu-coach{font-size:.54em;bottom:1%}
   .tl-pitch-box-l,.tl-pitch-box-r{top:12%;bottom:12%}
   .tl-pitch-ga-l,.tl-pitch-ga-r{top:25%;bottom:25%}
+}
+
+/* 时间轴头部视频来源图标 */
+#tlVideoSrcIcon {
+  font-size: 16px;
+  margin-right: 4px;
+  flex-shrink: 0;
 }
