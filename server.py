@@ -103,6 +103,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         if self.path == '/api/video/watch':
             self._handle_video_watch()
             return
+        if self.path == '/api/diag':
+            self._handle_diag()
+            return
         self.send_error(404)
 
     def _handle_proxy(self):
@@ -572,7 +575,8 @@ class FIFAHandler(SimpleHTTPRequestHandler):
 
     def _log_apk_access(self):
         """记录APK访问信息到专用日志"""
-        import datetime
+        # 不再写 user_activity.log，避免外挂硬盘频繁访问
+        return
         ip = self.client_address[0]
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         apk_file = self.path[len('/apk/'):]
@@ -610,7 +614,8 @@ class FIFAHandler(SimpleHTTPRequestHandler):
 
     def _log_page_view(self):
         """记录页面访问"""
-        import datetime
+        # 不再写 user_activity.log，避免外挂硬盘频繁访问
+        return
         ip = self.client_address[0]
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         page = self.path.split('?')[0]
@@ -752,6 +757,23 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             print(f"  [heartbeat] Error: {e}")
         
         self._json_response({'status': 'ok', 'online_count': len(online_users)})
+
+    def _handle_diag(self):
+        """接收前端诊断日志，追加写入文件"""
+        import datetime
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            body = json.loads(self.rfile.read(length).decode('utf-8')) if length else {}
+        except Exception:
+            body = {}
+        ip = self.client_address[0]
+        ts = datetime.datetime.now().strftime("%H:%M:%S")
+        line = f"[{ts}] [{ip}] {json.dumps(body, ensure_ascii=False)}\n"
+        diag_file = os.path.join(WEB_DIR, '.temp', 'diag.log')
+        os.makedirs(os.path.dirname(diag_file), exist_ok=True)
+        with open(diag_file, 'a', encoding='utf-8') as f:
+            f.write(line)
+        self._json_response({'status': 'ok'})
 
     def _handle_video_watch(self):
         """记录视频观看行为"""
@@ -1039,11 +1061,8 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         self._json_response(all_stats)
 
     def log_message(self, format, *args):
-        import datetime
-        ts = datetime.datetime.now().strftime("%H:%M:%S")
-        line = f"{ts} {format % args}\n"
-        with open(os.path.join(WEB_DIR, "access.log"), "a", encoding="utf-8") as f:
-            f.write(line)
+        # 不再写 access.log，避免外挂硬盘频繁访问
+        pass
 
 
 def _run_fetch():
