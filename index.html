@@ -76,13 +76,7 @@ header p{color:var(--text2);margin-top:8px;font-size:1.1em}
 nav{display:flex;gap:4px;padding:6px 2px;overflow-x:auto;flex-wrap:nowrap;justify-content:center;position:fixed;top:0;left:0;right:0;width:100%;background:var(--bg);z-index:100;border-bottom:1px solid var(--border);scrollbar-width:none;padding-left:max(2px,env(safe-area-inset-left));padding-right:max(2px,env(safe-area-inset-right))}
 nav::-webkit-scrollbar{display:none}
 nav a{border:1px solid transparent;color:#fff;padding:6px 12px;border-radius:18px;cursor:pointer;font-size:.88em;transition:all .2s;white-space:nowrap;text-decoration:none;font-weight:600;letter-spacing:.2px;line-height:1.3;display:inline-flex;align-items:center}
-nav a:nth-child(1){background:#e67e22;border-color:#d35400}
-nav a:nth-child(2){background:#2ecc71;border-color:#27ae60}
-nav a:nth-child(3){background:#e74c3c;border-color:#c0392b}
-nav a:nth-child(4){background:#9b59b6;border-color:#8e44ad}
-nav a:nth-child(5){background:#3498db;border-color:#2980b9}
-nav a:nth-child(6){background:#1abc9c;border-color:#16a085}
-nav a:nth-child(7){background:#e84393;border-color:#c2185b}
+nav a.active{box-shadow:0 0 0 2px var(--gold);filter:brightness(1.15)}
 nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 #net-indicator{margin-left:auto;font-size:.75em;padding:4px 10px;border-radius:12px;font-weight:600;white-space:nowrap;align-self:center}
 .net-ok{display:none}
@@ -91,7 +85,8 @@ nav a:hover{filter:brightness(1.15);transform:scale(1.05)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* 区块通用 */
-.section{padding:30px 0}
+.section{padding:30px 0;display:none}
+.section.active{display:block}
 .sticky-head{position:sticky;top:0;background:var(--bg);z-index:90;padding:0 0 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;min-height:40px}
 h2{color:var(--gold);font-size:1.4em;margin:0;padding:0;width:fit-content}
 
@@ -506,40 +501,19 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 <body>
 <div class="container">
 <nav>
-  <a href="#overview">概况</a>
-  <a href="#groupstand">积分</a>
-  <a href="#knockout">淘汰赛</a>
-  <a href="#stars">球星</a>
-  <a href="#venues">场馆</a>
-  <a href="#rules">新规</a>
-  <a href="#roster">阵容</a>
+  <a onclick="switchTab('groupstand')" data-tab="groupstand" style="background:#2ecc71;border-color:#27ae60">积分</a>
+  <a onclick="switchTab('knockout')" data-tab="knockout" style="background:#e74c3c;border-color:#c0392b">淘汰赛</a>
+  <a onclick="switchTab('stars')" data-tab="stars" style="background:#9b59b6;border-color:#8e44ad">球星</a>
+  <a onclick="switchTab('roster')" data-tab="roster" style="background:#e84393;border-color:#c2185b">阵容</a>
+  <a onclick="switchTab('overview')" data-tab="overview" style="background:#e67e22;border-color:#d35400">概况</a>
+  <a onclick="switchTab('rules')" data-tab="rules" style="background:#1abc9c;border-color:#16a085">新规</a>
+  <a onclick="switchTab('venues')" data-tab="venues" style="background:#3498db;border-color:#2980b9">场馆</a>
   <span id="net-indicator" class="net-ok"></span>
 </nav>
 <header>
   <img src="/WC26_Logo.png" style="height:80px;margin-bottom:12px" alt="FIFA World Cup 2026">
   <h1>2026 美加墨世界杯</h1>
 </header>
-
-<!-- 赛事概况 -->
-<section id="overview" class="section fade-in">
-  <div class="sticky-head" style="z-index:89"><h2>赛事概况</h2></div>
-  <div class="overview-grid overview-stats">
-    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">48</span><span class="label">参赛球队</span></div>
-    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">12</span><span class="label">小组</span></div>
-    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">104</span><span class="label">比赛场次</span></div>
-    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">39</span><span class="label">赛事天数</span></div>
-  </div>
-  <div class="overview-grid">
-    <div class="overview-item"><span class="label">举办国</span><span class="value">美国 · 加拿大 · 墨西哥</span></div>
-    <div class="overview-item"><span class="label">比赛时间</span><span class="value">6月12日 - 7月20日</span></div>
-    <div class="overview-item"><span class="label">揭幕战</span><span class="value">6/12 03:00 墨西哥 vs 南非</span></div>
-    <div class="overview-item"><span class="label">决赛</span><span class="value">7/20 03:00 纽约·大都会人寿</span></div>
-    <div class="overview-item"><span class="label">出线规则</span><span class="value">每组前2 + 8个最佳第3 → 32强</span></div>
-    <div class="overview-item"><span class="label">淘汰赛</span><span class="value">1/16 → 1/8 → 1/4 → 半决赛 → 决赛</span></div>
-    <div class="overview-item"><span class="label">中国观赛</span><span class="value">约70%比赛 6:00-11:00，无需熬夜</span></div>
-    <div class="overview-item"><span class="label">技术</span><span class="value">VAR + 半自动越位</span></div>
-  </div>
-</section>
 
 <!-- 小组积分 -->
 <section id="groupstand" class="section fade-in">
@@ -569,28 +543,38 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   <div class="star-scroll" id="starScroll"></div>
 </section>
 
-<!-- 场馆 -->
-<section id="venues" class="section fade-in">
-  <div class="sticky-head" id="venuesSticky"><h2>举办城市与场馆</h2></div>
-  <h3 style="color:var(--accent);margin-top:20px">美国</h3>
-  <div class="venue-card"><div><strong>大都会人寿体育场</strong><br><span style="color:var(--text2)">纽约/新泽西</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">82,500</span><br><span style="color:var(--text2);font-size:.85em">8(含决赛)场</span></div></div>
-  <div class="venue-card"><div><strong>SoFi体育场</strong><br><span style="color:var(--text2)">洛杉矶</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">70,000</span><br><span style="color:var(--text2);font-size:.85em">8场</span></div></div>
-  <div class="venue-card"><div><strong>AT&T体育场</strong><br><span style="color:var(--text2)">达拉斯</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">80,000</span><br><span style="color:var(--text2);font-size:.85em">7场</span></div></div>
-  <div class="venue-card"><div><strong>奥克兰球场</strong><br><span style="color:var(--text2)">旧金山</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">63,000</span><br><span style="color:var(--text2);font-size:.85em">5场</span></div></div>
-  <div class="venue-card"><div><strong>硬石球场</strong><br><span style="color:var(--text2)">迈阿密</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">65,000</span><br><span style="color:var(--text2);font-size:.85em">6(含三四名)场</span></div></div>
-  <div class="venue-card"><div><strong>奔驰穹顶</strong><br><span style="color:var(--text2)">亚特兰大</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">71,000</span><br><span style="color:var(--text2);font-size:.85em">6场</span></div></div>
-  <div class="venue-card"><div><strong>NRG体育场</strong><br><span style="color:var(--text2)">休斯敦</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">72,000</span><br><span style="color:var(--text2);font-size:.85em">5场</span></div></div>
-  <div class="venue-card"><div><strong>箭头球场</strong><br><span style="color:var(--text2)">堪萨斯城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">61,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <div class="venue-card"><div><strong>LumenField</strong><br><span style="color:var(--text2)">西雅图</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">69,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <div class="venue-card"><div><strong>吉列体育场</strong><br><span style="color:var(--text2)">波士顿</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">65,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <div class="venue-card"><div><strong>林肯金融球场</strong><br><span style="color:var(--text2)">费城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">69,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <h3 style="color:var(--accent);margin-top:20px">加拿大</h3>
-  <div class="venue-card"><div><strong>蒙特利尔银行体育场</strong><br><span style="color:var(--text2)">多伦多</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">45,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <div class="venue-card"><div><strong>BC Place</strong><br><span style="color:var(--text2)">温哥华</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">54,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <h3 style="color:var(--accent);margin-top:20px">墨西哥</h3>
-  <div class="venue-card"><div><strong>阿兹特克球场</strong><br><span style="color:var(--text2)">墨西哥城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">87,000</span><br><span style="color:var(--text2);font-size:.85em">5(含揭幕战)场</span></div></div>
-  <div class="venue-card"><div><strong>Estadio Akron</strong><br><span style="color:var(--text2)">瓜达拉哈拉</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">49,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
-  <div class="venue-card"><div><strong>Estadio BBVA</strong><br><span style="color:var(--text2)">蒙特雷</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">53,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+<!-- 各队阵容 -->
+<section id="roster" class="section fade-in">
+  <div class="sticky-head" id="rosterSticky"><h2>各队阵容</h2></div>
+  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+    <span style="color:var(--text2);font-size:.9em">筛选：</span>
+    <button onclick="filterRoster('all')" class="roster-filter active" data-filter="all">全部</button>
+    <button onclick="filterRoster('has-photo')" class="roster-filter" data-filter="has-photo">有照片</button>
+    <button onclick="filterRoster('no-photo')" class="roster-filter" data-filter="no-photo">无照片</button>
+    <span style="color:var(--text2);font-size:.85em;margin-left:12px" id="roster-stats"></span>
+  </div>
+  <div id="roster-container"></div>
+</section>
+
+<!-- 赛事概况 -->
+<section id="overview" class="section fade-in">
+  <div class="sticky-head" style="z-index:89"><h2>赛事概况</h2></div>
+  <div class="overview-grid overview-stats">
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">48</span><span class="label">参赛球队</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">12</span><span class="label">小组</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">104</span><span class="label">比赛场次</span></div>
+    <div class="overview-item" style="justify-content:center;gap:4px"><span class="value" style="font-size:1.8em;max-width:100%">39</span><span class="label">赛事天数</span></div>
+  </div>
+  <div class="overview-grid">
+    <div class="overview-item"><span class="label">举办国</span><span class="value">美国 · 加拿大 · 墨西哥</span></div>
+    <div class="overview-item"><span class="label">比赛时间</span><span class="value">6月12日 - 7月20日</span></div>
+    <div class="overview-item"><span class="label">揭幕战</span><span class="value">6/12 03:00 墨西哥 vs 南非</span></div>
+    <div class="overview-item"><span class="label">决赛</span><span class="value">7/20 03:00 纽约·大都会人寿</span></div>
+    <div class="overview-item"><span class="label">出线规则</span><span class="value">每组前2 + 8个最佳第3 → 32强</span></div>
+    <div class="overview-item"><span class="label">淘汰赛</span><span class="value">1/16 → 1/8 → 1/4 → 半决赛 → 决赛</span></div>
+    <div class="overview-item"><span class="label">中国观赛</span><span class="value">约70%比赛 6:00-11:00，无需熬夜</span></div>
+    <div class="overview-item"><span class="label">技术</span><span class="value">VAR + 半自动越位</span></div>
+  </div>
 </section>
 
 <!-- 2026新规 -->
@@ -675,17 +659,28 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   </div>
 </section>
 
-<!-- 各队阵容 -->
-<section id="roster" class="section fade-in">
-  <div class="sticky-head" id="rosterSticky"><h2>各队阵容</h2></div>
-  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
-    <span style="color:var(--text2);font-size:.9em">筛选：</span>
-    <button onclick="filterRoster('all')" class="roster-filter active" data-filter="all">全部</button>
-    <button onclick="filterRoster('has-photo')" class="roster-filter" data-filter="has-photo">有照片</button>
-    <button onclick="filterRoster('no-photo')" class="roster-filter" data-filter="no-photo">无照片</button>
-    <span style="color:var(--text2);font-size:.85em;margin-left:12px" id="roster-stats"></span>
-  </div>
-  <div id="roster-container"></div>
+<!-- 场馆 -->
+<section id="venues" class="section fade-in">
+  <div class="sticky-head" id="venuesSticky"><h2>举办城市与场馆</h2></div>
+  <h3 style="color:var(--accent);margin-top:20px">美国</h3>
+  <div class="venue-card"><div><strong>大都会人寿体育场</strong><br><span style="color:var(--text2)">纽约/新泽西</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">82,500</span><br><span style="color:var(--text2);font-size:.85em">8(含决赛)场</span></div></div>
+  <div class="venue-card"><div><strong>SoFi体育场</strong><br><span style="color:var(--text2)">洛杉矶</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">70,000</span><br><span style="color:var(--text2);font-size:.85em">8场</span></div></div>
+  <div class="venue-card"><div><strong>AT&T体育场</strong><br><span style="color:var(--text2)">达拉斯</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">80,000</span><br><span style="color:var(--text2);font-size:.85em">7场</span></div></div>
+  <div class="venue-card"><div><strong>奥克兰球场</strong><br><span style="color:var(--text2)">旧金山</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">63,000</span><br><span style="color:var(--text2);font-size:.85em">5场</span></div></div>
+  <div class="venue-card"><div><strong>硬石球场</strong><br><span style="color:var(--text2)">迈阿密</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">65,000</span><br><span style="color:var(--text2);font-size:.85em">6(含三四名)场</span></div></div>
+  <div class="venue-card"><div><strong>奔驰穹顶</strong><br><span style="color:var(--text2)">亚特兰大</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">71,000</span><br><span style="color:var(--text2);font-size:.85em">6场</span></div></div>
+  <div class="venue-card"><div><strong>NRG体育场</strong><br><span style="color:var(--text2)">休斯敦</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">72,000</span><br><span style="color:var(--text2);font-size:.85em">5场</span></div></div>
+  <div class="venue-card"><div><strong>箭头球场</strong><br><span style="color:var(--text2)">堪萨斯城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">61,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <div class="venue-card"><div><strong>LumenField</strong><br><span style="color:var(--text2)">西雅图</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">69,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <div class="venue-card"><div><strong>吉列体育场</strong><br><span style="color:var(--text2)">波士顿</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">65,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <div class="venue-card"><div><strong>林肯金融球场</strong><br><span style="color:var(--text2)">费城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">69,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <h3 style="color:var(--accent);margin-top:20px">加拿大</h3>
+  <div class="venue-card"><div><strong>蒙特利尔银行体育场</strong><br><span style="color:var(--text2)">多伦多</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">45,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <div class="venue-card"><div><strong>BC Place</strong><br><span style="color:var(--text2)">温哥华</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">54,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <h3 style="color:var(--accent);margin-top:20px">墨西哥</h3>
+  <div class="venue-card"><div><strong>阿兹特克球场</strong><br><span style="color:var(--text2)">墨西哥城</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">87,000</span><br><span style="color:var(--text2);font-size:.85em">5(含揭幕战)场</span></div></div>
+  <div class="venue-card"><div><strong>Estadio Akron</strong><br><span style="color:var(--text2)">瓜达拉哈拉</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">49,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
+  <div class="venue-card"><div><strong>Estadio BBVA</strong><br><span style="color:var(--text2)">蒙特雷</span></div><div style="text-align:right"><span style="color:var(--gold);font-weight:600">53,000</span><br><span style="color:var(--text2);font-size:.85em">4场</span></div></div>
 </section>
 
 </div>
@@ -1297,6 +1292,7 @@ document.addEventListener('click', function(e) {
 
 // 跳转到阵容区并展开指定球队
 function goToRoster(teamCode) {
+  switchTab('roster');
   var head = document.getElementById('rh-' + teamCode);
   if (!head) {
     if (typeof renderRoster === 'function') renderRoster('all');
@@ -1927,11 +1923,37 @@ function syncScores(){
   });
 }
 
+// ===== SPA 标签切换 =====
+var _currentTab = null;
+function switchTab(tabId) {
+  // Hide all sections, show target
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  var target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+  // Update nav active state
+  document.querySelectorAll('nav a[data-tab]').forEach(function(a) { a.classList.remove('active'); });
+  var navA = document.querySelector('nav a[data-tab="'+tabId+'"]');
+  if (navA) navA.classList.add('active');
+  _currentTab = tabId;
+  // Update URL hash without scrolling
+  history.replaceState(null, '', '#' + tabId);
+  // Scroll to top of container
+  window.scrollTo(0, 0);
+  // Redraw bracket lines when knockout tab becomes visible
+  if (tabId === 'knockout' && typeof BRACKET !== 'undefined' && BRACKET.drawLines) {
+    requestAnimationFrame(function() { BRACKET.drawLines(); });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   GSTAND.init();
   BRACKET.init();
   renderStars();
   renderRoster('all');
+  // Activate tab from hash or default to groupstand
+  var hash = location.hash.replace('#', '');
+  var validTabs = ['groupstand','knockout','stars','roster','overview','rules','venues'];
+  switchTab(validTabs.indexOf(hash) >= 0 ? hash : 'groupstand');
   // Auto-sync scores on first load
   syncScores();
   // Load tournament card data
@@ -2337,13 +2359,50 @@ function _setupVideo(ev) {
     fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        var ld = document.getElementById('tlVideoLoader');
-        if (ld) ld.remove();
         if (data.error) {
-          _videoCache[fifaId] = null;
-          videoDiv.style.display = 'none';
+          // No video mapped yet - try real-time discover from FIFA
+          var ld = document.getElementById('tlVideoLoader');
+          if (ld) ld.textContent = '查找视频中...';
+          fetch('/api/video/discover?fifaId=' + encodeURIComponent(fifaId))
+            .then(function(r2) { return r2.json(); })
+            .then(function(disc) {
+              var ld2 = document.getElementById('tlVideoLoader');
+              if (ld2) ld2.remove();
+              if (disc.found) {
+                // Found! Now get the actual play URL
+                delete _videoCache[fifaId];
+                fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
+                  .then(function(r3) { return r3.json(); })
+                  .then(function(data3) {
+                    if (data3.error) {
+                      _videoCache[fifaId] = null;
+                      videoDiv.style.display = 'none';
+                      return;
+                    }
+                    _videoCache[fifaId] = data3;
+                    _playM3u8(data3.url, false, data3.entryId, data3.title);
+                  })
+                  .catch(function() {
+                    var ld3 = document.getElementById('tlVideoLoader');
+                    if (ld3) ld3.remove();
+                    _videoCache[fifaId] = null;
+                    videoDiv.style.display = 'none';
+                  });
+              } else {
+                _videoCache[fifaId] = null;
+                videoDiv.style.display = 'none';
+              }
+            })
+            .catch(function() {
+              var ld2 = document.getElementById('tlVideoLoader');
+              if (ld2) ld2.remove();
+              _videoCache[fifaId] = null;
+              videoDiv.style.display = 'none';
+            });
           return;
         }
+        var ld = document.getElementById('tlVideoLoader');
+        if (ld) ld.remove();
         _videoCache[fifaId] = data;
         _playM3u8(data.url, false, data.entryId, data.title);
       })

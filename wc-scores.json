@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-14T21:07:24Z",
+ "last_updated": "2026-06-15T03:02:10Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -39,8 +39,16 @@
    "s2": 7
   },
   "F1": {
-   "s1": 0,
+   "s1": 2,
+   "s2": 2
+  },
+  "E3": {
+   "s1": 1,
    "s2": 0
+  },
+  "F2": {
+   "s1": 2,
+   "s2": 1
   }
  },
  "bracket_scores": {},
@@ -222,15 +230,15 @@
    "away": "JPN",
    "h_cn": "荷兰",
    "a_cn": "日本",
-   "score_h": 0,
-   "score_a": 0,
-   "status": 3,
-   "finished": false,
-   "live": true,
+   "score_h": 2,
+   "score_a": 2,
+   "status": 0,
+   "finished": true,
+   "live": false,
    "date": "2026-06-14T20:00:00Z",
    "group": "Group F",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "69285",
    "venue": "Dallas Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -241,15 +249,15 @@
    "away": "ECU",
    "h_cn": "科特迪瓦",
    "a_cn": "厄瓜多尔",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 0,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-14T23:00:00Z",
    "group": "Group E",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "68274",
    "venue": "Philadelphia Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -260,11 +268,11 @@
    "away": "TUN",
    "h_cn": "瑞典",
    "a_cn": "突尼斯",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
+   "score_h": 2,
+   "score_a": 1,
+   "status": 3,
    "finished": false,
-   "live": false,
+   "live": true,
    "date": "2026-06-15T02:00:00Z",
    "group": "Group F",
    "stage": "First Stage",

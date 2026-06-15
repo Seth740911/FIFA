@@ -57,6 +57,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         if self.path.split('?')[0] == '/api/videos':
             self._handle_api_videos()
             return
+        if self.path.split('?')[0] == '/api/video/discover':
+            self._handle_video_discover()
+            return
         # /dl → 全部下载页 / /fifa → FIFA专用下载页
         if self.path.split('?')[0] in ('/dl', '/dl/'):
             self.path = '/download.html'
@@ -177,6 +180,141 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self._json_response(data)
         except Exception as e:
             self._json_response({'error': str(e)}, 500)
+
+    def _handle_video_discover(self):
+        """实时从FIFA carousel查询单场比赛的视频，找到后写入wc-videos.json并返回播放信息"""
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        fifa_id = qs.get('fifaId', [''])[0]
+        if not fifa_id:
+            self._json_response({'error': 'Missing fifaId'}, 400)
+            return
+
+        CXM_API = "https://cxm-api.fifa.com/fifaplusweb/api"
+        HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+        # 1. Check if already mapped
+        video_map_path = os.path.join(WEB_DIR, 'wc-videos.json')
+        vmap = {}
+        if os.path.exists(video_map_path):
+            try:
+                with open(video_map_path, 'r', encoding='utf-8') as f:
+                    vmap = json.load(f)
+            except Exception:
+                pass
+
+        if vmap.get(fifa_id):
+            # Already mapped, return video info directly
+            entry = vmap[fifa_id]
+            entry_id = entry.get('entryId') if isinstance(entry, dict) else entry
+            self._json_response({'found': True, 'entryId': entry_id, 'title': entry.get('title', '') if isinstance(entry, dict) else '', 'source': 'cache'})
+            return
+
+        # 2. Scan carousels for new entries
+        CAROUSEL_IDS = [
+            "2Q6UcV6pn5i5Zmiwto9gwD",
+            "1klF18lgpe12FFtd1IoTSs",
+        ]
+        NEWS_IDS = [
+            "1klF18lgpe12FFtd1IoTSs",
+        ]
+
+        # Collect already-mapped entryIds to skip
+        existing_entry_ids = set()
+        for mid, entry in vmap.items():
+            if isinstance(entry, dict):
+                existing_entry_ids.add(entry.get('entryId', ''))
+            else:
+                existing_entry_ids.add(entry)
+
+        seen_entry_ids = []
+        for cid in CAROUSEL_IDS:
+            try:
+                url = f"{CXM_API}/sections/promoCarousel/{cid}?locale=en"
+                with _urlopen(url, headers=HEADERS) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                for item in data.get('items', []):
+                    eid = item.get('entryId', '')
+                    if eid and item.get('programmeType') == 3 and eid not in existing_entry_ids:
+                        seen_entry_ids.append(eid)
+            except Exception:
+                pass
+
+        for nid in NEWS_IDS:
+            try:
+                url = f"{CXM_API}/sections/news/{nid}?locale=en&limit=50"
+                with _urlopen(url, headers=HEADERS) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                for item in data.get('items', []):
+                    eid = item.get('entryId', '')
+                    if eid and item.get('programmeType') == 3 and eid not in existing_entry_ids:
+                        seen_entry_ids.append(eid)
+            except Exception:
+                pass
+
+        if not seen_entry_ids:
+            self._json_response({'found': False}, 200)
+            return
+
+        # 3. For each new entryId, call videoDetails to find matchId
+        found_entry = None
+        found_title = ''
+        for eid in seen_entry_ids:
+            try:
+                details_url = f"{CXM_API}/sections/videoDetails/{eid}?locale=en"
+                with _urlopen(details_url, headers=HEADERS) as resp:
+                    details = json.loads(resp.read().decode('utf-8'))
+
+                title = details.get('title', '')
+                tags = details.get('semanticTags', [])
+                match_tag = next((t for t in tags if t.get('sourceCategory') == 'Match'), None)
+                if not match_tag:
+                    continue
+
+                match_id = match_tag.get('id', '')
+
+                # Filter: only standard Highlights
+                is_standard = (
+                    'Highlights' in title
+                    and 'Gamified' not in title
+                    and 'International Sign Language' not in title
+                    and 'Alt Cast' not in title
+                    and '|' in title
+                )
+                if not is_standard:
+                    continue
+
+                # Also register other newly found videos while we're at it
+                if match_id and match_id not in vmap:
+                    vmap[match_id] = {'entryId': eid, 'title': title}
+                    print(f"  [video-discover] Found: {match_id} -> {eid} ({title})")
+
+                if match_id == fifa_id:
+                    found_entry = eid
+                    found_title = title
+                    break  # Found our target
+            except Exception:
+                continue
+
+        if not found_entry:
+            # Save any other videos we found along the way
+            if len(vmap) > 0:
+                try:
+                    with open(video_map_path, 'w', encoding='utf-8') as f:
+                        json.dump(vmap, f, ensure_ascii=False, indent=2)
+                except Exception:
+                    pass
+            self._json_response({'found': False}, 200)
+            return
+
+        # 4. Save updated vmap
+        try:
+            with open(video_map_path, 'w', encoding='utf-8') as f:
+                json.dump(vmap, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+        print(f"  [video-discover] Target found: {fifa_id} -> {found_entry} ({found_title})")
+        self._json_response({'found': True, 'entryId': found_entry, 'title': found_title, 'source': 'discovered'})
 
     def _handle_video_register(self):
         try:
