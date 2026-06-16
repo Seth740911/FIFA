@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>缓存检查</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#111;color:#eee;padding:16px;font-size:14px}
+h2{color:#4caf50;margin:8px 0}
+#info{background:#000;color:#0f0;padding:12px;border-radius:8px;white-space:pre-wrap;font-family:monospace;font-size:12px;max-height:80vh;overflow-y:auto}
+.ok{color:#4caf50}.bad{color:#f44336}.warn{color:#ff9800}.dim{color:#888}
+</style>
+</head>
+<body>
+<h2>IndexedDB 缓存检查</h2>
+<div id="info">检查中...</div>
+<script>
+var el = document.getElementById('info');
+
+function log(t, cls) {
+  var s = document.createElement('span');
+  s.textContent = t + '\n';
+  if (cls) s.className = cls;
+  el.appendChild(s);
+}
+
+// 1. 持久化状态
+if (navigator.storage && navigator.storage.persisted) {
+  navigator.storage.persisted().then(function(p) {
+    log('持久化存储: ' + (p ? '✅ 已持久化' : '⚠️ 未持久化（数据可被浏览器回收）'), p ? 'ok' : 'warn');
+  });
+} else {
+  log('持久化API不可用', 'bad');
+}
+
+// 2. 存储估算
+if (navigator.storage && navigator.storage.estimate) {
+  navigator.storage.estimate().then(function(est) {
+    var used = (est.usage / 1024 / 1024).toFixed(1);
+    var quota = (est.quota / 1024 / 1024).toFixed(1);
+    log('存储用量: ' + used + 'MB / ' + quota + 'MB');
+  });
+}
+
+// 3. 遍历 IndexedDB 所有记录
+var req = indexedDB.open('fifa_video_cache', 2);
+req.onerror = function() { log('❌ IndexedDB 打开失败', 'bad'); };
+req.onsuccess = function(e) {
+  var db = e.target.result;
+  if (!db.objectStoreNames.contains('videos')) {
+    log('❌ videos 对象存储不存在', 'bad');
+    return;
+  }
+  var tx = db.transaction('videos', 'readonly');
+  var store = tx.objectStore('videos');
+  var allReq = store.getAll();
+  allReq.onsuccess = function() {
+    var results = allReq.result || [];
+    el.textContent = '';
+    log('共 ' + results.length + ' 条缓存记录\n');
+    
+    var totalSize = 0;
+    var validCount = 0;
+    var emptyCount = 0;
+    
+    results.forEach(function(r, idx) {
+      var segs = r.segBlobs || [];
+      var valid = 0;
+      var empty = 0;
+      var dead = 0;
+      var segSize = 0;
+      
+      for (var i = 0; i < segs.length; i++) {
+        if (segs[i] && segs[i].size > 0) {
+          valid++;
+          segSize += segs[i].size;
+        } else if (segs[i] && segs[i].size === 0) {
+          dead++;  // Blob被浏览器回收了（size=0但对象还在）
+          empty++;
+        } else {
+          empty++;
+        }
+      }
+      
+      totalSize += segSize;
+      if (valid > 0) validCount++;
+      if (valid === 0 && segs.length > 0) emptyCount++;
+      
+      var pct = segs.length > 0 ? Math.round(valid / segs.length * 100) : 0;
+      var status = valid === 0 ? '❌ 全部失效' : pct === 100 ? '✅ 完整' : '⚠️ 不完整';
+      var statusCls = valid === 0 ? 'bad' : pct === 100 ? 'ok' : 'warn';
+      
+      log('━━━ #' + (idx+1) + ' ━━━', 'dim');
+      log('fifaId: ' + r.fifaId);
+      log('状态: ' + status, statusCls);
+      log('分片: ' + valid + '/' + segs.length + ' 有效 (' + pct + '%)');
+      if (dead > 0) log('⚡ 其中 ' + dead + ' 个分片Blob被浏览器回收（size=0）', 'bad');
+      log('数据量: ' + (segSize / 1024 / 1024).toFixed(2) + ' MB');
+      log('标题: ' + (r.title || '无'));
+      log('complete标志: ' + r.complete);
+      log('缓存时间: ' + new Date(r.time).toLocaleString());
+      log('viaProxy: ' + r.viaProxy);
+      log('');
+    });
+    
+    log('━━━ 汇总 ━━━', 'dim');
+    log('总数据量: ' + (totalSize / 1024 / 1024).toFixed(2) + ' MB');
+    log('完整缓存: ' + validCount + ' 条');
+    if (emptyCount > 0) log('⚠️ 全部失效: ' + emptyCount + ' 条（Blob被浏览器回收）', 'warn');
+  };
+};
+</script>
+</body>
+</html>

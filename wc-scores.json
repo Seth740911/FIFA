@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-15T14:20:18Z",
+ "last_updated": "2026-06-16T03:06:57Z",
  "source": "FIFA",
  "group_scores": {
   "A2": {
@@ -49,6 +49,22 @@
   "F2": {
    "s1": 5,
    "s2": 1
+  },
+  "H1": {
+   "s1": 0,
+   "s2": 0
+  },
+  "G1": {
+   "s1": 1,
+   "s2": 1
+  },
+  "H2": {
+   "s1": 1,
+   "s2": 1
+  },
+  "G2": {
+   "s1": 2,
+   "s2": 2
   }
  },
  "bracket_scores": {},
@@ -287,15 +303,15 @@
    "away": "CPV",
    "h_cn": "西班牙",
    "a_cn": "佛得角",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 0,
+   "score_a": 0,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-15T16:00:00Z",
    "group": "Group H",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "67640",
    "venue": "Atlanta Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -306,15 +322,15 @@
    "away": "EGY",
    "h_cn": "比利时",
    "a_cn": "埃及",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-15T19:00:00Z",
    "group": "Group G",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "66775",
    "venue": "Seattle Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -325,15 +341,15 @@
    "away": "URU",
    "h_cn": "沙特阿拉伯",
    "a_cn": "乌拉圭",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 1,
+   "score_a": 1,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-15T22:00:00Z",
    "group": "Group H",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "62764",
    "venue": "Miami Stadium",
    "group_matched": true,
    "bracket_matched": false
@@ -344,15 +360,15 @@
    "away": "NZL",
    "h_cn": "伊朗",
    "a_cn": "新西兰",
-   "score_h": null,
-   "score_a": null,
-   "status": 1,
-   "finished": false,
+   "score_h": 2,
+   "score_a": 2,
+   "status": 0,
+   "finished": true,
    "live": false,
    "date": "2026-06-16T01:00:00Z",
    "group": "Group G",
    "stage": "First Stage",
-   "attendance": null,
+   "attendance": "70108",
    "venue": "Los Angeles Stadium",
    "group_matched": true,
    "bracket_matched": false

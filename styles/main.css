@@ -240,11 +240,11 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .gs-team:hover .gs-team-hint{opacity:1}
 
 /* 首次引导气泡 */
-.guide-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.guide-box{background:#1a1a2e;border:1px solid var(--gold);border-radius:16px;padding:28px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.guide-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);cursor:pointer}
+.guide-box{background:#1a1a2e;border:1px solid var(--gold);border-radius:16px;padding:28px 24px;max-width:400px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .guide-box h3{color:var(--gold);font-size:1.1em;margin:0 0 16px}
 .guide-box ul{list-style:none;padding:0;margin:0 0 20px;text-align:left}
-.guide-box li{padding:6px 0;color:#ccc;font-size:.88em;line-height:1.5}
+.guide-box li{padding:4px 0;color:#ccc;font-size:.82em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .guide-box li b{color:#fff}
 .guide-box li .guide-icon{display:inline-block;width:20px;text-align:center;margin-right:4px}
 .guide-btn{background:var(--gold);color:#000;border:none;border-radius:8px;padding:10px 28px;font-size:.95em;font-weight:600;cursor:pointer}
