@@ -94,6 +94,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
+        if self.path == '/api/diag':
+            self._handle_diag()
+            return
         if self.path == '/api/video/register':
             self._handle_video_register()
             return

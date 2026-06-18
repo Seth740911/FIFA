@@ -2120,6 +2120,42 @@ function _clearAllVideoCache() {
   });
 }
   
+// 解析 master playlist，返回指定分辨率的 variant URL（绝对路径）
+// 优先匹配 RESOLUTION=960x540，找不到则选 BANDWIDTH 最高的兜底
+function _parseTargetVariantUrl(masterText, masterUrl) {
+  if (!masterText || masterText.indexOf('#EXT-X-STREAM-INF') === -1) return null;
+  var lines = masterText.split('\n');
+  var targetUrl = null;
+  var bestBw = -1;
+  var bestUrl = null;
+  var baseUrl = masterUrl.substring(0, masterUrl.lastIndexOf('/') + 1);
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (line.indexOf('#EXT-X-STREAM-INF') > -1) {
+      var resMatch = line.match(/RESOLUTION=([^,]+)/);
+      var res = resMatch ? resMatch[1] : '';
+      var bwMatch = line.match(/BANDWIDTH=(\d+)/);
+      var bw = bwMatch ? parseInt(bwMatch[1], 10) : 0;
+      if (i + 1 < lines.length) {
+        var nextLine = lines[i + 1].trim();
+        if (nextLine && !nextLine.startsWith('#') && nextLine.indexOf('.m3u8') > -1) {
+          var vUrl = nextLine.startsWith('http') ? nextLine : baseUrl + nextLine;
+          if (res === '960x540') targetUrl = vUrl;
+          if (bw > bestBw) { bestBw = bw; bestUrl = vUrl; }
+        }
+      }
+    }
+  }
+  var chosen = targetUrl || bestUrl;
+  if (chosen) {
+    var chosenRes = targetUrl ? '960x540' : 'highest';
+    console.log('[VCACHE] 选 variant: ' + chosenRes + ' BANDWIDTH=' + bestBw + ' url=' + chosen.substring(0, 80));
+    // 上报分辨率信息到服务器日志
+    try { navigator.sendBeacon('/api/diag', JSON.stringify({fifaId: 'variant', event: 'select_variant', res: chosenRes, bw: bestBw, url: chosen.substring(0, 120)})); } catch(e) {}
+  }
+  return chosen;
+}
+
 // 下载 .ts 分段并存 IndexedDB（支持断点续传 + 增量更新）
 function _cacheVideoSegments(fifaId, m3u8Url, m3u8Text, baseUrl, viaProxy, entryId, title) {
   // 解析 m3u8 提取 .ts URL
@@ -2424,49 +2460,43 @@ function _playFromCache(cacheData) {
     console.warn('[VCACHE] 有 ' + missingIndices.length + ' 段缺失（索引：' + missingIndices.slice(0, 10).join(',') + (missingIndices.length > 10 ? '...' : '') + '），从新鲜m3u8获取URL');
   }
 
-  // 始终获取新鲜m3u8（需要替换过期的密钥URL和缺失段URL）
-  // 但如果有本地密钥，则不需要新鲜密钥URL
   var hasLocalKey = !!(cacheData.keyBlob && cacheData.keyBlob.size > 0);
   if (hasLocalKey) {
     console.log('[VCACHE] 有本地密钥缓存（' + cacheData.keyBlob.size + ' 字节），使用本地密钥播放');
   }
+
+  // 缓存完整（无缺失段）且有本地密钥时，直接播放不等网络请求
+  var canPlayImmediately = hasLocalKey && missingIndices.length === 0;
+
   var freshM3u8Promise;
-  if (fifaId && !hasLocalKey) {
+  if (canPlayImmediately) {
+    // 缓存完整+有密钥 → 先立即播放，后台同步新鲜 m3u8（用于下次缓存更新）
+    freshM3u8Promise = Promise.resolve(null);
+    console.log('[VCACHE] 缓存完整+有本地密钥，跳过网络请求直接播放');
+  } else if (fifaId && !hasLocalKey) {
     // 没有本地密钥时，仍然需要获取新鲜m3u8来拿密钥URL（兼容旧缓存）
     freshM3u8Promise = fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (!d || !d.url) return null;
         return fetch('/proxy/?url=' + encodeURIComponent(d.url)).then(function(r) { return r.text(); }).then(function(text) {
-          if (text.indexOf('#EXT-X-STREAM-INF') > -1) {
-            var vLines = text.split('\n');
-            for (var vi = 0; vi < vLines.length; vi++) {
-              var vt = vLines[vi].trim();
-              if (vt && !vt.startsWith('#') && vt.indexOf('.m3u8') > -1) {
-                var vUrl = vt.startsWith('http') ? vt : d.url.substring(0, d.url.lastIndexOf('/') + 1) + vt;
-                return fetch('/proxy/?url=' + encodeURIComponent(vUrl)).then(function(r2) { return r2.text(); });
-              }
-            }
+          var bestUrl = _parseTargetVariantUrl(text, d.url);
+          if (bestUrl) {
+            return fetch('/proxy/?url=' + encodeURIComponent(bestUrl)).then(function(r2) { return r2.text(); });
           }
           return text;
         });
       }).catch(function() { return null; });
   } else if (fifaId && hasLocalKey) {
-    // 有本地密钥时，仍需要新鲜m3u8来获取缺失段的URL，但不需要密钥URL
+    // 有本地密钥但有缺失段，需要新鲜m3u8来获取缺失段URL
     freshM3u8Promise = fetch('/api/video?fifaId=' + encodeURIComponent(fifaId))
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (!d || !d.url) return null;
         return fetch('/proxy/?url=' + encodeURIComponent(d.url)).then(function(r) { return r.text(); }).then(function(text) {
-          if (text.indexOf('#EXT-X-STREAM-INF') > -1) {
-            var vLines = text.split('\n');
-            for (var vi = 0; vi < vLines.length; vi++) {
-              var vt = vLines[vi].trim();
-              if (vt && !vt.startsWith('#') && vt.indexOf('.m3u8') > -1) {
-                var vUrl = vt.startsWith('http') ? vt : d.url.substring(0, d.url.lastIndexOf('/') + 1) + vt;
-                return fetch('/proxy/?url=' + encodeURIComponent(vUrl)).then(function(r2) { return r2.text(); });
-              }
-            }
+          var bestUrl = _parseTargetVariantUrl(text, d.url);
+          if (bestUrl) {
+            return fetch('/proxy/?url=' + encodeURIComponent(bestUrl)).then(function(r2) { return r2.text(); });
           }
           return text;
         });
@@ -2592,23 +2622,16 @@ function _startBackgroundCache(fifaId, m3u8Url, viaProxy, entryId, title) {
       return fetch('/proxy/?url=' + encodeURIComponent(data.url)).then(function(r2) {
         if (!r2.ok) throw new Error('status ' + r2.status);
         return r2.text().then(function(text) {
-          // 如果是 master playlist，取第一个 variant
-          if (text.indexOf('#EXT-X-STREAM-INF') > -1) {
-            var lines = text.split('\n');
-            var baseUrl2 = data.url.substring(0, data.url.lastIndexOf('/') + 1);
-            for (var i = 0; i < lines.length; i++) {
-              var ln = lines[i].trim();
-              if (ln && !ln.startsWith('#') && ln.indexOf('.m3u8') > -1) {
-                var vUrl = ln.startsWith('http') ? ln : baseUrl2 + ln;
-                return fetch('/proxy/?url=' + encodeURIComponent(vUrl)).then(function(r3) {
-                  if (!r3.ok) throw new Error('variant status ' + r3.status);
-                  return r3.text().then(function(vt) {
-                    var vs = vUrl.lastIndexOf('/');
-                    return { m3u8Text: vt, baseUrl: vs > 0 ? vUrl.substring(0, vs + 1) : '', viaProxy: true };
-                  });
-                });
-              }
-            }
+          // 如果是 master playlist，取 960x540 分辨率 variant
+          var bestUrl = _parseTargetVariantUrl(text, data.url);
+          if (bestUrl) {
+            return fetch('/proxy/?url=' + encodeURIComponent(bestUrl)).then(function(r3) {
+              if (!r3.ok) throw new Error('variant status ' + r3.status);
+              return r3.text().then(function(vt) {
+                var vs = bestUrl.lastIndexOf('/');
+                return { m3u8Text: vt, baseUrl: vs > 0 ? bestUrl.substring(0, vs + 1) : '', viaProxy: true };
+              });
+            });
           }
           var bs = data.url.substring(0, data.url.lastIndexOf('/') + 1);
           return { m3u8Text: text, baseUrl: bs, viaProxy: true };
@@ -2794,7 +2817,9 @@ function _playM3u8(m3u8Url, _viaProxy, _entryId, _title) {
 }
 
 // 直接播放（用于本地缓存回放，不需要代理回退和缓存逻辑）
+var _directPlayErrGuard = false; // 防止 error 事件反复触发降级循环
 function _playM3u8Direct(m3u8Url) {
+  _directPlayErrGuard = false;
   var videoDiv = document.getElementById('tlVideo');
   var video = document.getElementById('tlPlayer');
   videoDiv.style.display = 'block';
@@ -2813,7 +2838,8 @@ function _playM3u8Direct(m3u8Url) {
     // 缓存播放失败时降级到网络流
     _hlsInstance.on(Hls.Events.ERROR, function(e, data) {
       console.warn('[VCACHE] HLS error:', data.type, data.details, data.fatal ? 'FATAL' : 'non-fatal', data.url || '');
-      if (data.fatal) {
+      if (data.fatal && !_directPlayErrGuard) {
+        _directPlayErrGuard = true; // 只降级一次，防循环
         _diag(_tlCurrentFifaId, 'cache_play_error', {type: data.type, details: data.details, url: (data.url || '').substring(0, 120)});
         var fifaId = _tlCurrentFifaId;
         // fragParsingError = 缓存段被旧密钥加密，新密钥无法解密，缓存永久失效
@@ -2849,8 +2875,10 @@ function _playM3u8Direct(m3u8Url) {
     // 追踪视频观看
     _trackVideoWatch();
   }
-  // video 元素错误事件也降级
+  // video 元素错误事件也降级（加 once 防止重复绑定）
   video.addEventListener('error', function() {
+    if (_directPlayErrGuard) return;
+    _directPlayErrGuard = true;
     console.warn('[VCACHE] video 元素错误，降级到网络流');
     var fifaId = _tlCurrentFifaId;
     if (fifaId) {
@@ -2860,7 +2888,7 @@ function _playM3u8Direct(m3u8Url) {
           if (d && d.url) _playM3u8(d.url, false, d.entryId, d.title);
         }).catch(function() {});
     }
-  });
+  }, {once: true});
 }
 
 // 追踪视频观看行为
