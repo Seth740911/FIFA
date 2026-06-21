@@ -71,6 +71,15 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             self.path = '/download.html'
         elif self.path.split('?')[0] in ('/fifa', '/fifa/'):
             self.path = '/fifa-dl.html'
+        # /install/ → 安装页（QR码+下载）
+        elif self.path.split('?')[0] in ('/install/fifa', '/install/fifa/'):
+            self.path = '/install/fifa.html'
+        elif self.path.split('?')[0] in ('/install/multi', '/install/multi/'):
+            self.path = '/install/multi.html'
+        elif self.path.split('?')[0] in ('/install/all', '/install/all/'):
+            self.path = '/install/all.html'
+        elif self.path.split('?')[0] in ('/install', '/install/'):
+            self.path = '/install/all.html'
         elif self.path.split('?')[0] in ('/stats', '/stats/'):
             self.path = '/stats.html'
         elif self.path.split('?')[0] in ('/all-stats', '/all-stats/'):

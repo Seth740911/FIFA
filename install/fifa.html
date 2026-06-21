@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FIFA 2026 安装</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.hd{width:88%;max-width:340px;margin:20px auto 0;padding:14px;text-align:center;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:12px}
+.hd .hlogo{height:28px;vertical-align:middle;margin-right:6px}
+.hd h1{font-size:1.2em;color:#d4a04a;display:inline;vertical-align:middle}
+.hd p{font-size:.72em;color:#777;margin-top:6px}
+.qr{text-align:center;margin:18px 0 4px}
+.qr img{width:220px;height:220px;border-radius:8px}
+.qr .hint{font-size:.76em;color:#888;margin-top:10px}
+.switch{font-size:.7em;color:#d4a04a;margin-top:6px;cursor:pointer;user-select:none}
+.switch:hover{text-decoration:underline}
+.cards{width:88%;max-width:340px;margin:14px auto 0}
+.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .15s;text-decoration:none;color:inherit}
+.card:hover{border-color:#d4a04a}
+.card:active{transform:scale(.98)}
+.ico{width:40px;height:40px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#15152a}
+.ico img{width:100%;height:100%;object-fit:contain}
+.cinfo{flex:1;min-width:0}
+.cname{font-size:.9em;font-weight:600;color:#fff}
+.cdesc{font-size:.68em;color:#888;margin-top:1px}
+.cbtn{background:#d4a04a;color:#000;border:none;border-radius:7px;padding:6px 12px;font-size:.74em;font-weight:600;cursor:pointer}
+.guide{width:88%;max-width:340px;margin:12px auto 0;background:#111827;border:1px solid #2a2a4a;border-radius:10px;padding:14px;display:none}
+.guide.show{display:block}
+.guide h3{color:#d4a04a;font-size:.84em;margin-bottom:8px}
+.guide ol{padding-left:18px;font-size:.74em;line-height:1.85;color:#ccc}
+.guide ol b{color:#fff}
+.guide .tip{margin-top:8px;padding-top:8px;border-top:1px solid #222;font-size:.66em;color:#555}
+.ft{text-align:center;padding:16px;font-size:.62em;color:#3a3a3a;margin-top:auto}
+.wg{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:flex-end;padding:18px 22px}
+.wg.show{display:flex}
+.wg .ar{font-size:2.8em;color:#fff;margin-right:16px;animation:b 1s infinite}
+.wg .tx{color:#fff;font-size:1em;line-height:1.8;text-align:center;margin-top:56px;padding:0 16px}
+.wg .tx b{color:#d4a04a}
+@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <img class="hlogo" src="install/logos/fifa.png" alt="">
+  <h1>FIFA 2026</h1>
+  <p>World Cup Viewer</p>
+</div>
+
+<div class="qr">
+  <img id="qrImg" src="install/qr-fifa.png" alt="QR">
+  <div class="hint">扫描二维码打开安装页 · 点击下方按钮下载</div>
+  <div class="switch" onclick="toggleQR()">
+    <span id="qrLabel">外网</span> · 点此切换内/外网
+  </div>
+</div>
+
+<div class="cards">
+  <a class="card" onclick="return dl(event,'fifa.apk')">
+    <div class="ico"><img src="install/logos/fifa.png" alt=""></div>
+    <div class="cinfo">
+      <div class="cname">FIFA 2026</div>
+      <div class="cdesc">世界杯观赛指南 · 赛程/比分/时间轴/视频集锦</div>
+    </div>
+    <button class="cbtn">下载</button>
+  </a>
+</div>
+
+<div class="guide" id="guide">
+  <h3>安装步骤</h3>
+  <ol>
+    <li>点<b>下载</b>按钮，等待下载完成</li>
+    <li>拉下<b>通知栏</b>，点击已下载的 apk</li>
+    <li>提示"未知来源" → <b>设置 → 允许安装</b></li>
+    <li>点<b>安装</b>，完成后打开即可</li>
+  </ol>
+  <div class="tip">仅限 Android · 需开启"允许安装未知来源"</div>
+</div>
+
+<div class="ft">Powered by AI</div>
+
+<div class="wg" id="wg" onclick="this.classList.remove('show')">
+  <div class="ar">↗</div>
+  <div class="tx">请先点击右上角 <b>···</b><br>选择 <b>在浏览器中打开</b><br>即可下载安装</div>
+</div>
+
+<script>
+var isWan=true;
+function toggleQR(){
+  isWan=!isWan;
+  document.getElementById('qrImg').src=isWan?'install/qr-fifa.png':'install/qr-fifa-lan.png';
+  document.getElementById('qrLabel').textContent=isWan?'外网':'内网';
+}
+function dl(e,f){
+  if(/MicroMessenger/i.test(navigator.userAgent)){
+    e.preventDefault();
+    document.getElementById('wg').classList.add('show');
+    return false;
+  }
+  var a=document.createElement('a');
+  a.href='/apk/'+f;
+  a.download=f;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  document.getElementById('guide').classList.add('show');
+  return false;
+}
+</script>
+</body>
+</html>
