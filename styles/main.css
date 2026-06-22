@@ -245,6 +245,7 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
 .gs-form-w{background:rgba(76,175,80,.25);color:#4caf50}
 .gs-form-d{background:rgba(255,193,7,.2);color:#ffc107}
 .gs-form-l{background:rgba(244,67,54,.2);color:#f44336}
+.gs-form-empty{background:rgba(255,255,255,.06);color:rgba(255,255,255,.15)}
 .gs-arrow-up{color:#4caf50;font-size:.78em}
 .gs-arrow-down{color:#f44336;font-size:.78em}
 .gs-qual{color:#4caf50;font-weight:700;font-size:.85em}

@@ -1098,14 +1098,17 @@ function render(){
         else if(t.pos>t.prevPos)arrow=' <span class="gs-arrow-down">↓</span>';
       }
       var flagH=teamMap[t.cn]?'<img src="/wc-flags/'+t.code+'.png" class="gs-flag" onerror="this.style.display=\'none\'">':'';
-      // 近况Form显示
+      // 近况Form显示（固定3格，未赛显示占位）
       var formHtml='';
-      if(t.form&&t.form.length>0){
-        var recent=t.form.slice(-3);
-        recent.forEach(function(f){
+      var recent=t.form?t.form.slice(-3):[];
+      for(var fi=0;fi<3;fi++){
+        if(fi<recent.length){
+          var f=recent[fi];
           var fc=f==='W'?'gs-form-w':f==='L'?'gs-form-l':'gs-form-d';
           formHtml+='<span class="gs-form-dot '+fc+'">'+f+'</span>';
-        });
+        }else{
+          formHtml+='<span class="gs-form-dot gs-form-empty">-</span>';
+        }
       }
       // TCS显示
       var tcsVal=t.tcs||0;
