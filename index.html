@@ -1373,12 +1373,12 @@ function processFifaData(data){
       /* 已确定的球队 */
       if(match.TeamA&&match.TeamA.Abbreviation){
         info.teamA=match.TeamA.Abbreviation;
-        info.teamAFull=match.TeamA.TeamName&&match.TeamA.TeamName[0]?match.TeamA.TeamName[0].Description:match.TeamA.Abbreviation;
+        info.teamAFull=_knockoutTeamName(match.TeamA);
         info.teamACode=match.TeamA.IdCountry||match.TeamA.Abbreviation;
       }
       if(match.TeamB&&match.TeamB.Abbreviation){
         info.teamB=match.TeamB.Abbreviation;
-        info.teamBFull=match.TeamB.TeamName&&match.TeamB.TeamName[0]?match.TeamB.TeamName[0].Description:match.TeamB.Abbreviation;
+        info.teamBFull=_knockoutTeamName(match.TeamB);
         info.teamBCode=match.TeamB.IdCountry||match.TeamB.Abbreviation;
       }
       /* 比分 */
@@ -1425,6 +1425,15 @@ function loadKnockoutData(){
 }
 
 /* ---- 合并knockout赛程中的真实球队到fifaMap ---- */
+function _knockoutTeamName(apiObj){
+  /* 用IdCountry查WC_TEAMS拿中文名，找不到则用API英文名 */
+  var code=apiObj.IdCountry||apiObj.Abbreviation;
+  if(typeof WC_TEAMS!=='undefined'){
+    var t=WC_TEAMS.find(function(x){return x.code===code});
+    if(t)return t.cn;
+  }
+  return apiObj.TeamName&&apiObj.TeamName[0]?apiObj.TeamName[0].Description:apiObj.Abbreviation;
+}
 function mergeKnockoutTeams(data){
   if(!data||!data.Results)return;
   data.Results.forEach(function(m){
@@ -1434,13 +1443,13 @@ function mergeKnockoutTeams(data){
     /* Home -> teamA (签表左侧) */
     if(m.Home&&m.Home.Abbreviation&&!info.teamA){
       info.teamA=m.Home.Abbreviation;
-      info.teamAFull=m.Home.TeamName&&m.Home.TeamName[0]?m.Home.TeamName[0].Description:m.Home.Abbreviation;
+      info.teamAFull=_knockoutTeamName(m.Home);
       info.teamACode=m.Home.IdCountry||m.Home.Abbreviation;
     }
     /* Away -> teamB (签表右侧) */
     if(m.Away&&m.Away.Abbreviation&&!info.teamB){
       info.teamB=m.Away.Abbreviation;
-      info.teamBFull=m.Away.TeamName&&m.Away.TeamName[0]?m.Away.TeamName[0].Description:m.Away.Abbreviation;
+      info.teamBFull=_knockoutTeamName(m.Away);
       info.teamBCode=m.Away.IdCountry||m.Away.Abbreviation;
     }
     /* 也同步比分(如果有的话) */
