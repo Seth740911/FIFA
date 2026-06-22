@@ -26,6 +26,8 @@ FIFA_STANDINGS_API = "https://api.fifa.com/api/v3/calendar/17/285023/289273/stan
 STANDINGS_FILE = os.path.join(WEB_DIR, "wc-standings.json")
 FIFA_BRACKETS_API = "https://api.fifa.com/api/v3/seasonbracket/season/285023?language=en"
 BRACKETS_FILE = os.path.join(WEB_DIR, "wc-brackets.json")
+FIFA_KNOCKOUT_API = "https://api.fifa.com/api/v3/calendar/matches?language=en&count=500&idSeason=285023&from=2026-06-27"
+KNOCKOUT_FILE = os.path.join(WEB_DIR, "wc-knockout.json")
 
 
 def _urlopen(url, headers=None, timeout=15):
@@ -63,6 +65,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             return
         if self.path.split('?')[0] == '/api/brackets':
             self._handle_api_brackets()
+            return
+        if self.path.split('?')[0] == '/api/knockout':
+            self._handle_api_knockout()
             return
         if self.path.split('?')[0] == '/api/lineup':
             self._handle_api_lineup()
@@ -617,6 +622,29 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                 self._json_response(data)
             else:
                 self._json_response({'error': 'brackets unavailable'}, 503)
+        except Exception as e:
+            self._json_response({'error': str(e)}, 500)
+
+    def _handle_api_knockout(self):
+        if os.path.exists(KNOCKOUT_FILE):
+            try:
+                cache_age = time.time() - os.path.getmtime(KNOCKOUT_FILE)
+                with open(KNOCKOUT_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if cache_age < 300:
+                    self._json_response(data)
+                    return
+                print(f"[knockout] 缓存过期({cache_age:.0f}s)，重新拉取")
+            except Exception:
+                pass
+        try:
+            _fetch_knockout()
+            if os.path.exists(KNOCKOUT_FILE):
+                with open(KNOCKOUT_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                self._json_response(data)
+            else:
+                self._json_response({'error': 'knockout unavailable'}, 503)
         except Exception as e:
             self._json_response({'error': str(e)}, 500)
 
@@ -1235,6 +1263,29 @@ def _fetch_brackets():
         print(f"[brackets] 拉取失败: {e}")
 
 
+def _fetch_knockout():
+    try:
+        resp = _urlopen(FIFA_KNOCKOUT_API, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+        }, timeout=20)
+        data = json.loads(resp.read().decode('utf-8'))
+        results = data.get('Results', [])
+        if not results:
+            print("[knockout] API返回空数据")
+            return
+        output = {
+            'last_updated': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            'count': len(results),
+            'Results': results,
+        }
+        with open(KNOCKOUT_FILE, 'w', encoding='utf-8') as f:
+            json.dump(output, f, ensure_ascii=False)
+        print(f"[knockout] 拉取成功，{len(results)}场淘汰赛")
+    except Exception as e:
+        print(f"[knockout] 拉取失败: {e}")
+
+
 def _run_fetch():
     try:
         result = subprocess.run(
@@ -1370,6 +1421,8 @@ def _startup_sync():
     _fetch_standings()
     print("[brackets] 启动拉取淘汰赛赛程...")
     _fetch_brackets()
+    print("[knockout] 启动拉取淘汰赛对阵...")
+    _fetch_knockout()
 
 
 def main():

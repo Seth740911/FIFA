@@ -1398,11 +1398,56 @@ function loadFifaData(){
   xhr.open('GET','/api/brackets',true);
   xhr.onload=function(){
     if(xhr.status===200){
-      try{fifaData=JSON.parse(xhr.responseText);processFifaData(fifaData);render()}
+      try{fifaData=JSON.parse(xhr.responseText);processFifaData(fifaData);loadKnockoutData()}
       catch(e){console.error('[bracket] parse error',e)}
     }
   };
   xhr.send();
+}
+
+/* ---- 加载knockout赛程(含已出线球队) ---- */
+var knockoutData=null;
+function loadKnockoutData(){
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET','/api/knockout',true);
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{
+        knockoutData=JSON.parse(xhr.responseText);
+        mergeKnockoutTeams(knockoutData);
+        render();
+      }catch(e){console.error('[bracket] knockout parse error',e)}
+    }else{
+      render(); // 无knockout数据也正常渲染
+    }
+  };
+  xhr.send();
+}
+
+/* ---- 合并knockout赛程中的真实球队到fifaMap ---- */
+function mergeKnockoutTeams(data){
+  if(!data||!data.Results)return;
+  data.Results.forEach(function(m){
+    var fn=m.MatchNumber;
+    var info=fifaMap[fn];
+    if(!info)return;
+    /* Home -> teamA (签表左侧) */
+    if(m.Home&&m.Home.Abbreviation&&!info.teamA){
+      info.teamA=m.Home.Abbreviation;
+      info.teamAFull=m.Home.TeamName&&m.Home.TeamName[0]?m.Home.TeamName[0].Description:m.Home.Abbreviation;
+      info.teamACode=m.Home.IdCountry||m.Home.Abbreviation;
+    }
+    /* Away -> teamB (签表右侧) */
+    if(m.Away&&m.Away.Abbreviation&&!info.teamB){
+      info.teamB=m.Away.Abbreviation;
+      info.teamBFull=m.Away.TeamName&&m.Away.TeamName[0]?m.Away.TeamName[0].Description:m.Away.Abbreviation;
+      info.teamBCode=m.Away.IdCountry||m.Away.Abbreviation;
+    }
+    /* 也同步比分(如果有的话) */
+    if(m.HomeTeamScore!=null&&info.scoreA==null){info.scoreA=m.HomeTeamScore;info.scoreB=m.AwayTeamScore}
+    if(m.HomeTeamPenaltyScore!=null&&info.penA==null){info.penA=m.HomeTeamPenaltyScore;info.penB=m.AwayTeamPenaltyScore}
+    if(m.Winner!=null&&info.winner==null){info.winner=m.Winner}
+  });
 }
 
 /* ---- 渲染对阵卡 (FIFA风格) ---- */
