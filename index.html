@@ -1221,9 +1221,10 @@ function editScore(id){
 return{init:init,editScore:editScore,reset:reset,scores:scores,save:save,render:render,teamMap:teamMap,fifaStandings:fifaStandingsData};
 })();
 
-/* ====== 淘汰赛签表 ====== */
+/* ====== 淘汰赛签表 (FIFA brackets 风格) ====== */
 var BRACKET=(function(){
-var R32=[
+/* ---- 本地编号与FIFA编号映射 (保持与fetch_scores.py一致) ---- */
+var R32_DEF=[
   {n:1,t1:'2B',t2:'2A'},{n:2,t1:'1E',t2:'3rd(ABCDF)'},{n:3,t1:'1F',t2:'2C'},
   {n:4,t1:'1C',t2:'2F'},{n:5,t1:'1I',t2:'3rd(CDFGH)'},{n:6,t1:'2E',t2:'2I'},
   {n:7,t1:'1A',t2:'3rd(CEFHI)'},{n:8,t1:'1L',t2:'3rd(EHIJK)'},
@@ -1232,32 +1233,33 @@ var R32=[
   {n:13,t1:'1B',t2:'3rd(EFGIJ)'},{n:14,t1:'1J',t2:'2H'},
   {n:15,t1:'1K',t2:'3rd(DEIJL)'},{n:16,t1:'2D',t2:'2G'}
 ];
-var R32_ORD=[1,3,2,5,4,6,7,8,11,12,9,10,14,16,13,15];
-var R16=[
+var R16_DEF=[
   {n:17,from:[2,5]},{n:18,from:[1,3]},{n:19,from:[4,6]},{n:20,from:[7,8]},
   {n:21,from:[11,12]},{n:22,from:[9,10]},{n:23,from:[14,16]},{n:24,from:[13,15]}
 ];
-var R16_ORD=[17,18,21,22,19,20,23,24];
-var QF=[{n:25,from:[17,18]},{n:26,from:[21,22]},{n:27,from:[19,20]},{n:28,from:[23,24]}];
-var SF=[{n:29,from:[25,26]},{n:30,from:[27,28]}];
-var FL={n:31,from:[29,30]};
-var TP={n:32,from:[29,30],losers:true};
-var ROUNDS=[
-  {name:'1/16决赛',matches:R32,order:R32_ORD},
-  {name:'1/8决赛',matches:R16,order:R16_ORD},
-  {name:'1/4决赛',matches:QF,order:[25,26,27,28]},
-  {name:'半决赛',matches:SF,order:[29,30]},
-  {name:'决赛',matches:[FL],order:[31]}
-];
-var ALL_LATER=R16.concat(QF).concat(SF).concat([FL,TP]);
-var SKEY='wc2026_bracket';
-var st={};
+var QF_DEF=[{n:25,from:[17,18]},{n:26,from:[21,22]},{n:27,from:[19,20]},{n:28,from:[23,24]}];
+var SF_DEF=[{n:29,from:[25,26]},{n:30,from:[27,28]}];
+var FL_DEF={n:31,from:[29,30]};
+var TP_DEF={n:32,from:[29,30],losers:true};
+var ALL_DEF=R32_DEF.concat(R16_DEF).concat(QF_DEF).concat(SF_DEF).concat([FL_DEF,TP_DEF]);
+var ALL_LATER=R16_DEF.concat(QF_DEF).concat(SF_DEF).concat([FL_DEF,TP_DEF]);
 
+/* 显示顺序：上下半区交叉排列 */
+var R32_ORD=[1,3,2,5,4,6,7,8,11,12,9,10,14,16,13,15];
+var R16_ORD=[17,18,21,22,19,20,23,24];
+
+/* ---- 状态 ---- */
+var SKEY='wc2026_bracket';
+var st={};          // 交互式比分: st[n]={s1,s2}
+var fifaData=null;  // FIFA seasonbracket API 数据
+var fifaMap={};     // FIFA MatchNumber -> {n, slot_a, slot_b, date, stadium, phA, phB, teamA, teamB, scoreA, scoreB, penA, penB, winner}
+var ourToFifa={};   // our n -> FIFA MatchNumber
+
+/* ---- 辅助 ---- */
+function gm(n){for(var i=0;i<ALL_DEF.length;i++)if(ALL_DEF[i].n===n)return ALL_DEF[i];return null}
 function load(){try{var s=localStorage.getItem(SKEY);if(s){var d=JSON.parse(s);Object.keys(st).forEach(function(k){delete st[k]});Object.keys(d).forEach(function(k){st[k]=d[k]})}}catch(e){}}
 function save(){localStorage.setItem(SKEY,JSON.stringify(st))}
 function reset(){if(confirm('确定重置所有淘汰赛数据？')){Object.keys(st).forEach(function(k){delete st[k]});save();render()}}
-
-function gm(n){for(var i=0;i<ROUNDS.length;i++)for(var j=0;j<ROUNDS[i].matches.length;j++)if(ROUNDS[i].matches[j].n===n)return ROUNDS[i].matches[j];return null}
 
 function winner(n){
   var d=st[n];if(!d||d.s1===''||d.s2==='')return null;
@@ -1289,41 +1291,218 @@ function teamFlag(name){
   return null;
 }
 
-function renderMatch(m){
-  var d=st[m.n]||{};
-  var t1=m.t1?m.t1:teamName(m.n,0);
-  var t2=m.t1?m.t2:teamName(m.n,1);
-  var w=winner(m.n);
-  var dec=w!==null&&w!==-1;
-  var cls='b-match'+(dec?' decided':'');
-  var t1cls='b-team'+(dec?(w===0?' winner':' loser'):'');
-  var t2cls='b-team'+(dec?(w===1?' winner':' loser'):'');
-  var s1=d.s1!==undefined?d.s1:'';
-  var s2=d.s2!==undefined?d.s2:'';
-  var f1=teamFlag(t1),f2=teamFlag(t2);
-  var f1h=f1?'<img src="/wc-flags/'+f1+'.png" class="b-flag" onerror="this.style.display=\'none\'">':'';
-  var f2h=f2?'<img src="/wc-flags/'+f2+'.png" class="b-flag" onerror="this.style.display=\'none\'">':'';
-  return '<div class="'+cls+'" data-mnum="'+m.n+'"><div class="'+t1cls+'">'+f1h+
-    '<span class="b-name">'+t1+'</span><span class="b-score" onclick="BRACKET.editScore('+m.n+',0)">'+s1+'</span></div><div class="'+t2cls+'">'+
-    f2h+'<span class="b-name">'+t2+'</span><span class="b-score" onclick="BRACKET.editScore('+m.n+',1)">'+s2+'</span></div></div>';
+/* ---- FIFA 数据处理 ---- */
+function _phOurs(ph){
+  /* 将FIFA占位符转换为我们的格式: 3CEFHI -> 3rd(CEFHI), W73 -> W73, 1A -> 1A */
+  if(!ph)return'';
+  if(ph.startsWith('W')||ph.startsWith('RU')||ph.startsWith('1')||ph.startsWith('2'))return ph;
+  if(ph.startsWith('3')&&ph.length>2)return'3rd('+ph.substring(1)+')';
+  return ph;
 }
 
+function processFifaData(data){
+  if(!data||!data.KnockoutStages)return;
+  fifaMap={};ourToFifa={};
+  var stages=data.KnockoutStages;
+  /* 第1遍: 建FIFA MatchNumber -> our n 的映射 (与fetch_scores.py逻辑一致) */
+  var slotToN={};
+  R32_DEF.forEach(function(m){slotToN[frozenskey(m.t1,m.t2)]=m.n});
+  /* 对R32: 用PlaceHolder匹配 */
+  stages.forEach(function(stage){
+    var stageName=stage.Name&&stage.Name[0]?stage.Name[0].Description:'';
+    if(!stage.Matches)return;
+    stage.Matches.forEach(function(match){
+      var fn=match.MatchNumber;
+      var phA=match.PlaceHolderA||'';
+      var phB=match.PlaceHolderB||'';
+      var sa=_phOurs(phA),sb=_phOurs(phB);
+      if(stageName==='Round of 32'){
+        var n=slotToN[frozenskey(sa,sb)];
+        if(n!=null){fifaMap[fn]={n:n,phA:sa,phB:sb};ourToFifa[n]=fn}
+      }
+    });
+  });
+  /* 对后续轮: 用W/RU引用链映射 */
+  var fifaW2our={},fifaRU2our={};
+  Object.keys(fifaMap).forEach(function(fn){
+    var o=fifaMap[fn];
+    fifaW2our['W'+fn]='W'+o.n;
+    fifaRU2our['RU'+fn]='RU'+o.n;
+  });
+  var laterSlotToN={};
+  R16_DEF.concat(QF_DEF).concat(SF_DEF).concat([FL_DEF,TP_DEF]).forEach(function(m){
+    var s1=m.losers?'RU'+m.from[0]:'W'+m.from[0];
+    var s2=m.losers?'RU'+m.from[1]:'W'+m.from[1];
+    laterSlotToN[frozenskey(s1,s2)]=m.n;
+  });
+  var stageOrder=['Round of 16','Quarter-final','Semi-final','Play-off for third place','Final'];
+  stageOrder.forEach(function(sn){
+    stages.forEach(function(stage){
+      if(!stage.Name||!stage.Name[0]||stage.Name[0].Description!==sn)return;
+      if(!stage.Matches)return;
+      stage.Matches.forEach(function(match){
+        var fn=match.MatchNumber;
+        var phA=match.PlaceHolderA||'';
+        var phB=match.PlaceHolderB||'';
+        var sa=fifaW2our[phA]||fifaRU2our[phA]||phA;
+        var sb=fifaW2our[phB]||fifaRU2our[phB]||phB;
+        var n=laterSlotToN[frozenskey(sa,sb)];
+        if(n!=null){
+          fifaMap[fn]={n:n,phA:sa,phB:sb};
+          ourToFifa[n]=fn;
+          fifaW2our['W'+fn]='W'+n;
+          fifaRU2our['RU'+fn]='RU'+n;
+        }
+      });
+    });
+  });
+  /* 第2遍: 填充详情 */
+  stages.forEach(function(stage){
+    if(!stage.Matches)return;
+    stage.Matches.forEach(function(match){
+      var fn=match.MatchNumber;
+      var info=fifaMap[fn];
+      if(!info)return;
+      info.date=match.Date||'';
+      info.stadium=match.Stadium&&match.Stadium.Name&&match.Stadium.Name[0]?match.Stadium.Name[0].Description:'';
+      info.city=match.Stadium&&match.Stadium.CityName&&match.Stadium.CityName[0]?match.Stadium.CityName[0].Description:'';
+      info.fifaNum=fn;
+      /* 已确定的球队 */
+      if(match.TeamA&&match.TeamA.Abbreviation){
+        info.teamA=match.TeamA.Abbreviation;
+        info.teamAFull=match.TeamA.TeamName&&match.TeamA.TeamName[0]?match.TeamA.TeamName[0].Description:match.TeamA.Abbreviation;
+        info.teamACode=match.TeamA.IdCountry||match.TeamA.Abbreviation;
+      }
+      if(match.TeamB&&match.TeamB.Abbreviation){
+        info.teamB=match.TeamB.Abbreviation;
+        info.teamBFull=match.TeamB.TeamName&&match.TeamB.TeamName[0]?match.TeamB.TeamName[0].Description:match.TeamB.Abbreviation;
+        info.teamBCode=match.TeamB.IdCountry||match.TeamB.Abbreviation;
+      }
+      /* 比分 */
+      if(match.HomeTeamScore!=null)info.scoreA=match.HomeTeamScore;
+      if(match.AwayTeamScore!=null)info.scoreB=match.AwayTeamScore;
+      if(match.HomeTeamPenaltyScore!=null)info.penA=match.HomeTeamPenaltyScore;
+      if(match.AwayTeamPenaltyScore!=null)info.penB=match.AwayTeamPenaltyScore;
+      if(match.Winner!=null)info.winner=match.Winner;
+    });
+  });
+}
+function frozenskey(a,b){return a<b?a+'|'+b:b+'|'+a}
+
+/* ---- 加载FIFA数据 ---- */
+function loadFifaData(){
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET','/api/brackets',true);
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{fifaData=JSON.parse(xhr.responseText);processFifaData(fifaData);render()}
+      catch(e){console.error('[bracket] parse error',e)}
+    }
+  };
+  xhr.send();
+}
+
+/* ---- 渲染对阵卡 (FIFA风格) ---- */
+function renderCard(m){
+  var n=m.n, d=st[n]||{};
+  var fi=fifaMap[ourToFifa[n]]||{};
+
+  /* 球队1 */
+  var t1Name, t1Code, t1IsTBD;
+  if(fi.teamA){
+    t1Name=fi.teamAFull||fi.teamA; t1Code=fi.teamACode; t1IsTBD=false;
+  }else if(m.t1){
+    t1Name=m.t1; t1Code=teamFlag(m.t1); t1IsTBD=!!m.t1.match(/^[123]/);
+  }else{
+    var w1=winner(m.from[0]);
+    t1Name=w1!==null&&w1!==-1?teamName(m.from[0],w1):'胜'+m.from[0];
+    t1Code=teamFlag(t1Name); t1IsTBD=w1===null||w1===-1;
+  }
+
+  /* 球队2 */
+  var t2Name, t2Code, t2IsTBD;
+  if(fi.teamB){
+    t2Name=fi.teamBFull||fi.teamB; t2Code=fi.teamBCode; t2IsTBD=false;
+  }else if(m.t1){
+    t2Name=m.t2; t2Code=teamFlag(m.t2); t2IsTBD=!!m.t2.match(/^[123]/);
+  }else{
+    var w2=winner(m.from[1]);
+    t2Name=w2!==null&&w2!==-1?teamName(m.from[1],w2):'胜'+m.from[1];
+    t2Code=teamFlag(t2Name); t2IsTBD=w2===null||w2===-1;
+  }
+
+  /* 比分: 优先FIFA，其次交互 */
+  var s1='',s2='',penInfo='',dec=false;
+  if(fi.scoreA!=null&&fi.scoreB!=null){
+    s1=fi.scoreA;s2=fi.scoreB;dec=true;
+    if(fi.penA!=null&&fi.penB!=null)penInfo='('+fi.penA+'-'+fi.penB+')';
+  }else if(d.s1!==undefined&&d.s2!==undefined){
+    s1=d.s1;s2=d.s2;
+    var w=winner(n);dec=w!==null&&w!==-1;
+  }
+
+  var w=winner(n);
+  var decCls=dec?' decided':'';
+  var t1cls='b-team'+(dec?(w===0?' winner':' loser'):'');
+  var t2cls='b-team'+(dec?(w===1?' winner':' loser'):'');
+
+  /* 比赛编号 & 日期 */
+  var matchLabel=fi.fifaNum?'M'+fi.fifaNum:'';
+  var dateStr='';
+  if(fi.date){
+    var dt=new Date(fi.date);
+    dateStr=(dt.getMonth()+1)+'/'+dt.getDate();
+  }
+
+  /* 国旗 */
+  var f1h=t1Code?'<img src="/wc-flags/'+t1Code+'.png" class="b-flag" onerror="this.style.display=\'none\'">'
+    :(t1IsTBD?'<span class="b-flag-ph"></span>':'');
+  var f2h=t2Code?'<img src="/wc-flags/'+t2Code+'.png" class="b-flag" onerror="this.style.display=\'none\'">'
+    :(t2IsTBD?'<span class="b-flag-ph"></span>':'');
+
+  var t1NameCls=t1IsTBD?'b-name b-tbd':'b-name';
+  var t2NameCls=t2IsTBD?'b-name b-tbd':'b-name';
+
+  return '<div class="b-match'+decCls+'" data-mnum="'+n+'">'
+    +'<div class="b-match-header"><span class="b-mnum">'+matchLabel+'</span><span class="b-date">'+dateStr+'</span></div>'
+    +'<div class="b-team b-slot-0'+(dec?(w===0?' winner':' loser'):'')+'">'+f1h+'<span class="'+t1NameCls+'">'+t1Name+'</span>'
+    +'<span class="b-score" onclick="BRACKET.editScore('+n+',0)">'+s1+'</span></div>'
+    +'<div class="b-team b-slot-1'+(dec?(w===1?' winner':' loser'):'')+'">'+f2h+'<span class="'+t2NameCls+'">'+t2Name+'</span>'
+    +'<span class="b-score" onclick="BRACKET.editScore('+n+',1)">'+s2+'</span></div>'
+    +(penInfo?'<div class="b-pen">'+penInfo+'</div>':'')
+    +'</div>';
+}
+
+/* ---- 主渲染 ---- */
 function render(){
   var c=document.getElementById('bracket-scroll');if(!c)return;
+  var ROUNDS=[
+    {name:'1/16决赛',matches:R32_DEF,order:R32_ORD},
+    {name:'1/8决赛',matches:R16_DEF,order:R16_ORD},
+    {name:'1/4决赛',matches:QF_DEF,order:[25,26,27,28]},
+    {name:'半决赛',matches:SF_DEF,order:[29,30]},
+    {name:'决赛',matches:[FL_DEF],order:[31]}
+  ];
   var h='<div class="bracket-grid" id="bracket-grid"><svg class="bracket-svg" id="bracket-svg"></svg>';
   ROUNDS.forEach(function(r){
     h+='<div class="bracket-col"><div class="bc-title">'+r.name+'</div><div class="bc-matches">';
-    r.order.forEach(function(n){var m=r.matches.find(function(x){return x.n===n});if(m)h+=renderMatch(m)});
+    r.order.forEach(function(n){var m=r.matches.find(function(x){return x.n===n});if(m)h+=renderCard(m)});
     h+='</div></div>';
   });
-  h+='<div class="bracket-col"><div class="bc-title">三四名</div><div class="bc-matches">'+renderMatch(TP)+'</div></div>';
+  /* 三四名单独列 */
+  h+='<div class="bracket-col bracket-3rd"><div class="bc-title">三四名</div><div class="bc-matches">'+renderCard(TP_DEF)+'</div></div>';
   h+='</div>';
   c.innerHTML=h;
-  // Force DOM reflow for Edge compatibility
+  /* 更新时间 */
+  if(fifaData){
+    var lu=document.getElementById('bracket-last-updated');
+    if(lu){var d=new Date();lu.textContent='更新于 '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+  }
   void c.offsetHeight;
   requestAnimationFrame(drawLines);
 }
 
+/* ---- SVG 连线 ---- */
 function drawLines(){
   var grid=document.getElementById('bracket-grid'),svg=document.getElementById('bracket-svg');
   if(!grid||!svg)return;
@@ -1333,10 +1512,11 @@ function drawLines(){
   svg.style.width=grid.scrollWidth+'px';
   svg.style.height=grid.scrollHeight+'px';
   svg.innerHTML='';
-  function ap(d){
+  function ap(d,isLoser){
     var p=document.createElementNS('http://www.w3.org/2000/svg','path');
     p.setAttribute('d',d);p.setAttribute('fill','none');
-    p.setAttribute('stroke',m_losers?'#3a3a4a':'#2a2a3a');p.setAttribute('stroke-width','2');
+    p.setAttribute('stroke',isLoser?'#4a4a5a':'#3a3a4a');
+    p.setAttribute('stroke-width','2');
     svg.appendChild(p);
   }
   function cen(el){
@@ -1344,7 +1524,7 @@ function drawLines(){
     return{l:r.left-gr.left,ri:r.right-gr.left,t:r.top-gr.top,b:r.bottom-gr.top,cy:r.top+r.height/2-gr.top};
   }
   ALL_LATER.forEach(function(match){
-    m_losers=!!match.losers;
+    var isLoser=!!match.losers;
     var toEl=document.querySelector('[data-mnum="'+match.n+'"]');if(!toEl)return;
     var tb=cen(toEl);
     var f1El=document.querySelector('[data-mnum="'+match.from[0]+'"]');
@@ -1353,17 +1533,16 @@ function drawLines(){
     var f1=cen(f1El),f2=cen(f2El);
     var x1=f1.ri+2,x2=tb.l-2,mx=(x1+x2)/2;
     var y1=f1.cy,y2=f2.cy,yt=tb.cy;
-    ap('M'+x1+','+y1+' H'+mx);
-    ap('M'+x1+','+y2+' H'+mx);
-    ap('M'+mx+','+Math.min(y1,y2)+' V'+Math.max(y1,y2));
-    ap('M'+mx+','+yt+' H'+x2);
-    m_losers=false;
+    ap('M'+x1+','+y1+' H'+mx,isLoser);
+    ap('M'+x1+','+y2+' H'+mx,isLoser);
+    ap('M'+mx+','+Math.min(y1,y2)+' V'+Math.max(y1,y2),isLoser);
+    ap('M'+mx+','+yt+' H'+x2,isLoser);
   });
 }
-var m_losers=false;
 
+/* ---- 交互编辑 ---- */
 function editScore(n,slot){
-  var el=document.querySelector('[data-mnum="'+n+'"] .b-team:nth-child('+(slot+1)+') .b-score');
+  var el=document.querySelector('[data-mnum="'+n+'"] .b-slot-'+slot+' .b-score');
   if(!el)return;
   var cv=st[n]?st[n]['s'+(slot+1)]:'';
   var inp=document.createElement('input');
@@ -1393,8 +1572,26 @@ function propagate(n){
   });
 }
 
-return{init:function(){load();render();window.addEventListener('resize',drawLines)},
-  editScore:editScore,reset:reset,save:save,drawLines:drawLines,st:st,render:render};
+/* ---- 将FIFA比分同步到st ---- */
+function applyFifaScores(bracketScores){
+  if(!bracketScores||typeof bracketScores!=='object')return;
+  Object.keys(bracketScores).forEach(function(nStr){
+    var n=parseInt(nStr);
+    var bs=bracketScores[nStr];
+    if(bs&&bs.s1!=null&&bs.s2!=null){
+      if(!st[n])st[n]={};
+      /* 只在FIFA数据与本地不一致时更新（FIFA优先） */
+      st[n].s1=bs.s1; st[n].s2=bs.s2;
+    }
+  });
+  save();render();
+}
+
+return{
+  init:function(){load();loadFifaData();window.addEventListener('resize',drawLines)},
+  editScore:editScore,reset:reset,save:save,drawLines:drawLines,st:st,render:render,
+  applyFifaScores:applyFifaScores,loadFifaData:loadFifaData
+};
 })();
 
 /* ====== 同步比分 ====== */

@@ -268,25 +268,32 @@ tr[data-fifa]:hover .gs-sch-hint{opacity:1;color:var(--gold)}
   .gs-grid{grid-template-columns:1fr}
 }
 
-/* 淘汰赛签表 */
+/* 淘汰赛签表 (FIFA brackets 风格) */
 .bracket-wrap{position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 0 20px;max-width:100%;contain:layout}
 .bracket-grid{display:flex;align-items:stretch;position:relative;min-width:max-content;padding:0 10px}
 .bracket-svg{position:absolute;top:0;left:0;pointer-events:none;z-index:1}
-.bracket-col{display:flex;flex-direction:column;z-index:2}
-.bc-title{color:var(--gold);font-size:.85em;font-weight:600;padding:6px 10px;text-align:center;white-space:nowrap;letter-spacing:.5px}
-.bc-matches{display:flex;flex-direction:column;justify-content:space-around;flex:1;padding:0 15px;min-width:170px}
-.b-match{background:var(--card);border:1px solid var(--border);border-radius:6px;width:170px;overflow:hidden;flex-shrink:0;transition:border-color .2s}
-.b-match:hover{border-color:var(--gold)}
-.b-match.decided{border-color:#3a6fdf}
-.b-team{display:flex;align-items:center;padding:4px 8px;gap:4px;font-size:.8em}
-.b-team+.b-team{border-top:1px solid var(--border)}
-.b-team.winner{background:rgba(212,168,83,.1)}
+.bracket-col{display:flex;flex-direction:column;z-index:2;gap:0}
+.bracket-3rd{margin-left:30px}
+.bc-title{color:#999;font-size:.72em;font-weight:600;padding:8px 10px 6px;text-align:center;white-space:nowrap;letter-spacing:.5px;text-transform:uppercase}
+.bc-matches{display:flex;flex-direction:column;justify-content:space-around;flex:1;padding:0 12px;gap:8px;min-width:185px}
+.b-match{background:#1e1e2a;border:1px solid #333;border-radius:8px;width:185px;overflow:hidden;flex-shrink:0;transition:border-color .2s}
+.b-match:hover{border-color:#555}
+.b-match.decided{border-color:#4a7fdf}
+.b-match-header{display:flex;justify-content:space-between;padding:3px 8px;background:#161622;font-size:.65em;color:#777;border-bottom:1px solid #2a2a3a}
+.b-mnum{font-weight:600;color:#999}
+.b-date{color:#666}
+.b-team{display:flex;align-items:center;padding:6px 8px;gap:5px;font-size:.78em;min-height:28px}
+.b-team+.b-team{border-top:1px solid #2a2a3a}
+.b-team.winner{background:rgba(74,127,223,.08)}
 .b-team.loser{opacity:.4}
-.b-flag{width:18px;height:12px;border-radius:2px;object-fit:contain;flex-shrink:0;cursor:pointer}
-.b-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.b-score{min-width:20px;text-align:center;font-weight:700;color:var(--gold);cursor:pointer;padding:1px 3px;border-left:1px solid var(--border);font-size:.85em}
-.b-score:hover{background:rgba(212,168,83,.15)}
-.b-score-input{width:26px;text-align:center;background:var(--bg);border:1px solid var(--gold);color:#fff;font-weight:700;font-size:.85em;border-radius:3px;padding:1px 2px;outline:none}
+.b-flag{width:20px;height:14px;border-radius:2px;object-fit:contain;flex-shrink:0}
+.b-flag-ph{width:20px;height:14px;border-radius:2px;flex-shrink:0;background:#2a2a3a}
+.b-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;font-weight:500}
+.b-name.b-tbd{color:#888;font-style:italic;font-weight:400}
+.b-score{min-width:22px;text-align:center;font-weight:700;color:var(--gold);cursor:pointer;padding:1px 4px;border-left:1px solid #2a2a3a;font-size:.85em}
+.b-score:hover{background:rgba(212,168,83,.1)}
+.b-score-input{width:28px;text-align:center;background:var(--bg);border:1px solid var(--gold);color:#fff;font-weight:700;font-size:.85em;border-radius:3px;padding:1px 2px;outline:none}
+.b-pen{font-size:.65em;color:#888;text-align:center;padding:1px 0 3px;background:#161622}
 .bc-ctrl{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 .bc-btn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 14px;border-radius:6px;cursor:pointer;font-size:.82em;transition:all .2s}
 .bc-btn:hover{border-color:var(--gold);color:var(--text)}

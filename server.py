@@ -24,6 +24,8 @@ APK_DIR = r"G:\AI\APK"
 VIDEO_DIR = r"D:\迅雷下载"
 FIFA_STANDINGS_API = "https://api.fifa.com/api/v3/calendar/17/285023/289273/standing?language=en&count=200"
 STANDINGS_FILE = os.path.join(WEB_DIR, "wc-standings.json")
+FIFA_BRACKETS_API = "https://api.fifa.com/api/v3/seasonbracket/season/285023?language=en"
+BRACKETS_FILE = os.path.join(WEB_DIR, "wc-brackets.json")
 
 
 def _urlopen(url, headers=None, timeout=15):
@@ -58,6 +60,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             return
         if self.path.split('?')[0] == '/api/standings':
             self._handle_api_standings()
+            return
+        if self.path.split('?')[0] == '/api/brackets':
+            self._handle_api_brackets()
             return
         if self.path.split('?')[0] == '/api/lineup':
             self._handle_api_lineup()
@@ -589,6 +594,29 @@ class FIFAHandler(SimpleHTTPRequestHandler):
                 self._json_response(data)
             else:
                 self._json_response({'error': 'standings unavailable'}, 503)
+        except Exception as e:
+            self._json_response({'error': str(e)}, 500)
+
+    def _handle_api_brackets(self):
+        if os.path.exists(BRACKETS_FILE):
+            try:
+                cache_age = time.time() - os.path.getmtime(BRACKETS_FILE)
+                with open(BRACKETS_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if cache_age < 300:
+                    self._json_response(data)
+                    return
+                print(f"[brackets] 缓存过期({cache_age:.0f}s)，重新拉取")
+            except Exception:
+                pass
+        try:
+            _fetch_brackets()
+            if os.path.exists(BRACKETS_FILE):
+                with open(BRACKETS_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                self._json_response(data)
+            else:
+                self._json_response({'error': 'brackets unavailable'}, 503)
         except Exception as e:
             self._json_response({'error': str(e)}, 500)
 
@@ -1184,6 +1212,29 @@ def _fetch_standings():
         print(f"[standings] 拉取失败: {e}")
 
 
+def _fetch_brackets():
+    try:
+        resp = _urlopen(FIFA_BRACKETS_API, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+        }, timeout=20)
+        data = json.loads(resp.read().decode('utf-8'))
+        stages = data.get('KnockoutStages', [])
+        if not stages:
+            print("[brackets] API返回空数据")
+            return
+        output = {
+            'last_updated': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            'count': len(stages),
+            'KnockoutStages': stages,
+        }
+        with open(BRACKETS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(output, f, ensure_ascii=False)
+        print(f"[brackets] 拉取成功，{len(stages)}个阶段")
+    except Exception as e:
+        print(f"[brackets] 拉取失败: {e}")
+
+
 def _run_fetch():
     try:
         result = subprocess.run(
@@ -1317,6 +1368,8 @@ def _startup_sync():
     _regen_photo_map()
     print("[standings] 启动拉取FIFA官方积分排名...")
     _fetch_standings()
+    print("[brackets] 启动拉取淘汰赛赛程...")
+    _fetch_brackets()
 
 
 def main():
