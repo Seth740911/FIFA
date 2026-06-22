@@ -58,6 +58,10 @@ window.addEventListener('online', function() {
   if (typeof syncScores === 'function') syncScores();
 });
 window.addEventListener('offline', function() { _setNetStatus('offline'); });
+// 切回页面时刷新数据
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden && typeof syncScores === 'function') syncScores();
+});
 </script>
 <title>2026 美加墨世界杯</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
@@ -961,8 +965,7 @@ document.addEventListener('click', function(e) {
 window.addEventListener('scroll', () => {
   document.getElementById('backTop').classList.toggle('show', window.scrollY > 600);
 });
-// 阻止横向滚动（不影响sticky）
-window.addEventListener('scroll',function(){ if(window.scrollX!==0)window.scrollTo(0,window.scrollY); },{passive:true});
+// body级横向滚动由CSS overflow-x:hidden控制
 // 设置所有sticky-head top=nav高度，同时补偿container padding
 (function(){
   function setStickyTop(){
@@ -984,6 +987,7 @@ var SKEY='wc2026_group_scores';
 var scores={};
 var groups={},fixtures={},teamMap={};
 var scheduleByGroup={};
+var fifaStandingsData={list:null};  // FIFA官方排名数据（含TCS等）
 
 function init(){
   if(typeof WC_TEAMS==='undefined')return;
@@ -1020,7 +1024,7 @@ function reset(){if(confirm('确定重置所有小组赛比分？')){Object.keys
 
 function calcStandings(g){
   var teams={};
-  groups[g].forEach(function(t){teams[t.cn]={code:t.code,cn:t.cn,color:t.color,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}});
+  groups[g].forEach(function(t){teams[t.cn]={code:t.code,cn:t.cn,color:t.color,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0,tcs:0,pos:0,prevPos:null,qualified:'',form:[]}});
   fixtures[g].forEach(function(fix){
     var d=scores[fix.id];if(!d||d.s1===''||d.s2==='')return;
     var a=parseInt(d.s1),b=parseInt(d.s2);if(isNaN(a)||isNaN(b))return;
@@ -1028,11 +1032,49 @@ function calcStandings(g){
     t1.p++;t2.p++;
     t1.gf+=a;t1.ga+=b;t1.gd=t1.gf-t1.ga;
     t2.gf+=b;t2.ga+=a;t2.gd=t2.gf-t2.ga;
-    if(a>b){t1.w++;t1.pts+=3;t2.l++}
-    else if(a<b){t2.w++;t2.pts+=3;t1.l++}
-    else{t1.d++;t2.d++;t1.pts++;t2.pts++}
+    if(a>b){t1.w++;t1.pts+=3;t2.l++;t1.form.push('W');t2.form.push('L')}
+    else if(a<b){t2.w++;t2.pts+=3;t1.l++;t1.form.push('L');t2.form.push('W')}
+    else{t1.d++;t2.d++;t1.pts++;t2.pts++;t1.form.push('D');t2.form.push('D')}
   });
-  return Object.values(teams).sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf});
+  var sorted=Object.values(teams).sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf});
+  // 如果有FIFA官方排名数据，覆盖排序和TCS等
+  if(fifaStandingsData.list){
+    var gLetter=g.replace('组','').replace('Group ','');
+    var fifaTeams=fifaStandingsData.list.filter(function(s){return s.group==='Group '+gLetter});
+    if(fifaTeams.length===4){
+      // 按FIFA Position排序，合并数据到我们的team对象
+      var fifaByAbbr={};
+      fifaTeams.forEach(function(ft){fifaByAbbr[ft.abbreviation]=ft});
+      // 用中文名映射回我们的team
+      Object.keys(teams).forEach(function(cn){
+        var t=teams[cn];
+        var ft=fifaByAbbr[t.code];
+        if(ft){
+          t.tcs=ft.tcs||0;
+          t.pos=ft.position||0;
+          t.prevPos=ft.prevPosition;
+          t.qualified=ft.qualified||'';
+          // Form: 从matchResults推导
+          if(ft.matchResults&&ft.matchResults.length>0){
+            t.form=[];
+            ft.matchResults.forEach(function(mr){
+              if(mr.hs!==null&&mr.as!==null){
+                var isHome=mr.ht===ft.idTeam||mr.ht===ft.abbreviation;
+                var myScore=isHome?mr.hs:mr.as;
+                var oppScore=isHome?mr.as:mr.hs;
+                if(myScore>oppScore)t.form.push('W');
+                else if(myScore<oppScore)t.form.push('L');
+                else t.form.push('D');
+              }
+            });
+          }
+        }
+      });
+      // 按FIFA Position重排
+      sorted.sort(function(a,b){return(a.pos||99)-(b.pos||99)});
+    }
+  }
+  return sorted;
 }
 
 function render(){
@@ -1043,11 +1085,32 @@ function render(){
     var st=calcStandings(g);
     var fx=fixtures[g];
     h+='<div class="gs-card"><h3>'+g+'组 <span class="gs-rank-hint">前2名出线 + 第3名候选</span></h3>';
-    h+='<table class="gs-table"><thead><tr><th>#</th><th>球队</th><th>场</th><th>胜</th><th>平</th><th>负</th><th>进</th><th>失</th><th>净</th><th>分</th></tr></thead><tbody>';
+    h+='<table class="gs-table"><thead><tr><th>#</th><th>球队</th><th>场</th><th>胜</th><th>平</th><th>负</th><th>进</th><th>失</th><th>净</th><th class="gs-th-tcs">TCS</th><th>分</th><th class="gs-th-form">近况</th></tr></thead><tbody>';
     st.forEach(function(t,i){
       var cls=i<2?'gs-adv':i===2?'gs-3rd':'';
+      // 出线状态标记（仅当有FIFA数据时）
+      var qualTag='';
+      if(t.qualified==='ConfirmedQualified'||t.qualified==='Qualified')qualTag=' <span class="gs-qual">✓</span>';
+      // 排名变化箭头
+      var arrow='';
+      if(t.prevPos!==null&&t.prevPos!==undefined&&t.prevPos!==0){
+        if(t.pos<t.prevPos)arrow=' <span class="gs-arrow-up">↑</span>';
+        else if(t.pos>t.prevPos)arrow=' <span class="gs-arrow-down">↓</span>';
+      }
       var flagH=teamMap[t.cn]?'<img src="/wc-flags/'+t.code+'.png" class="gs-flag" onerror="this.style.display=\'none\'">':'';
-      h+='<tr class="'+cls+'"><td>'+(i+1)+'</td><td><span class="gs-team">'+flagH+'<span class="gs-tn">'+t.cn+'</span><span class="gs-team-hint">›</span></span></td><td>'+t.p+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td><td>'+t.gf+'</td><td>'+t.ga+'</td><td>'+(t.gd>=0?'+':'')+t.gd+'</td><td style="font-weight:700;color:var(--gold)">'+t.pts+'</td></tr>';
+      // 近况Form显示
+      var formHtml='';
+      if(t.form&&t.form.length>0){
+        var recent=t.form.slice(-3);
+        recent.forEach(function(f){
+          var fc=f==='W'?'gs-form-w':f==='L'?'gs-form-l':'gs-form-d';
+          formHtml+='<span class="gs-form-dot '+fc+'">'+f+'</span>';
+        });
+      }
+      // TCS显示
+      var tcsVal=t.tcs||0;
+      var tcsHtml=tcsVal<0?''+tcsVal:tcsVal===0?'0':''+tcsVal;
+      h+='<tr class="'+cls+'"><td>'+(t.pos||i+1)+arrow+qualTag+'</td><td><span class="gs-team">'+flagH+'<span class="gs-tn">'+t.cn+'</span><span class="gs-team-hint">›</span></span></td><td>'+t.p+'</td><td>'+t.w+'</td><td>'+t.d+'</td><td>'+t.l+'</td><td>'+t.gf+'</td><td>'+t.ga+'</td><td>'+(t.gd>=0?'+':'')+t.gd+'</td><td class="gs-td-tcs">'+tcsHtml+'</td><td style="font-weight:700;color:var(--gold)">'+t.pts+'</td><td class="gs-td-form">'+formHtml+'</td></tr>';
     });
     h+='</tbody></table>';
     // Schedule + scores combined
@@ -1155,7 +1218,7 @@ function editScore(id){
   });
 }
 
-return{init:init,editScore:editScore,reset:reset,scores:scores,save:save,render:render,teamMap:teamMap};
+return{init:init,editScore:editScore,reset:reset,scores:scores,save:save,render:render,teamMap:teamMap,fifaStandings:fifaStandingsData};
 })();
 
 /* ====== 淘汰赛签表 ====== */
@@ -1494,6 +1557,16 @@ function syncScores(){
     _rebuildMatchMappings(data.match_details||[]);
   
     GSTAND.save();GSTAND.render();
+    // 同步FIFA官方积分排名（含TCS、出线状态等）
+    _fetchWithRetry('/api/standings?t='+Date.now(),{cache:'no-store'},2).then(function(sd){
+      if(sd&&sd.standings){
+        GSTAND.fifaStandings.list=sd.standings;
+        GSTAND.render();
+        console.log('[Standings] FIFA官方排名已同步，'+sd.count+'支队');
+      }
+    }).catch(function(e){
+      console.log('[Standings] 排名同步失败(不影响比分):',e.message);
+    });
     SCORE_SYNC.lastSync=data.last_updated;
     // Update bracket if scores available
     var bs=data.bracket_scores||{};
@@ -1545,10 +1618,17 @@ function syncScores(){
     // Cache synced data for offline use
     _cacheSet('sync', data);
     _setNetStatus('ok');
-    // 只在有新比赛结束时才更新黄红牌
+    // 只在有新比赛结束时才更新黄红牌 + 刷新standings
     if (hasNewFinished) {
       console.log('[Cards] 检测到新结束比赛，更新黄红牌');
       loadCards();
+      _fetchWithRetry('/api/standings?t='+Date.now(),{cache:'no-store'},2).then(function(sd){
+        if(sd&&sd.standings){
+          GSTAND.fifaStandings.list=sd.standings;
+          GSTAND.render();
+          console.log('[Standings] 比赛结束，排名已刷新，'+sd.count+'支队');
+        }
+      }).catch(function(){});
     }
   }).catch(function(e){
     _setNetStatus('degraded');
@@ -3146,13 +3226,13 @@ function _calcLineupPositions(players, formation, side) {
   if (!formation || !formation.match(/^\d+(-\d+)+$/) || !players.length) return [];
 
   var lines = formation.split('-').map(Number);
+
+  // Separate GK first, then lay out the rest strictly by formation line order
   var gk = null;
-  var df = [], mf = [], fw = [];
+  var outfield = [];
   players.forEach(function(p) {
     if (p.pos === 0) { if (!gk) gk = p; return; }
-    if (p.pos === 1) df.push(p);
-    else if (p.pos === 3) fw.push(p);
-    else mf.push(p);
+    outfield.push(p);
   });
 
   var result = [];
@@ -3165,35 +3245,18 @@ function _calcLineupPositions(players, formation, side) {
     });
   }
 
-  // Map formation lines to position groups
-  // lines[0] → DF, lines[1..n-2] → MF, lines[n-1] → FW
+  // Assign outfield players to formation lines sequentially
+  // The formation string dictates the layout: 4-3-3 means first 4 = line1, next 3 = line2, last 3 = line3
   var totalLines = lines.length;
-  var dfIdx = 0, mfIdx = 0, fwIdx = 0;
+  var totalNeeded = lines.reduce(function(s, n) { return s + n; }, 0);
+  var idx = 0;
 
   for (var li = 0; li < totalLines; li++) {
     var count = lines[li];
     var picked = [];
 
-    // Determine which pool to draw from
-    var posType;
-    if (totalLines <= 3) {
-      posType = li === 0 ? 1 : (li === totalLines - 1 ? 3 : 2);
-    } else {
-      if (li === 0) posType = 1;
-      else if (li === totalLines - 1) posType = 3;
-      else posType = 2;
-    }
-
-    if (posType === 1) {
-      while (picked.length < count && dfIdx < df.length) picked.push(df[dfIdx++]);
-      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
-    } else if (posType === 3) {
-      while (picked.length < count && fwIdx < fw.length) picked.push(fw[fwIdx++]);
-      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
-    } else {
-      while (picked.length < count && mfIdx < mf.length) picked.push(mf[mfIdx++]);
-      while (picked.length < count && fwIdx < fw.length) picked.push(fw[fwIdx++]);
-      while (picked.length < count && dfIdx < df.length) picked.push(df[dfIdx++]);
+    for (var k = 0; k < count && idx < outfield.length; k++) {
+      picked.push(outfield[idx++]);
     }
 
     // Depth fraction: row position from own goal to opponent

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """2026世界杯观赛指南 - 后端服务器 (端口8086)
 纯静态网页服务，双栈监听，后台定时同步比分和红黄牌
@@ -22,6 +22,8 @@ WEB_DIR = os.path.dirname(os.path.abspath(__file__))
 FETCH_SCRIPT = os.path.join(WEB_DIR, "fetch_scores.py")
 APK_DIR = r"G:\AI\APK"
 VIDEO_DIR = r"D:\迅雷下载"
+FIFA_STANDINGS_API = "https://api.fifa.com/api/v3/calendar/17/285023/289273/standing?language=en&count=200"
+STANDINGS_FILE = os.path.join(WEB_DIR, "wc-standings.json")
 
 
 def _urlopen(url, headers=None, timeout=15):
@@ -53,6 +55,9 @@ class FIFAHandler(SimpleHTTPRequestHandler):
             return
         if self.path.split('?')[0] == '/api/sync':
             self._handle_sync()
+            return
+        if self.path.split('?')[0] == '/api/standings':
+            self._handle_api_standings()
             return
         if self.path.split('?')[0] == '/api/lineup':
             self._handle_api_lineup()
@@ -559,6 +564,33 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-cache')
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+
+    def _handle_api_standings(self):
+        """返回FIFA官方积分排名数据 /api/standings（5分钟缓存过期后重新拉取）"""
+        if os.path.exists(STANDINGS_FILE):
+            try:
+                cache_age = time.time() - os.path.getmtime(STANDINGS_FILE)
+                with open(STANDINGS_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                # 缓存5分钟内直接返回
+                if cache_age < 300:
+                    self._json_response(data)
+                    return
+                # 过期，后台刷新
+                print(f"[standings] 缓存过期({cache_age:.0f}s)，重新拉取")
+            except Exception:
+                pass
+        # 无缓存或已过期，实时拉取
+        try:
+            _fetch_standings()
+            if os.path.exists(STANDINGS_FILE):
+                with open(STANDINGS_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                self._json_response(data)
+            else:
+                self._json_response({'error': 'standings unavailable'}, 503)
+        except Exception as e:
+            self._json_response({'error': str(e)}, 500)
 
     def _handle_sync(self):
         if hasattr(self.server, '_sync_running') and self.server._sync_running:
@@ -1077,6 +1109,81 @@ class FIFAHandler(SimpleHTTPRequestHandler):
         pass
 
 
+def _fetch_standings():
+    """从FIFA API拉取小组积分排名数据（含TCS、出线状态等）"""
+    try:
+        resp = _urlopen(FIFA_STANDINGS_API, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+        }, timeout=20)
+        data = json.loads(resp.read().decode('utf-8'))
+        results = data.get('Results', [])
+        if not results:
+            print("[standings] API返回空数据")
+            return
+        # 精简：只保留前端需要的字段
+        teams = []
+        for r in results:
+            t = r.get('Team') or {}
+            team_name = ''
+            for n in t.get('Name', []):
+                if n.get('Locale') == 'en-GB':
+                    team_name = n.get('Description', '')
+                    break
+            if not team_name:
+                team_name = t.get('ShortClubName', '')
+            group_name = ''
+            for g in r.get('Group', []):
+                if g.get('Locale') == 'en-GB':
+                    group_name = g.get('Description', '')
+                    break
+            # 每场比赛结果（用于Form近况）
+            match_results = []
+            for mr in r.get('MatchResults', []):
+                match_results.append({
+                    'id': mr.get('IdMatch', ''),
+                    'hs': mr.get('HomeTeamScore'),
+                    'as': mr.get('AwayTeamScore'),
+                    'ht': mr.get('HomeTeamId', ''),
+                    'at': mr.get('AwayTeamId', ''),
+                    'result': mr.get('Result', 0),
+                })
+            teams.append({
+                'idTeam': r.get('IdTeam', ''),
+                'abbreviation': t.get('Abbreviation', ''),
+                'name': team_name,
+                'country': t.get('IdCountry', ''),
+                'flag': t.get('PictureUrl', ''),
+                'idGroup': r.get('IdGroup', ''),
+                'group': group_name,
+                'position': r.get('Position', 0),
+                'prevPosition': r.get('PreviousPosition'),
+                'played': r.get('Played', 0),
+                'won': r.get('Won', 0),
+                'drawn': r.get('Drawn', 0),
+                'lost': r.get('Lost', 0),
+                'for': r.get('For', 0),
+                'against': r.get('Against', 0),
+                'gd': r.get('GoalsDiference', 0),
+                'pts': r.get('Points', 0),
+                'tcs': r.get('TeamConductScore', 0),
+                'fpc': r.get('FairPlayCoefficient', 0.0),
+                'qualified': r.get('QualificationStatus', 'Undefined'),
+                'isLive': r.get('IsLive', False),
+                'matchResults': match_results,
+            })
+        output = {
+            'last_updated': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            'count': len(teams),
+            'standings': teams,
+        }
+        with open(STANDINGS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(output, f, ensure_ascii=False)
+        print(f"[standings] 拉取成功，{len(teams)}支队")
+    except Exception as e:
+        print(f"[standings] 拉取失败: {e}")
+
+
 def _run_fetch():
     try:
         result = subprocess.run(
@@ -1208,6 +1315,8 @@ def _startup_sync():
     _run_fetch()
     print("[sync] 启动同步完成")
     _regen_photo_map()
+    print("[standings] 启动拉取FIFA官方积分排名...")
+    _fetch_standings()
 
 
 def main():

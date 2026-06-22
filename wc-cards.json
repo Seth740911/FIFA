@@ -1,5 +1,5 @@
 {
- "last_updated": "2026-06-21T12:16:18Z",
+ "last_updated": "2026-06-22T05:05:05Z",
  "processed_matches": [
   "400021440",
   "400021441",
@@ -26,9 +26,13 @@
   "400021474",
   "400021475",
   "400021476",
+  "400021477",
   "400021478",
+  "400021480",
   "400021482",
+  "400021483",
   "400021486",
+  "400021487",
   "400021488",
   "400021490",
   "400021496",
@@ -44,216 +48,612 @@
  },
  "cards": {
   "MEX-26": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "MEX-3": {
    "y_group": 0,
-   "r_group": 1,
+   "r_group": 2,
    "y_ko": 0,
    "r_ko": 0
   },
   "RSA-4": {
-   "y_group": 1,
+   "y_group": 3,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "RSA-13": {
    "y_group": 0,
-   "r_group": 1,
+   "r_group": 2,
    "y_ko": 0,
    "r_ko": 0
   },
   "RSA-19": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "RSA-11": {
    "y_group": 0,
-   "r_group": 1,
+   "r_group": 2,
    "y_ko": 0,
    "r_ko": 0
   },
   "KOR-3": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "CAN-2": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "CAN-4": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "BIH-10": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "BIH-25": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "BIH-18": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "USA-4": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "PAR-4": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "PAR-10": {
-   "y_group": 1,
-   "r_group": 0,
+   "y_group": 2,
+   "r_group": 1,
    "y_ko": 0,
    "r_ko": 0
   },
   "PAR-8": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "PAR-18": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "PAR-6": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "QAT-1": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "QAT-5": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "SUI-6": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "BRA-5": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "BRA-24": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "HAI-10": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "SCO-2": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "SCO-25": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "SCO-23": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "TUR-19": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "NED-24": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "NED-10": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "NED-15": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "CIV-6": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "CIV-8": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "CIV-17": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "ECU-25": {
-   "y_group": 1,
+   "y_group": 2,
    "r_group": 0,
    "y_ko": 0,
    "r_ko": 0
   },
   "TUN-13": {
+   "y_group": 2,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "ESP-20": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CPV-13": {
+   "y_group": 2,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KSA-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "IRN-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "IRQ-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "AUT-9": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "POR-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "POR-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "POR-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "COD-22": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "GHA-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAN-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAN-14": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "UZB-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "COL-17": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SUI-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-7": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-11": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BIH-4": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CAN-13": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "QAT-14": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "QAT-23": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "QAT-20": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "USA-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "USA-20": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "USA-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "AUS-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "AUS-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "AUS-4": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "AUS-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SCO-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "MAR-14": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "TUR-13": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "PAR-23": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SWE-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SWE-18": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "SWE-7": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "ECU-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CUW-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CUW-7": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CUW-8": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CUW-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CUW-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KSA-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KSA-23": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "URU-6": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "URU-16": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CPV-3": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "NZL-10": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "NZL-20": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "EGY-17": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BEL-21": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BEL-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "EGY-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "EGY-13": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "CZE-7": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "RSA-5": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KOR-19": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "KOR-8": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BRA-16": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "HAI-2": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "HAI-20": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "HAI-17": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BEL-9": {
+   "y_group": 1,
+   "r_group": 0,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "BEL-25": {
+   "y_group": 0,
+   "r_group": 1,
+   "y_ko": 0,
+   "r_ko": 0
+  },
+  "IRN-6": {
    "y_group": 1,
    "r_group": 0,
    "y_ko": 0,

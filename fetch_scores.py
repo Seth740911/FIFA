@@ -716,13 +716,11 @@ def fetch_and_aggregate_cards(match_details, pid_map):
             "timeline": ev_list,
         }
 
-        # Mark event as processed if match is finished and data looks complete
-        # If any event has minute >= 90' (e.g. 90', 90'+1', 90'+5'), it means
-        # we have full-time data. Mid-game snapshots won't have 90' events.
+        # Mark event as processed if match is finished
+        # (FIFA Live API data for finished matches is always complete;
+        #  the old "has_90" check could miss matches with no late events)
         if mi.get("finished"):
-            has_90 = any("90" in (e.get("min") or "") for e in ev_list)
-            if has_90:
-                event_processed.add(mid)
+            event_processed.add(mid)
 
         time.sleep(0.3)
 
@@ -731,10 +729,10 @@ def fetch_and_aggregate_cards(match_details, pid_map):
     # Compute stage flags
     stage_info = _compute_stage_flags(match_details)
 
-    # Save cards
+    # Save cards (only mark matches we actually extracted cards from)
     output = {
         "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "processed_matches": sorted(all_finished),
+        "processed_matches": sorted(processed_match_ids | set(new_card_ids)),
         "stages": stage_info,
         "cards": existing_cards,
     }
